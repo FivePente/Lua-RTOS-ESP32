@@ -46,29 +46,6 @@ static int adxl345_init(lua_State* L) {
     user_data->unit = id;
     user_data->transaction = I2C_TRANSACTION_INITIALIZER;
 
-    char reg_addr = 0x29;
-    char value = 0x08;
-
-    // Enable sensor
-    if ((error = i2c_start(user_data->unit, &user_data->transaction))) {
-    	return luaL_driver_error(L, error);
-    }
-
-	if ((error = i2c_write_address(user_data->unit, &user_data->transaction, adxl345_i2c_addr, false))) {
-    	return luaL_driver_error(L, error);
-    }
-
-    if ((error = i2c_write(user_data->unit, &user_data->transaction, &reg_addr , sizeof(uint8_t)))) {
-    	return luaL_driver_error(L, error);
-    }
-    if ((error = i2c_write(user_data->unit, &user_data->transaction, &value , sizeof(uint8_t)))) {
-    	return luaL_driver_error(L, error);
-    }
-
-    if ((error = i2c_stop(user_data->unit, &user_data->transaction))) {
-    	return luaL_driver_error(L, error);
-    }
-
     luaL_getmetatable(L, "adxl345.trans");
     lua_setmetatable(L, -2);
 
@@ -76,8 +53,6 @@ static int adxl345_init(lua_State* L) {
 }
 
 static int adxl345_writeReg(lua_State* L) {
-
-    printf("testttttttt")
 
     driver_error_t *error;
 	adxl345_user_data_t *user_data;
@@ -89,9 +64,6 @@ static int adxl345_writeReg(lua_State* L) {
     char reg_addr = luaL_checkinteger(L, 2);
     char value = luaL_checkinteger(L, 3);
 
-    printf("writeReg %c %c", reg_addr , value);
-    /*
-
     // Enable sensor
     if ((error = i2c_start(user_data->unit, &user_data->transaction))) {
     	return luaL_driver_error(L, error);
@@ -110,7 +82,7 @@ static int adxl345_writeReg(lua_State* L) {
 
     if ((error = i2c_stop(user_data->unit, &user_data->transaction))) {
     	return luaL_driver_error(L, error);
-    }*/
+    }
     return 0;
 }
 
