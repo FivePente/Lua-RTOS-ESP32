@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <vfs.h>
 
 #include <sys/stat.h>
 #include <sys/syslog.h>
@@ -390,18 +391,20 @@ static int os_stats(lua_State *L) {
 }
 
 static int os_format(lua_State *L) {
-	#if 0
     const char *device = luaL_checkstring(L, 1);
-    const struct devops *ops;
     char response = ' ';
 
     // This if check is for future use, to determine drive number
-    if (strcmp(device,"cfi") == 0) {
+    if (strcmp(device,"spiffs") == 0) {
     } else if (strcmp(device,"sd") == 0) {
     } else {
         return luaL_error(L, "device %s not exists for format", device); 
     }
     
+    if (strcmp(device,"sd") == 0) {
+        return luaL_error(L, "device %s not allowed for format", device);
+    }
+
     // Check for mounted device
     if (!mount_is_mounted(device)) {
          return luaL_error(L, "device %s is not mounted", device);            
@@ -418,12 +421,14 @@ static int os_format(lua_State *L) {
     printf("\n");
     
     if ((response == 'y') || (response == 'Y')) {
-        ops = getdevops(device);
-        (*ops->fo_format)();  
+        if (strcmp(device,"spiffs") == 0) {
+        	printf("Formatting...\r\n");
+        	vfs_spiffs_format();
+        }
     } else {
         printf("Format cancelled\n");
     }
-    #endif
+
     return 0;
 }
 
@@ -517,7 +522,7 @@ static int os_run (lua_State *L) {
     lua_pop(L, 1);
 
     // Lock tty, avoid other threads to write to console
-    uart_lock(CONSOLE_UART);
+    uart_ll_lock(CONSOLE_UART);
 
     // Clear received buffer
     uart_consume(CONSOLE_UART);
@@ -575,7 +580,7 @@ skip:
     lua_getglobal(L, "load"); 
     lua_pushstring(L, (const char *)code);
 
-    status = lua_pcall(L, 1, 2, NULL);
+    status = lua_pcall(L, 1, 2, 0);
     if (status != LUA_OK) {
         if (code && from_uart) free(code);
         return luaL_error(L, lua_tostring(L, -1));
@@ -589,7 +594,7 @@ skip:
     lua_remove(L, -2);   // Remove "thread" from the stack
     lua_insert(L, -2);   // Switch "thread" with parsed function
     
-    status = lua_pcall(L, 1, 1, NULL);
+    status = lua_pcall(L, 1, 1, 0);
     if (status != LUA_OK) {
         if (code && from_uart) free(code);
         return luaL_error(L, lua_tostring(L, -1));

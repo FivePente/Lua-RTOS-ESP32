@@ -116,11 +116,6 @@ static int llora_setup(lua_State* L) {
 	driver_error_t *error;
     
     int band = luaL_checkinteger(L, 1);
-
-    // Sanity checks
-    if ((band != 868) && (band != 433)) {
-        return luaL_error(L, "%d:invalid band", LORA_ERR_INVALID_ARGUMENT);
-    }
     
     // Setup in base of frequency
     error = lora_setup(band);
@@ -432,6 +427,7 @@ static const LUA_REG_TYPE lora_map[] = {
 	// Constant definitions
     { LSTRKEY( "BAND868" ),		 LINTVAL( 868 ) },
     { LSTRKEY( "BAND433" ), 	 LINTVAL( 433 ) },
+    { LSTRKEY( "BAND915" ), 	 LINTVAL( 915 ) },
 #endif
 
 #if CONFIG_LUA_RTOS_LORA_DEVICE_TYPE_GATEWAY

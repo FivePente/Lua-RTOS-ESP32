@@ -11,7 +11,6 @@ os.logcons(true)           -- Enable/disable sys log messages to console
 os.shell(true)             -- Enable/disable shell
 os.history(false)          -- Enable/disable history
 
-os.shell(true) 
 net.wf.scan(); 
 net.wf.setup(net.wf.mode.STA, "ssid","pass")
 net.wf.start()
