@@ -214,7 +214,7 @@ static void pppos_client_task()
             while (1) {
                 memset(data, 0, 1024);
                 //int len = uart_read_bytes(uart_num, (uint8_t *)data, BUF_SIZE, 500 / portTICK_RATE_MS);
-                int len = uart_reads(uart_num, data, 1024, 500 / portTICK_RATE_MS);
+                int len = uart_reads(uart_num, data, 1, 500 / portTICK_RATE_MS);
                 if (len > 0) {
                     ESP_LOGI(TAG, "%s", data);
                 }
@@ -261,7 +261,7 @@ static void pppos_client_task()
 
         while (1) {
             memset(data, 0, 1024);
-            int len = uart_reads(uart_num, data, 1024, 10 / portTICK_RATE_MS);
+            int len = uart_reads(uart_num, data, 1, 10 / portTICK_RATE_MS);
             if (len > 0) {
                 ESP_LOGI(TAG, "PPP rx len %d", len);
                 pppos_input_tcpip(ppp, (u8_t *)data, len);
