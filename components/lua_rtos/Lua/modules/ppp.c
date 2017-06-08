@@ -3,7 +3,7 @@
  */
 #include "luartos.h"
 
-#if CONFIG_LUA_RTOS_LUA_USE_PPP
+//#if CONFIG_LUA_RTOS_LUA_USE_PPP
 
 #include "lua.h"
 #include "error.h"
@@ -290,4 +290,4 @@ LUALIB_API int luaopen_pppos( lua_State *L ) {
 }
 
 MODULE_REGISTER_MAPPED(PPPOS, pppos, pppos_map, luaopen_pppos);
-#endif
+//#endif
