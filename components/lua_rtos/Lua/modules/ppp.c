@@ -1,7 +1,5 @@
 #include "luartos.h"
 
-#if CONFIG_LUA_RTOS_LUA_USE_TMR
-
 #include "lua.h"
 #include "lauxlib.h"
 #include "modules.h"
@@ -29,5 +27,3 @@ LUALIB_API int luaopen_ppp( lua_State *L ) {
 }
 
 MODULE_REGISTER_MAPPED(PPP, ppp, ppp_map, luaopen_ppp);
-
-#endif
