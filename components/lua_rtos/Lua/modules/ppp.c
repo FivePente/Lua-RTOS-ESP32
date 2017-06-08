@@ -195,7 +195,8 @@ static void ppp_status_cb(ppp_pcb *pcb, int err_code, void *ctx)
 static u32_t ppp_output_callback(ppp_pcb *pcb, u8_t *data, u32_t len, void *ctx)
 {
     ESP_LOGI(TAG, "PPP tx len %d", len);
-    return uart_write_bytes(uart_num, (const char *)data, len);
+    //return uart_write_bytes(uart_num, (const char *)data, len);
+    return uart_writes(uart_num, (char *)data);
 }
 
 static void pppos_client_task()
@@ -207,13 +208,14 @@ static void pppos_client_task()
         int gsmCmdIter = 0;
         while (1) {
             ESP_LOGI(TAG, "%s", GSM_MGR_InitCmds[gsmCmdIter].cmd);
-            uart_write_bytes(uart_num, (const char *)GSM_MGR_InitCmds[gsmCmdIter].cmd,
-                             GSM_MGR_InitCmds[gsmCmdIter].cmdSize);
+            //uart_write_bytes(uart_num, (const char *)GSM_MGR_InitCmds[gsmCmdIter].cmd,GSM_MGR_InitCmds[gsmCmdIter].cmdSize);
+            uart_writes(uart_num, GSM_MGR_InitCmds[gsmCmdIter].cmd);
 
             int timeoutCnt = 0;
             while (1) {
                 memset(data, 0, BUF_SIZE);
-                int len = uart_read_bytes(uart_num, (uint8_t *)data, BUF_SIZE, 500 / portTICK_RATE_MS);
+                //int len = uart_read_bytes(uart_num, (uint8_t *)data, BUF_SIZE, 500 / portTICK_RATE_MS);
+                int len = uart_reads(uart_num, data, BUF_SIZE, 500 / portTICK_RATE_MS);
                 if (len > 0) {
                     ESP_LOGI(TAG, "%s", data);
                 }
@@ -260,7 +262,7 @@ static void pppos_client_task()
 
         while (1) {
             memset(data, 0, BUF_SIZE);
-            int len = uart_read_bytes(uart_num, (uint8_t *)data, BUF_SIZE, 10 / portTICK_RATE_MS);
+            int len = uart_reads(uart_num, data, BUF_SIZE, 10 / portTICK_RATE_MS);
             if (len > 0) {
                 ESP_LOGI(TAG, "PPP rx len %d", len);
                 pppos_input_tcpip(ppp, (u8_t *)data, len);
@@ -270,8 +272,8 @@ static void pppos_client_task()
 }
 
 static int pppos_task_step(lua_State* L){
-    //tcpip_adapter_init();
-    //xTaskCreate(&pppos_client_task, "pppos_client_task", 2048, NULL, 5, NULL); 
+    tcpip_adapter_init();
+    xTaskCreate(&pppos_client_task, "pppos_client_task", 2048, NULL, 5, NULL); 
     return 0;
 }
 
