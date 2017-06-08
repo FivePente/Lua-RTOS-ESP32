@@ -559,11 +559,14 @@ void IRAM_ATTR uart_write(int8_t unit, char byte) {
 }
 
 // Writes a null-terminated string to the UART
-void IRAM_ATTR uart_writes(int8_t unit, char *s) {
+uint8_t IRAM_ATTR uart_writes(int8_t unit, char *s) {
+	uint8_t size = 0;
     while (*s) {
 	    while (((READ_PERI_REG(UART_STATUS_REG(unit)) & (UART_TXFIFO_CNT << UART_TXFIFO_CNT_S)) >> UART_TXFIFO_CNT_S & UART_TXFIFO_CNT) >= 126);
 	    WRITE_PERI_REG(UART_FIFO_REG(unit) , *s++);
+		size++;
    }
+   return size;
 }
 
 // Reads a byte from uart
