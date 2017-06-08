@@ -5,10 +5,10 @@
 
 //#if CONFIG_LUA_RTOS_LUA_USE_PPP
 
+#include "modules.h"
 #include "lua.h"
 #include "error.h"
 #include "lauxlib.h"
-#include "modules.h"
 #include "platform.h"
 #include <stdlib.h>
 #include <string.h>
@@ -28,13 +28,8 @@ static const LUA_REG_TYPE pppos_map[] = {
 };
 
 
-LUALIB_API int luaopen_pppos( lua_State *L ) {
-#if !LUA_USE_ROTABLE
-    luaL_newlib(L, pppos_map);
-    return 1;
-#else
-	return 0;
-#endif
+int luaopen_pppos(lua_State* L) {
+    return 0;
 }
 
 MODULE_REGISTER_MAPPED(PPPOS, pppos, pppos_map, luaopen_pppos);
