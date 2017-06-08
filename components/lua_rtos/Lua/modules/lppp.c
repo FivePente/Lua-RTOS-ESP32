@@ -13,7 +13,7 @@ static int pppos_step( lua_State* L ) {
     return 0;
 }
 
-static const LUA_REG_TYPE tmr_map[] = {
+static const LUA_REG_TYPE ppp_map[] = {
     { LSTRKEY( "step" ),			LFUNCVAL( pppos_step ) },
     { LNILKEY, LNILVAL }
 };
