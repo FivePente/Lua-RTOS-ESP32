@@ -41,7 +41,7 @@ const char *PPP_Pass = "";
 const char *PPP_ApnATReq = "AT+CGDCONT=1,\"IP\",\"uninet\"";
 
 /* UART */
-int uart_num = UART_NUM_1;
+int uart_num = UART_UART2;
 
 /* The PPP control block */
 ppp_pcb *ppp;
@@ -200,6 +200,8 @@ static u32_t ppp_output_callback(ppp_pcb *pcb, u8_t *data, u32_t len, void *ctx)
 
 static void pppos_client_task()
 {
+    char *data = (char *) malloc(BUF_SIZE);
+
     while (1) {
         //init gsm
         int gsmCmdIter = 0;
