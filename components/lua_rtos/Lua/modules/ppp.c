@@ -35,7 +35,6 @@
 #include "lwip/dns.h"
 #include "lwip/pppapi.h"
 
-#define BUF_SIZE (1024)
 const char *PPP_User = "";
 const char *PPP_Pass = "";
 const char *PPP_ApnATReq = "AT+CGDCONT=1,\"IP\",\"uninet\"";
@@ -201,7 +200,7 @@ static u32_t ppp_output_callback(ppp_pcb *pcb, u8_t *data, u32_t len, void *ctx)
 
 static void pppos_client_task()
 {
-    char *data = (char *) malloc(BUF_SIZE);
+    char *data = (char *) malloc(1024);
 
     while (1) {
         //init gsm
@@ -213,9 +212,9 @@ static void pppos_client_task()
 
             int timeoutCnt = 0;
             while (1) {
-                memset(data, 0, BUF_SIZE);
+                memset(data, 0, 1024);
                 //int len = uart_read_bytes(uart_num, (uint8_t *)data, BUF_SIZE, 500 / portTICK_RATE_MS);
-                int len = uart_reads(uart_num, data, BUF_SIZE, 500 / portTICK_RATE_MS);
+                int len = uart_reads(uart_num, data, 1024, 500 / portTICK_RATE_MS);
                 if (len > 0) {
                     ESP_LOGI(TAG, "%s", data);
                 }
@@ -261,8 +260,8 @@ static void pppos_client_task()
         ESP_LOGI(TAG, "After pppapi_connect");
 
         while (1) {
-            memset(data, 0, BUF_SIZE);
-            int len = uart_reads(uart_num, data, BUF_SIZE, 10 / portTICK_RATE_MS);
+            memset(data, 0, 1024);
+            int len = uart_reads(uart_num, data, 1024, 10 / portTICK_RATE_MS);
             if (len > 0) {
                 ESP_LOGI(TAG, "PPP rx len %d", len);
                 pppos_input_tcpip(ppp, (u8_t *)data, len);
