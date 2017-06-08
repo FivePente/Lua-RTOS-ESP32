@@ -283,5 +283,5 @@ int luaopen_ppp(lua_State* L) {
     return 0;
 }
 
-MODULE_REGISTER_MAPPED(PPP, uart, ppp_map, luaopen_ppp);
+MODULE_REGISTER_MAPPED(PPP, ppp, ppp_map, luaopen_ppp);
 #endif
