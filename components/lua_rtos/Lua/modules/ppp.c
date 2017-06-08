@@ -41,7 +41,7 @@ const char *PPP_Pass = "";
 const char *PPP_ApnATReq = "AT+CGDCONT=1,\"IP\",\"uninet\"";
 
 /* UART */
-int uart_num = UART_UART2;
+int uart_num = 2;
 
 /* The PPP control block */
 ppp_pcb *ppp;
