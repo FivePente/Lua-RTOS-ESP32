@@ -192,11 +192,11 @@ static void ppp_status_cb(ppp_pcb *pcb, int err_code, void *ctx)
     /* OR ppp_listen(pcb); */
 }
 
-static u32_t ppp_output_callback(ppp_pcb *pcb, u8_t *data, u32_t len, void *ctx)
+static void ppp_output_callback(ppp_pcb *pcb, u8_t *data, u32_t len, void *ctx)
 {
     ESP_LOGI(TAG, "PPP tx len %d", len);
     //return uart_write_bytes(uart_num, (const char *)data, len);
-    return uart_writes(uart_num, (char *)data);
+    uart_writes(uart_num, (char *)data);
 }
 
 static void pppos_client_task()
