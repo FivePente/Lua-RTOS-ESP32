@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "uart.h"
-/*
+
 #include <drivers/gpio.h>
 #include <drivers/cpu.h>
 #include <drivers/uart.h>
@@ -34,8 +34,8 @@
 #include "lwip/netdb.h"
 #include "lwip/dns.h"
 #include "lwip/pppapi.h"
-*/
 
+/*
 #include <string.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -55,7 +55,7 @@
 #include "lwip/netdb.h"
 #include "lwip/dns.h"
 #include "lwip/pppapi.h"
-
+*/
 const char *PPP_User = "";
 const char *PPP_Pass = "";
 const char *PPP_ApnATReq = "AT+CGDCONT=1,\"IP\",\"CMNET\"";
@@ -212,6 +212,7 @@ static void ppp_status_cb(ppp_pcb *pcb, int err_code, void *ctx)
     /* OR ppp_listen(pcb); */
 }
 
+/*
 static u32_t ppp_output_callback(ppp_pcb *pcb, u8_t *data, u32_t len, void *ctx)
 {
     ESP_LOGI(TAG, "PPP tx len %d", len);
@@ -307,9 +308,9 @@ static void pppos_client_task()
         }
     }
 }
+*/
 
 
-/*
 static u32_t ppp_output_callback(ppp_pcb *pcb, u8_t *data, u32_t len, void *ctx)
 {
     ESP_LOGI(TAG, "PPP tx len %d", len);
@@ -387,7 +388,7 @@ static void pppos_client_task()
             }
         }
     }
-}*/
+}
 
 static int ppp_task_step(lua_State* L){
     tcpip_adapter_init();
