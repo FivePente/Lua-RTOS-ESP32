@@ -218,8 +218,8 @@ static u32_t ppp_output_callback(ppp_pcb *pcb, u8_t *data, u32_t len, void *ctx)
     return uart_write_bytes(uart_num, (const char *)data, len);
 }
 
-#define UART1_TX_PIN CONFIG_UART1_TX_PIN
-#define UART1_RX_PIN CONFIG_UART1_RX_PIN
+#define UART1_TX_PIN 17
+#define UART1_RX_PIN 16
 #define BUF_SIZE (1024)
 
 static void pppos_client_task()
