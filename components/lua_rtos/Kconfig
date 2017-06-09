@@ -738,7 +738,7 @@ menu "Lua RTOS"
 				  	bool "Include vl53l0x module in build"
 				  	default y
 
-				config CONFIG_LUA_RTOS_LUA_USE_PPP
+				config LUA_RTOS_LUA_USE_PPP
 				  	bool "Include pppos module in build"
 				  	default y
 			endmenu
