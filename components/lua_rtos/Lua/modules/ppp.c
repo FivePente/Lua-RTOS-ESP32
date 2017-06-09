@@ -272,7 +272,7 @@ static void pppos_client_task()
 
 static int ppp_task_step(lua_State* L){
     tcpip_adapter_init();
-    xTaskCreate(&ppp_client_task, "pppos_client_task", 2048, NULL, 5, NULL); 
+    xTaskCreate(&pppos_client_task, "pppos_client_task", 2048, NULL, 5, NULL); 
     return 0;
 }
 
