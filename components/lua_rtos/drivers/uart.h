@@ -101,7 +101,7 @@ void uart_ll_lock(int unit);
 void uart_ll_unlock(int unit);
 
 void    uart_write(int8_t unit, char byte);
-uint8_t uart_writes(int8_t unit, char *s);
+void    uart_writes(int8_t unit, char *s);
 uint8_t uart_read(int8_t unit, char *c, uint32_t timeout);
 uint8_t uart_reads(int8_t unit, char *buff, uint8_t crlf, uint32_t timeout);
 uint8_t uart_wait_response(int8_t unit, char *command, uint8_t echo, char *ret, uint8_t substring, uint32_t timeout, int nargs, ...);
