@@ -334,7 +334,7 @@ static void pppos_client_task()
 	driver_error_t *error;
 
     // Setup
-    uart_init(uart_num, 115200, UART_DATA_8_BITS, UART_PARITY_DISABLE, UART_STOP_BITS_1, 2048);
+    uart_init(uart_num, 115200, 8, 0, 1, 2048);
 
     while (1) {
         //init gsm
