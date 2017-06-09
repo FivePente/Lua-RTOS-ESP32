@@ -75,13 +75,13 @@ GSM_Cmd GSM_MGR_InitCmds[] = {
     {
         .cmd = "AT+CPIN?\r",
         .cmdSize = sizeof("AT+CPIN?\r") - 1,
-        .cmdResponseOnOk = "+CPIN: READY",
+        .cmdResponseOnOk = "CPIN: READY",
         .timeoutMs = 3000,
     },
     {
         //AT+CGDCONT=1,"IP","apn"
-        .cmd = "AT+CGDCONT=1,\"IP\",\"CMNET\"\r",
-        .cmdSize = sizeof("AT+CGDCONT=1,\"IP\",\"CMNET\"\r") - 1,
+        .cmd = "AT+CGDCONT=1,\"IP\",\"playmetric\"\r",
+        .cmdSize = sizeof("AT+CGDCONT=1,\"IP\",\"playmetric\"\r") - 1,
         .cmdResponseOnOk = GSM_OK_Str,
         .timeoutMs = 3000,
     },
