@@ -15,6 +15,7 @@ os.history(false)          -- Enable/disable history
 --net.wf.setup(net.wf.mode.STA, "HiWiFi_3B0F16","Freedom0806")
 --net.wf.start();
 
+--[[
 thread.start(function()
    ppp.step()
 end)
@@ -26,4 +27,4 @@ client:subscribe("code", mqtt.QOS0, function(len, message)
     file2:write(message)
     file2:close()
     os.exit(1)
-end)
+end)]]
