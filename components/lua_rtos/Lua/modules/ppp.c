@@ -14,7 +14,7 @@ static int pppos_step( lua_State* L ) {
     // Allocate userdata
     ppp_user_data_t *user_data = (ppp_user_data_t *)lua_newuserdata(L, sizeof(ppp_user_data_t));
     if (!user_data) {
-       	return luaL_exception(L, error);
+       	return luaL_exception(L, 1);
     }
 
     user_data->uart_num = 2;
