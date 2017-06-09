@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "uart.h"
-
+/*
 #include <drivers/gpio.h>
 #include <drivers/cpu.h>
 #include <drivers/uart.h>
@@ -26,6 +26,27 @@
 #include "esp_event_loop.h"
 #include "esp_log.h"
 #include "nvs_flash.h"
+
+#include "netif/ppp/pppos.h"
+#include "lwip/err.h"
+#include "lwip/sockets.h"
+#include "lwip/sys.h"
+#include "lwip/netdb.h"
+#include "lwip/dns.h"
+#include "lwip/pppapi.h"
+*/
+
+#include <string.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/event_groups.h"
+#include "esp_system.h"
+#include "esp_wifi.h"
+#include "esp_event_loop.h"
+#include "esp_log.h"
+#include "nvs_flash.h"
+
+#include "driver/uart.h"
 
 #include "netif/ppp/pppos.h"
 #include "lwip/err.h"
@@ -194,6 +215,105 @@ static void ppp_status_cb(ppp_pcb *pcb, int err_code, void *ctx)
 static u32_t ppp_output_callback(ppp_pcb *pcb, u8_t *data, u32_t len, void *ctx)
 {
     ESP_LOGI(TAG, "PPP tx len %d", len);
+    return uart_write_bytes(uart_num, (const char *)data, len);
+}
+
+#define UART1_TX_PIN CONFIG_UART1_TX_PIN
+#define UART1_RX_PIN CONFIG_UART1_RX_PIN
+#define BUF_SIZE (1024)
+
+static void pppos_client_task()
+{
+    char *data = (char *) malloc(BUF_SIZE);
+    uart_config_t uart_config = {
+        .baud_rate = 115200,
+        .data_bits = UART_DATA_8_BITS,
+        .parity = UART_PARITY_DISABLE,
+        .stop_bits = UART_STOP_BITS_1,
+        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE
+    };
+    //Configure UART1 parameters
+    uart_param_config(uart_num, &uart_config);
+
+    // Configure UART1 pins (as set in example's menuconfig)
+    ESP_LOGI(TAG, "Configuring UART1 GPIOs: TX:%d RX:%d",UART1_TX_PIN, UART1_RX_PIN);
+    uart_set_pin(uart_num, UART1_TX_PIN, UART1_RX_PIN, 0, 0);
+    uart_driver_install(uart_num, BUF_SIZE * 2, BUF_SIZE * 2, 0, NULL, 0);
+
+    while (1) {
+        //init gsm
+        int gsmCmdIter = 0;
+        while (1) {
+            ESP_LOGI(TAG, "%s", GSM_MGR_InitCmds[gsmCmdIter].cmd);
+            uart_write_bytes(uart_num, (const char *)GSM_MGR_InitCmds[gsmCmdIter].cmd,
+                             GSM_MGR_InitCmds[gsmCmdIter].cmdSize);
+
+            int timeoutCnt = 0;
+            while (1) {
+                memset(data, 0, BUF_SIZE);
+                int len = uart_read_bytes(uart_num, (uint8_t *)data, BUF_SIZE, 500 / portTICK_RATE_MS);
+                if (len > 0) {
+                    ESP_LOGI(TAG, "%s", data);
+                }
+
+                timeoutCnt += 500;
+                if (strstr(data, GSM_MGR_InitCmds[gsmCmdIter].cmdResponseOnOk) != NULL) {
+                    break;
+                }
+
+                if (timeoutCnt > GSM_MGR_InitCmds[gsmCmdIter].timeoutMs) {
+                    ESP_LOGE(TAG, "Gsm Init Error");
+                    return;
+                }
+            }
+            gsmCmdIter++;
+
+            if (gsmCmdIter >= GSM_MGR_InitCmdsSize) {
+                break;
+            }
+        }
+
+        ESP_LOGI(TAG, "Gsm init end");
+
+        ppp = pppapi_pppos_create(&ppp_netif,
+                                  ppp_output_callback, ppp_status_cb, NULL);
+
+        ESP_LOGI(TAG, "After pppapi_pppos_create");
+
+        if (ppp == NULL) {
+            ESP_LOGE(TAG, "Error init pppos");
+            return;
+        }
+
+        pppapi_set_default(ppp);
+
+        ESP_LOGI(TAG, "After pppapi_set_default");
+
+        pppapi_set_auth(ppp, PPPAUTHTYPE_PAP, PPP_User, PPP_Pass);
+
+        ESP_LOGI(TAG, "After pppapi_set_auth");
+
+        pppapi_connect(ppp, 0);
+
+        ESP_LOGI(TAG, "After pppapi_connect");
+
+        while (1) {
+            memset(data, 0, BUF_SIZE);
+            int len = uart_read_bytes(uart_num, (uint8_t *)data, BUF_SIZE, 10 / portTICK_RATE_MS);
+            if (len > 0) {
+                ESP_LOGI(TAG, "PPP rx len %d", len);
+                pppos_input_tcpip(ppp, (u8_t *)data, len);
+            }
+        }
+
+    }
+}
+
+
+/*
+static u32_t ppp_output_callback(ppp_pcb *pcb, u8_t *data, u32_t len, void *ctx)
+{
+    ESP_LOGI(TAG, "PPP tx len %d", len);
     //return uart_write_bytes(uart_num, (const char *)data, len);
     return uart_writes(uart_num, (char *)data);
 }
@@ -268,7 +388,7 @@ static void pppos_client_task()
             }
         }
     }
-}
+}*/
 
 static int ppp_task_step(lua_State* L){
     tcpip_adapter_init();
