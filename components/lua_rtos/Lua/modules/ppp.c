@@ -30,7 +30,7 @@ MODULE_REGISTER_MAPPED(PPP, ppp, ppp_map, luaopen_ppp);
 
 #endif
 
-
+/*
 for key, value in pairs(_G) do      
     print(key)
 end*/
