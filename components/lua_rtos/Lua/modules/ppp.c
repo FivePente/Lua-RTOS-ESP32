@@ -80,8 +80,8 @@ GSM_Cmd GSM_MGR_InitCmds[] = {
     },
     {
         //AT+CGDCONT=1,"IP","apn"
-        .cmd = "AT+CGDCONT=1,\"IP\",\"playmetric\"\r",
-        .cmdSize = sizeof("AT+CGDCONT=1,\"IP\",\"playmetric\"\r") - 1,
+        .cmd = "AT+CGDCONT=1,\"IP\",\"uninet\"\r",
+        .cmdSize = sizeof("AT+CGDCONT=1,\"IP\",\"uninet\"\r") - 1,
         .cmdResponseOnOk = GSM_OK_Str,
         .timeoutMs = 3000,
     },
