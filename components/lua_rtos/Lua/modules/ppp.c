@@ -37,7 +37,7 @@
 
 const char *PPP_User = "";
 const char *PPP_Pass = "";
-const char *PPP_ApnATReq = "AT+CGDCONT=1,\"IP\",\"uninet\"";
+const char *PPP_ApnATReq = "AT+CGDCONT=1,\"IP\",\"CMNET\"";
 
 /* UART */
 int uart_num = 2;
@@ -80,8 +80,8 @@ GSM_Cmd GSM_MGR_InitCmds[] = {
     },
     {
         //AT+CGDCONT=1,"IP","apn"
-        .cmd = "AT+CGDCONT=1,\"IP\",\"uninet\"\r",
-        .cmdSize = sizeof("AT+CGDCONT=1,\"IP\",\"uninet\"\r") - 1,
+        .cmd = "AT+CGDCONT=1,\"IP\",\"CMNET\"\r",
+        .cmdSize = sizeof("AT+CGDCONT=1,\"IP\",\"CMNET\"\r") - 1,
         .cmdResponseOnOk = GSM_OK_Str,
         .timeoutMs = 3000,
     },
