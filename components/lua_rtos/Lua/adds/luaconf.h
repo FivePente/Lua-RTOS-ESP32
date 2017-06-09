@@ -174,6 +174,12 @@
     #define LINIT_REG_LORA
 #endif
 
+#if CONFIG_LUA_RTOS_LUA_USE_PPP
+    #define LINIT_REG_PPP {AUXLIB_PPP, luaopen_ppp},
+#else
+    #define LINIT_REG_PPP
+#endif
+
 #define LINIT_REG_ADDS \
   LINIT_REG_PIO \
   LINIT_REG_TMR \
@@ -191,7 +197,8 @@
   LINIT_REG_STEPPER \
   LINIT_REG_I2C \
   LINIT_REG_LORA \
-  LINIT_REG_PACK
+  LINIT_REG_PACK \
+  LINIT_REG_PPP
       
 #define LINIT_OPEN_ADDS
 
