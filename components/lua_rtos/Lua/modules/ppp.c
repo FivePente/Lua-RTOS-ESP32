@@ -14,6 +14,15 @@
 #include <string.h>
 #include "uart.h"
 
+#include <stdio.h>
+#include <assert.h>
+#include <signal.h>
+
+#include "lua.h"
+#include "lauxlib.h"
+#include "uart.h"
+#include "error.h"
+
 #include <drivers/gpio.h>
 #include <drivers/cpu.h>
 #include <drivers/uart.h>
