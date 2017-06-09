@@ -324,17 +324,17 @@ static u32_t ppp_output_callback(ppp_pcb *pcb, u8_t *data, u32_t len, void *ctx)
 {
     ESP_LOGI(TAG, "PPP tx len %d", len);
     //return uart_write_bytes(uart_num, (const char *)data, len);
-    return uart_writes(uart_num, (char *)data);
+    uart_writes(uart_num, (char *)data);
+    return len;
 }
 
 static void pppos_client_task()
 {
     char *data = (char *) malloc(1024);
 
-	driver_error_t *error;
-
     // Setup
     uart_init(uart_num, 115200, 8, 0, 1, 2048);
+    uart_setup_interrupts(uart_num);
 
     while (1) {
         //init gsm
