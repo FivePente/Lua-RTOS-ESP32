@@ -9,8 +9,6 @@ typedef struct {
 } ppp_user_data_t;
 
 static int pppos_step( lua_State* L ) {
-
-    driver_error_t *error;
     // Allocate userdata
     ppp_user_data_t *user_data = (ppp_user_data_t *)lua_newuserdata(L, sizeof(ppp_user_data_t));
     if (!user_data) {
