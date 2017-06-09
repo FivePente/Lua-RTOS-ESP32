@@ -4,15 +4,12 @@
 #include "lauxlib.h"
 #include "modules.h"
 
-#include <unistd.h>
-#include <sys/delay.h>
-
 static int pppos_step( lua_State* L ) {
     return 0;
 }
 
-static const LUA_REG_TYPE ppp_map[] = {
-    { LSTRKEY( "step" ),			LFUNCVAL( pppos_step ) },
+static const LUA_REG_TYPE pppos_map[] = {
+    { LSTRKEY( "step" ), LFUNCVAL( pppos_step ) },
     { LNILKEY, LNILVAL }
 };
 
@@ -26,4 +23,4 @@ LUALIB_API int luaopen_ppp( lua_State *L ) {
 #endif
 }
 
-MODULE_REGISTER_MAPPED(PPP, ppp, ppp_map, luaopen_ppp);
+MODULE_REGISTER_MAPPED(PPP, ppp, pppos_map, luaopen_ppp);
