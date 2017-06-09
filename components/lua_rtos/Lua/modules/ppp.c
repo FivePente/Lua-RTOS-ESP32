@@ -10,7 +10,7 @@ typedef struct {
 
 static int pppos_step( lua_State* L ) {
     // Allocate userdata
-    vl53l0x_user_data_t *user_data = (vl53l0x_user_data_t *)lua_newuserdata(L, sizeof(vl53l0x_user_data_t));
+    ppp_user_data_t *user_data = (ppp_user_data_t *)lua_newuserdata(L, sizeof(ppp_user_data_t));
     if (!user_data) {
        	return luaL_exception(L, I2C_ERR_NOT_ENOUGH_MEMORY);
     }
