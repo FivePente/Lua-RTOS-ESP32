@@ -1,8 +1,12 @@
 #include "luartos.h"
 
-#include "lua.h"
-#include "lauxlib.h"
 #include "modules.h"
+#include "lua.h"
+#include "error.h"
+#include "lauxlib.h"
+#include "platform.h"
+#include <stdlib.h>
+#include <string.h>
 
 typedef struct {
 	int uart_num;
