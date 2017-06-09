@@ -11,7 +11,7 @@ static int ppp_step( lua_State* L ) {
     return 0;
 }
 
-static const LUA_REG_TYPE pppss_map[] = {
+static const LUA_REG_TYPE ppp_map[] = {
     { LSTRKEY( "step" ), LFUNCVAL( ppp_step ) },
     { LNILKEY, LNILVAL }
 };
