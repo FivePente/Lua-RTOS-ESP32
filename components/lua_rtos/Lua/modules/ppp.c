@@ -322,6 +322,11 @@ static void pppos_client_task()
 {
     char *data = (char *) malloc(1024);
 
+	driver_error_t *error;
+
+    // Setup
+    uart_init(uart_num, 115200, UART_DATA_8_BITS, UART_PARITY_DISABLE, UART_STOP_BITS_1, 2048);
+
     while (1) {
         //init gsm
         int gsmCmdIter = 0;
@@ -334,7 +339,7 @@ static void pppos_client_task()
             while (1) {
                 memset(data, 0, 1024);
                 //int len = uart_read_bytes(uart_num, (uint8_t *)data, BUF_SIZE, 500 / portTICK_RATE_MS);
-                int len = uart_reads(uart_num, data, 1, 500 / portTICK_RATE_MS);
+                int len = uart_reads(uart_num, data, 0, 500 / portTICK_RATE_MS);
                 if (len > 0) {
                     ESP_LOGI(TAG, "%s", data);
                 }
