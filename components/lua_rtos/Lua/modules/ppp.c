@@ -1,6 +1,6 @@
 #include "luartos.h"
 
-//#if CONFIG_LUA_RTOS_LUA_USE_PPP
+#if CONFIG_LUA_RTOS_LUA_USE_PPP
 
 #include "lua.h"
 #include "lauxlib.h"
@@ -27,7 +27,8 @@ LUALIB_API int luaopen_ppp( lua_State *L ) {
 }
 
 MODULE_REGISTER_MAPPED(PPP, ppp, ppp_map, luaopen_ppp);
-/*#endif
+
+#endif
 
 
 for key, value in pairs(_G) do      
