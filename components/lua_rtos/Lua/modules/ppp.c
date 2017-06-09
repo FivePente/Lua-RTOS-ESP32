@@ -26,12 +26,10 @@ LUALIB_API int luaopen_ppp( lua_State *L ) {
 #endif
 }
 
-printf("tttt");
-
 MODULE_REGISTER_MAPPED(PPP, ppp, ppp_map, luaopen_ppp);
 #endif
 
 /*
 for key, value in pairs(_G) do      
     print(key)
-end*?
+end*/
