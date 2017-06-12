@@ -93,8 +93,8 @@ typedef struct {
 
 GSM_Cmd GSM_MGR_InitCmds[] = {
     {
-        .cmd = "AT\r",
-        .cmdSize = sizeof("AT\r") - 1,
+        .cmd = "AT\r\n",
+        .cmdSize = sizeof("AT\r\n") - 1,
         .cmdResponseOnOk = GSM_OK_Str,
         .timeoutMs = 3000,
     },
