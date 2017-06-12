@@ -44,7 +44,7 @@
 #include "lwip/dns.h"
 #include "lwip/pppapi.h"
 */
-/*
+
 #include <string.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -64,7 +64,7 @@
 #include "lwip/netdb.h"
 #include "lwip/dns.h"
 #include "lwip/pppapi.h"
-*/
+
 const char *PPP_User = "";
 const char *PPP_Pass = "";
 const char *PPP_ApnATReq = "AT+CGDCONT=1,\"IP\",\"CMNET\"";
