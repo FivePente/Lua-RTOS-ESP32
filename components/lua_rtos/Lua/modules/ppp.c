@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <signal.h>
-
+/*
 #include "lua.h"
 #include "lauxlib.h"
 #include "uart.h"
@@ -43,7 +43,7 @@
 #include "lwip/netdb.h"
 #include "lwip/dns.h"
 #include "lwip/pppapi.h"
-
+*/
 /*
 #include <string.h>
 #include "freertos/FreeRTOS.h"
