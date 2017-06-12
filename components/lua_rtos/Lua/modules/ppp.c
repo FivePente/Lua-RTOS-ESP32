@@ -104,12 +104,13 @@ GSM_Cmd GSM_MGR_InitCmds[] = {
         .cmdResponseOnOk = GSM_OK_Str,
         .timeoutMs = 3000,
     },
+    /*
     {
         .cmd = "AT+CGATT=1\r",
         .cmdSize = sizeof("AT+CGATT=1\r") - 1,
         .cmdResponseOnOk = GSM_OK_Str,
         .timeoutMs = 3000,
-    },
+    },*/
     {
         .cmd = "AT+CPIN?\r",
         .cmdSize = sizeof("AT+CPIN?\r") - 1,
@@ -118,8 +119,8 @@ GSM_Cmd GSM_MGR_InitCmds[] = {
     },
     {
         //AT+CGDCONT=1,"IP","playmetric"
-        .cmd = "AT+CGDCONT=1,\"IP\",\"CMNET\"\r",
-        .cmdSize = sizeof("AT+CGDCONT=1,\"IP\",\"CMNET\"\r") - 1,
+        .cmd = "AT+CGDCONT=1,\"IP\",\"playmetric\"\r",
+        .cmdSize = sizeof("AT+CGDCONT=1,\"IP\",\"playmetric\"\r") - 1,
         .cmdResponseOnOk = GSM_OK_Str,
         .timeoutMs = 3000,
     },
