@@ -116,12 +116,13 @@ GSM_Cmd GSM_MGR_InitCmds[] = {
         .cmdResponseOnOk = GSM_OK_Str,
         .timeoutMs = 3000,
     },
+    /*
     {
         .cmd = "AT+CGACT=1,1\r",
         .cmdSize = sizeof("AT+CGACT=1,1\r") - 1,
         .cmdResponseOnOk = GSM_OK_Str,
         .timeoutMs = 3000,
-    },
+    },*/
     {
         //AT+CGDCONT=1,"IP","playmetric"
         .cmd = "AT+CGDCONT=1,\"IP\",\"cmnet\"\r",
