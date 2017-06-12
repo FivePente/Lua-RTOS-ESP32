@@ -410,7 +410,7 @@ static int ppp_task_step(lua_State* L){
     return 0;
 }
 
-static int ppp_task_step(lua_State* L){
+static int ppp_step(lua_State* L){
     tcpip_adapter_init();
     pppos_client_task();
     return 0;
