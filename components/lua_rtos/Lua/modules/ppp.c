@@ -69,6 +69,8 @@ const char *PPP_User = "";
 const char *PPP_Pass = "";
 const char *PPP_ApnATReq = "AT+CGDCONT=1,\"IP\",\"CMNET\"";
 
+#define BUF_SIZE (1024)
+
 /* UART */
 int uart_num = 2;
 
@@ -230,7 +232,6 @@ static u32_t ppp_output_callback(ppp_pcb *pcb, u8_t *data, u32_t len, void *ctx)
 
 #define UART1_TX_PIN 17
 #define UART1_RX_PIN 16
-#define BUF_SIZE (1024)
 
 static void pppos_client_task()
 {
@@ -323,9 +324,9 @@ static void pppos_client_task()
 static u32_t ppp_output_callback(ppp_pcb *pcb, u8_t *data, u32_t len, void *ctx)
 {
     ESP_LOGI(TAG, "PPP tx len %d", len);
-    //return uart_write_bytes(uart_num, (const char *)data, len);
-    uart_writes(uart_num, (char *)data);
-    return len;
+    return uart_write_bytes(uart_num, (const char *)data, len);
+    //uart_writes(uart_num, (char *)data);
+    //return len;
 }
 
 static void pppos_client_task()
@@ -341,14 +342,14 @@ static void pppos_client_task()
         int gsmCmdIter = 0;
         while (1) {
             ESP_LOGI(TAG, "%s", GSM_MGR_InitCmds[gsmCmdIter].cmd);
-            //uart_write_bytes(uart_num, (const char *)GSM_MGR_InitCmds[gsmCmdIter].cmd,GSM_MGR_InitCmds[gsmCmdIter].cmdSize);
-            uart_writes(uart_num, GSM_MGR_InitCmds[gsmCmdIter].cmd);
+            uart_write_bytes(uart_num, (const char *)GSM_MGR_InitCmds[gsmCmdIter].cmd,GSM_MGR_InitCmds[gsmCmdIter].cmdSize);
+            //uart_writes(uart_num, GSM_MGR_InitCmds[gsmCmdIter].cmd);
 
             int timeoutCnt = 0;
             while (1) {
                 memset(data, 0, 1024);
-                //int len = uart_read_bytes(uart_num, (uint8_t *)data, BUF_SIZE, 500 / portTICK_RATE_MS);
-                int len = uart_reads(uart_num, data, 0, 500 / portTICK_RATE_MS);
+                int len = uart_read_bytes(uart_num, (uint8_t *)data, BUF_SIZE, 500 / portTICK_RATE_MS);
+                //int len = uart_reads(uart_num, data, 1, 500 / portTICK_RATE_MS);
                 if (len > 0) {
                     ESP_LOGI(TAG, "%s", data);
                 }
@@ -395,7 +396,8 @@ static void pppos_client_task()
 
         while (1) {
             memset(data, 0, 1024);
-            int len = uart_reads(uart_num, data, 1, 10 / portTICK_RATE_MS);
+            //int len = uart_reads(uart_num, data, 1, 10 / portTICK_RATE_MS);
+            int len = uart_read_bytes(uart_num, (uint8_t *)data, BUF_SIZE, 500 / portTICK_RATE_MS);
             if (len > 0) {
                 ESP_LOGI(TAG, "PPP rx len %d", len);
                 pppos_input_tcpip(ppp, (u8_t *)data, len);
