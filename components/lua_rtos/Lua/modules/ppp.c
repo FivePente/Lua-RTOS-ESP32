@@ -111,9 +111,9 @@ GSM_Cmd GSM_MGR_InitCmds[] = {
         .timeoutMs = 3000,
     },
     {
-        //AT+CGDCONT=1,"IP","apn"
-        .cmd = "AT+CGDCONT=1,\"IP\",\"playmetric\"\r\n",
-        .cmdSize = sizeof("AT+CGDCONT=1,\"IP\",\"playmetric\"\r\n") - 1,
+        //AT+CGDCONT=1,"IP","playmetric"
+        .cmd = "AT+CGDCONT=1,\"IP\",\"cmnet\"\r\n",
+        .cmdSize = sizeof("AT+CGDCONT=1,\"IP\",\"cmnet\"\r\n") - 1,
         .cmdResponseOnOk = GSM_OK_Str,
         .timeoutMs = 3000,
     },
