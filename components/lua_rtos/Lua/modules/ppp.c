@@ -91,33 +91,33 @@ typedef struct {
 
 GSM_Cmd GSM_MGR_InitCmds[] = {
     {
-        .cmd = "AT\r",
-        .cmdSize = sizeof("AT\r") - 1,
+        .cmd = "AT\r\n",
+        .cmdSize = sizeof("AT\r\n") - 1,
         .cmdResponseOnOk = GSM_OK_Str,
         .timeoutMs = 3000,
     },
     {
-        .cmd = "ATE0\r",
-        .cmdSize = sizeof("ATE0\r") - 1,
+        .cmd = "ATE0\r\n",
+        .cmdSize = sizeof("ATE0\r\n") - 1,
         .cmdResponseOnOk = GSM_OK_Str,
         .timeoutMs = 3000,
     },
     {
-        .cmd = "AT+CPIN?\r",
-        .cmdSize = sizeof("AT+CPIN?\r") - 1,
+        .cmd = "AT+CPIN?\r\n",
+        .cmdSize = sizeof("AT+CPIN?\r\n") - 1,
         .cmdResponseOnOk = "CPIN: READY",
         .timeoutMs = 3000,
     },
     {
         //AT+CGDCONT=1,"IP","apn"
-        .cmd = "AT+CGDCONT=1,\"IP\",\"playmetric\"\r",
-        .cmdSize = sizeof("AT+CGDCONT=1,\"IP\",\"playmetric\"\r") - 1,
+        .cmd = "AT+CGDCONT=1,\"IP\",\"playmetric\"\r\n",
+        .cmdSize = sizeof("AT+CGDCONT=1,\"IP\",\"playmetric\"\r\n") - 1,
         .cmdResponseOnOk = GSM_OK_Str,
         .timeoutMs = 3000,
     },
     {
-        .cmd = "ATDT*99***1#\r",
-        .cmdSize = sizeof("ATDT*99***1#\r") - 1,
+        .cmd = "ATDT*99***1#\r\n",
+        .cmdSize = sizeof("ATDT*99***1#\r\n") - 1,
         .cmdResponseOnOk = "CONNECT",
         .timeoutMs = 30000,
     }
@@ -406,14 +406,20 @@ static void pppos_client_task()
 
 static int ppp_task_step(lua_State* L){
     tcpip_adapter_init();
-    //xTaskCreate(&pppos_client_task, "pppos_client_task", 2048, NULL, 5, NULL); 
+    xTaskCreate(&pppos_client_task, "pppos_client_task", 2048, NULL, 5, NULL); 
+    return 0;
+}
+
+static int ppp_task_step(lua_State* L){
+    tcpip_adapter_init();
     pppos_client_task();
     return 0;
 }
 
 //class map
 static const LUA_REG_TYPE ppp_map[] = {
-    { LSTRKEY( "step" ),  LFUNCVAL( ppp_task_step )},
+    { LSTRKEY( "stepXTask" ),  LFUNCVAL( ppp_task_step )},
+    { LSTRKEY( "step" ),  LFUNCVAL( ppp_step )},
     { LNILKEY, LNILVAL }
 };
 
