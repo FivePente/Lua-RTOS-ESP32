@@ -123,12 +123,13 @@ GSM_Cmd GSM_MGR_InitCmds[] = {
         .cmdResponseOnOk = GSM_OK_Str,
         .timeoutMs = 3000,
     },
+    /*
     {
         .cmd = "AT+CGACT=1,1\r",
         .cmdSize = sizeof("AT+CGACT=1,1\r") - 1,
         .cmdResponseOnOk = GSM_OK_Str,
         .timeoutMs = 3000,
-    },
+    },*/
     {
         .cmd = "ATDT*99***1#\r\n",
         .cmdSize = sizeof("ATDT*99***1#\r\n") - 1,
