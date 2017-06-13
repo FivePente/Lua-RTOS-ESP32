@@ -356,8 +356,8 @@ static int ppp_sendAT(lua_State* L){
 }
 
 static int lppp_close(lua_State* L){
-    pppapi_close(ppp , 0);
-    pppapi_free(ppp);
+    ppp_close();
+    ppp_free();
     uart_write_bytes(uart_num, "ATH\r", sizeof("ATH\r") - 1);
     readCallback();
     if(xHandle != NULL){
