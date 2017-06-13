@@ -45,6 +45,8 @@ const char *PPP_ApnATReq = "AT+CGDCONT=1,\"IP\",\"CMNET\"";
 /* UART */
 static int uart_num = 2;
 
+static uint8_t conn_ok = 1;
+
 /* The PPP control block */
 static ppp_pcb *ppp;
 
@@ -225,8 +227,6 @@ static u32_t ppp_output_callback(ppp_pcb *pcb, u8_t *data, u32_t len, void *ctx)
 
 static void pppos_client_task()
 {
-    static uint8_t conn_ok = 1;
-
     static int init_ok = 0;
 
     char *data = (char *) malloc(BUF_SIZE);
@@ -257,6 +257,8 @@ static void pppos_client_task()
 
         ESP_LOGI(TAG, "After pppapi_connect");
 
+        conn_ok = 1;
+
         while (1) {
             memset(data, 0, BUF_SIZE);
             int len = uart_read_bytes(uart_num, (uint8_t *)data, BUF_SIZE, 10 / portTICK_RATE_MS);
@@ -269,7 +271,6 @@ static void pppos_client_task()
                 ESP_LOGE(TAG , "Disconnected, trying again...");
                 pppapi_close(ppp , 0);
                 ppp_init_gsm();
-                conn_ok = 10;
                 vTaskDelay(1000 / portTICK_RATE_MS);
                 break;
             }
