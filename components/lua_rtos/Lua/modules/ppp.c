@@ -258,6 +258,7 @@ static int ppp_init_gsm(){
         gsmCmdIter++;
 
         if (gsmCmdIter >= GSM_MGR_InitCmdsSize) {
+            conn_ok = 1;
             break;
         }
     }
