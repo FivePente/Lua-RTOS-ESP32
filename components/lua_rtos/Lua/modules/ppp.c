@@ -46,7 +46,9 @@ const char *PPP_ApnATReq = "AT+CGDCONT=1,\"IP\",\"CMNET\"";
 static int uart_num = 2;
 
 /* The PPP control block */
-ppp_pcb *ppp;
+static ppp_pcb *ppp;
+
+static int ppp_inited = 0;
 
 /* The PPP IP interface */
 struct netif ppp_netif;
@@ -224,13 +226,15 @@ static void pppos_client_task()
 {
     char *data = (char *) malloc(BUF_SIZE);
 
-    ppp = pppapi_pppos_create(&ppp_netif,ppp_output_callback, ppp_status_cb, NULL);
+    if(ppp_inited == 0){
+        ppp = pppapi_pppos_create(&ppp_netif,ppp_output_callback, ppp_status_cb, NULL);
 
-    ESP_LOGI(TAG, "After pppapi_pppos_create");
+        ESP_LOGI(TAG, "After pppapi_pppos_create");
 
-    if (ppp == NULL) {
-        ESP_LOGE(TAG, "Error init pppos");
-        return;
+        if (ppp == NULL) {
+            ESP_LOGE(TAG, "Error init pppos");
+            return;
+        }
     }
 
     pppapi_set_default(ppp);
@@ -366,7 +370,6 @@ static int lppp_close(lua_State* L){
     if(xHandle != NULL){
         vTaskDelete(xHandle);
         xHandle = NULL;
-        sleep(100);
     }
     
     err_t err = 0;
@@ -375,11 +378,12 @@ static int lppp_close(lua_State* L){
         ESP_LOGE(TAG, "pppapi_close error");
         return 0;
     }
+    /*
     err = pppapi_free(ppp);
     if( err != 0){
         ESP_LOGE(TAG, "pppapi_free error");
         return 0;
-    }
+    }*/
 
     return 0;
 }
