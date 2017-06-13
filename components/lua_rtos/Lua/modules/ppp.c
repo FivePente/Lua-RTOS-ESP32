@@ -72,7 +72,7 @@ const char *PPP_ApnATReq = "AT+CGDCONT=1,\"IP\",\"CMNET\"";
 #define BUF_SIZE (1024)
 
 /* UART */
-static int uart_num = 2;
+int uart_num = 2;
 
 /* The PPP control block */
 ppp_pcb *ppp;
