@@ -345,10 +345,17 @@ static int ppp_step(lua_State* L){
     return 0;
 }
 
+static int ppp_sendAT(lua_State* L){
+    const char *cmd = luaL_checkstring( L, 1 );
+    uart_write_bytes(uart_num, cmd , sizeof(cmd) - 1);
+    return 0;
+}
+
 //class map
 static const LUA_REG_TYPE ppp_map[] = {
     { LSTRKEY( "stepXTask" ),  LFUNCVAL( ppp_task_step )},
     { LSTRKEY( "step" ),  LFUNCVAL( ppp_step )},
+    { LSTRKEY( "sendAT" ),  LFUNCVAL( ppp_sendAT )},
     { LNILKEY, LNILVAL }
 };
 
