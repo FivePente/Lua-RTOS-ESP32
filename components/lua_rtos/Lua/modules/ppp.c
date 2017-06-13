@@ -224,6 +224,58 @@ static void pppos_client_task()
 {
     char *data = (char *) malloc(BUF_SIZE);
 
+    ppp = pppapi_pppos_create(&ppp_netif,ppp_output_callback, ppp_status_cb, NULL);
+
+    ESP_LOGI(TAG, "After pppapi_pppos_create");
+
+    if (ppp == NULL) {
+        ESP_LOGE(TAG, "Error init pppos");
+        return;
+    }
+
+    pppapi_set_default(ppp);
+
+    ESP_LOGI(TAG, "After pppapi_set_default");
+
+    pppapi_set_auth(ppp, PPPAUTHTYPE_PAP, PPP_User, PPP_Pass);
+
+    ESP_LOGI(TAG, "After pppapi_set_auth");
+
+    pppapi_connect(ppp, 0);
+
+    ESP_LOGI(TAG, "After pppapi_connect");
+
+    while (1) {
+        memset(data, 0, BUF_SIZE);
+        int len = uart_read_bytes(uart_num, (uint8_t *)data, BUF_SIZE, 10 / portTICK_RATE_MS);
+        if (len > 0) {
+            ESP_LOGI(TAG, "PPP rx len %d", len);
+            pppos_input_tcpip(ppp, (u8_t *)data, len);
+        }
+    }
+}
+
+static int ppp_init_uart(lua_State* L){
+        uart_config_t uart_config = {
+        .baud_rate = 115200,
+        .data_bits = UART_DATA_8_BITS,
+        .parity = UART_PARITY_DISABLE,
+        .stop_bits = UART_STOP_BITS_1,
+        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE
+    };
+    //Configure UART1 parameters
+    uart_param_config(uart_num, &uart_config);
+
+    // Configure UART1 pins (as set in example's menuconfig)
+    ESP_LOGI(TAG, "Configuring UART1 GPIOs: TX:%d RX:%d",UART1_TX_PIN, UART1_RX_PIN);
+    uart_set_pin(uart_num, UART1_TX_PIN, UART1_RX_PIN, 0, 0);
+    uart_driver_install(uart_num, BUF_SIZE * 2, BUF_SIZE * 2, 0, NULL, 0);
+}
+
+static int ppp_init_gsm(lua_State* L){
+
+    char *data = (char *) malloc(BUF_SIZE);
+
     while (1) {
         //init gsm
         int gsmCmdIter = 0;
@@ -258,55 +310,9 @@ static void pppos_client_task()
         }
 
         ESP_LOGI(TAG, "Gsm init end");
-
-        ppp = pppapi_pppos_create(&ppp_netif,
-                                  ppp_output_callback, ppp_status_cb, NULL);
-
-        ESP_LOGI(TAG, "After pppapi_pppos_create");
-
-        if (ppp == NULL) {
-            ESP_LOGE(TAG, "Error init pppos");
-            return;
-        }
-
-        pppapi_set_default(ppp);
-
-        ESP_LOGI(TAG, "After pppapi_set_default");
-
-        pppapi_set_auth(ppp, PPPAUTHTYPE_PAP, PPP_User, PPP_Pass);
-
-        ESP_LOGI(TAG, "After pppapi_set_auth");
-
-        pppapi_connect(ppp, 0);
-
-        ESP_LOGI(TAG, "After pppapi_connect");
-
-        while (1) {
-            memset(data, 0, BUF_SIZE);
-            int len = uart_read_bytes(uart_num, (uint8_t *)data, BUF_SIZE, 10 / portTICK_RATE_MS);
-            if (len > 0) {
-                ESP_LOGI(TAG, "PPP rx len %d", len);
-                pppos_input_tcpip(ppp, (u8_t *)data, len);
-            }
-        }
     }
-}
 
-static int ppp_setup_uart(lua_State* L){
-        uart_config_t uart_config = {
-        .baud_rate = 115200,
-        .data_bits = UART_DATA_8_BITS,
-        .parity = UART_PARITY_DISABLE,
-        .stop_bits = UART_STOP_BITS_1,
-        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE
-    };
-    //Configure UART1 parameters
-    uart_param_config(uart_num, &uart_config);
-
-    // Configure UART1 pins (as set in example's menuconfig)
-    ESP_LOGI(TAG, "Configuring UART1 GPIOs: TX:%d RX:%d",UART1_TX_PIN, UART1_RX_PIN);
-    uart_set_pin(uart_num, UART1_TX_PIN, UART1_RX_PIN, 0, 0);
-    uart_driver_install(uart_num, BUF_SIZE * 2, BUF_SIZE * 2, 0, NULL, 0);
+    free(data);
 
     return 0;
 }
@@ -380,7 +386,8 @@ static int lppp_close(lua_State* L){
 static const LUA_REG_TYPE ppp_map[] = {
     { LSTRKEY( "setupXTask" ),  LFUNCVAL( ppp_task_setup )},
     { LSTRKEY( "setup" ),  LFUNCVAL( ppp_setup )},
-    { LSTRKEY( "setupUART" ),  LFUNCVAL( ppp_setup_uart )},
+    { LSTRKEY( "initUART" ),  LFUNCVAL( ppp_init_uart )},
+    { LSTRKEY( "initGSM" ),  LFUNCVAL( ppp_init_gsm )},
     { LSTRKEY( "sendAT" ),  LFUNCVAL( ppp_sendAT )},
     { LSTRKEY( "close" ),  LFUNCVAL( lppp_close )},
     { LNILKEY, LNILVAL }
