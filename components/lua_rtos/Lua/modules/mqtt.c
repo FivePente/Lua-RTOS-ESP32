@@ -85,6 +85,9 @@ typedef struct {
     
     mqtt_subs_callback *callbacks;
 
+    int delivered;
+    int connectionLost;
+
     int secure;
 } mqtt_userdata;
 
@@ -117,6 +120,37 @@ static int add_subs_callback(mqtt_userdata *mqtt, const char *topic, int call) {
     return 0;
 }
 
+void delivered(void *context, MQTTClient_deliveryToken dt)
+{
+    mqtt_userdata *mqtt = (mqtt_userdata *)context;
+
+    mtx_lock(&mqtt->callback_mtx);
+    printf("Message with token value %d delivery confirmed\n", dt);
+
+    lua_rawgeti(mqtt->L, LUA_REGISTRYINDEX, mqtt->delivered);
+    lua_pushinteger(mqtt->L, dt);
+    lua_call(mqtt->L, 1, 0);
+
+    mtx_unlock(&mqtt->callback_mtx);
+    return 1;
+}
+
+
+static int connectionLost(void* context, char* cause);{
+    mqtt_userdata *mqtt = (mqtt_userdata *)context;
+
+    mtx_lock(&mqtt->callback_mtx);
+    printf("\nConnection lost\n");
+    printf("     cause: %s\n", cause);
+
+    lua_rawgeti(mqtt->L, LUA_REGISTRYINDEX, mqtt->connectionLost);
+    lua_pushinteger(mqtt->L, cause);
+    lua_call(mqtt->L, 1, 0);
+
+    mtx_unlock(&mqtt->callback_mtx);
+    return 1;
+}
+
 static int messageArrived(void *context, char * topicName, int topicLen, MQTTClient_message* m) {
     mqtt_userdata *mqtt = (mqtt_userdata *)context;
     mqtt_subs_callback *callback;
@@ -146,6 +180,43 @@ static int messageArrived(void *context, char * topicName, int topicLen, MQTTCli
     
     return 1;
 }
+
+static int lmqtt_setConnectLostCallback(lua_State* L ){
+
+    mqtt_userdata *mqtt = NULL;
+    mqtt = (mqtt_userdata *)luaL_checkudata(L, 1, "mqtt.cli");
+    luaL_argcheck(L, mqtt, 1, "mqtt expected");
+    
+    luaL_checktype(L, 2, LUA_TFUNCTION);
+
+    // Copy argument (function) to the top of stack
+    lua_pushvalue(L, 2); 
+
+    // Copy function reference
+    mqtt->connectionLost = luaL_ref(L, LUA_REGISTRYINDEX);
+
+    return 0;
+}
+
+
+static int lmqtt_setDeliveredCallback(lua_State* L ){
+
+    mqtt_userdata *mqtt = NULL;
+    mqtt = (mqtt_userdata *)luaL_checkudata(L, 1, "mqtt.cli");
+    luaL_argcheck(L, mqtt, 1, "mqtt expected");
+    
+    luaL_checktype(L, 2, LUA_TFUNCTION);
+
+    // Copy argument (function) to the top of stack
+    lua_pushvalue(L, 2); 
+
+    // Copy function reference
+    mqtt->delivered = luaL_ref(L, LUA_REGISTRYINDEX);
+
+    return 0;
+}
+
+
 
 // Lua: result = setup( id, clock )
 static int lmqtt_client( lua_State* L ){
@@ -185,7 +256,7 @@ static int lmqtt_client( lua_State* L ){
     	return luaL_exception(L, LUA_MQTT_ERR_CANT_CREATE_CLIENT);
     }
 
-    rc = MQTTClient_setCallbacks(mqtt->client, mqtt, NULL, messageArrived, NULL);
+    rc = MQTTClient_setCallbacks(mqtt->client, mqtt, connectionLost, messageArrived, delivered);
     if (rc < 0){
     	return luaL_exception(L, LUA_MQTT_ERR_CANT_SET_CALLBACKS);
     }
