@@ -359,6 +359,7 @@ static int ppp_sendAT(lua_State* L){
 
     char *data = (char *) malloc(BUF_SIZE);
     int timeoutCnt = 0;
+    char *cmdResponseOnOk = GSM_OK_Str;
     while (1) {
         memset(data, 0, BUF_SIZE);
         int len = uart_read_bytes(uart_num, (uint8_t *)data, BUF_SIZE, 500 / portTICK_RATE_MS);
@@ -367,7 +368,7 @@ static int ppp_sendAT(lua_State* L){
         }
 
         timeoutCnt += 500;
-        if (strstr(data, GSM_OK_Str != NULL)) {
+        if (strstr(data, cmdResponseOnOk != NULL)) {
             break;
         }
 
@@ -381,7 +382,7 @@ static int ppp_sendAT(lua_State* L){
     return 0;
 }
 
-static int ppp_close(lua_State* L){
+static int lppp_close(lua_State* L){
     pppapi_close(ppp , 1);
     pppapi_free(ppp);
     if(xHandle != NULL){
@@ -398,7 +399,7 @@ static const LUA_REG_TYPE ppp_map[] = {
     { LSTRKEY( "setup" ),  LFUNCVAL( ppp_setup )},
     { LSTRKEY( "setupUART" ),  LFUNCVAL( ppp_setup_uart )},
     { LSTRKEY( "sendAT" ),  LFUNCVAL( ppp_sendAT )},
-    { LSTRKEY( "close" ),  LFUNCVAL( ppp_close )},
+    { LSTRKEY( "close" ),  LFUNCVAL( lppp_close )},
     { LNILKEY, LNILVAL }
 };
 
