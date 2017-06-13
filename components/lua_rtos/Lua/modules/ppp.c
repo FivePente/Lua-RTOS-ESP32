@@ -72,13 +72,15 @@ const char *PPP_ApnATReq = "AT+CGDCONT=1,\"IP\",\"CMNET\"";
 #define BUF_SIZE (1024)
 
 /* UART */
-int uart_num = 2;
+static int uart_num = 2;
 
 /* The PPP control block */
-ppp_pcb *ppp;
+static ppp_pcb *ppp;
 
 /* The PPP IP interface */
 struct netif ppp_netif;
+
+static TaskHandle_t xHandle = NULL;
 
 static const char *TAG = "example";
 
@@ -250,20 +252,6 @@ static u32_t ppp_output_callback(ppp_pcb *pcb, u8_t *data, u32_t len, void *ctx)
 static void pppos_client_task()
 {
     char *data = (char *) malloc(BUF_SIZE);
-    uart_config_t uart_config = {
-        .baud_rate = 115200,
-        .data_bits = UART_DATA_8_BITS,
-        .parity = UART_PARITY_DISABLE,
-        .stop_bits = UART_STOP_BITS_1,
-        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE
-    };
-    //Configure UART1 parameters
-    uart_param_config(uart_num, &uart_config);
-
-    // Configure UART1 pins (as set in example's menuconfig)
-    ESP_LOGI(TAG, "Configuring UART1 GPIOs: TX:%d RX:%d",UART1_TX_PIN, UART1_RX_PIN);
-    uart_set_pin(uart_num, UART1_TX_PIN, UART1_RX_PIN, 0, 0);
-    uart_driver_install(uart_num, BUF_SIZE * 2, BUF_SIZE * 2, 0, NULL, 0);
 
     while (1) {
         //init gsm
@@ -333,13 +321,33 @@ static void pppos_client_task()
     }
 }
 
-static int ppp_task_step(lua_State* L){
-    tcpip_adapter_init();
-    xTaskCreate(&pppos_client_task, "pppos_client_task", 2048, NULL, 5, NULL); 
+static int ppp_setup_uart(lua_State* L){
+        uart_config_t uart_config = {
+        .baud_rate = 115200,
+        .data_bits = UART_DATA_8_BITS,
+        .parity = UART_PARITY_DISABLE,
+        .stop_bits = UART_STOP_BITS_1,
+        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE
+    };
+    //Configure UART1 parameters
+    uart_param_config(uart_num, &uart_config);
+
+    // Configure UART1 pins (as set in example's menuconfig)
+    ESP_LOGI(TAG, "Configuring UART1 GPIOs: TX:%d RX:%d",UART1_TX_PIN, UART1_RX_PIN);
+    uart_set_pin(uart_num, UART1_TX_PIN, UART1_RX_PIN, 0, 0);
+    uart_driver_install(uart_num, BUF_SIZE * 2, BUF_SIZE * 2, 0, NULL, 0);
+
     return 0;
 }
 
-static int ppp_step(lua_State* L){
+static int ppp_task_setup(lua_State* L){
+    tcpip_adapter_init();
+    xTaskCreate(&pppos_client_task, "pppos_client_task", 2048, NULL, 5, $xHandle); 
+    configASSERT(xHandle);
+    return 0;
+}
+
+static int ppp_setup(lua_State* L){
     tcpip_adapter_init();
     pppos_client_task();
     return 0;
@@ -373,11 +381,23 @@ static int ppp_sendAT(lua_State* L){
     return 0;
 }
 
+static int ppp_close(lua_State* L){
+    pppapi_close(ppp , 1);
+    pppapi_free(ppp);
+    if(xHandle != NULL){
+        vTaskDelete(xHandle);
+        xHandle = NULL;
+    }
+    return 0;
+}
+
 //class map
 static const LUA_REG_TYPE ppp_map[] = {
-    { LSTRKEY( "stepXTask" ),  LFUNCVAL( ppp_task_step )},
-    { LSTRKEY( "step" ),  LFUNCVAL( ppp_step )},
+    { LSTRKEY( "setupXTask" ),  LFUNCVAL( ppp_task_setup )},
+    { LSTRKEY( "setup" ),  LFUNCVAL( ppp_setup )},
+    { LSTRKEY( "setupUART" ),  LFUNCVAL( ppp_setup_uart )},
     { LSTRKEY( "sendAT" ),  LFUNCVAL( ppp_sendAT )},
+    { LSTRKEY( "close" ),  LFUNCVAL( ppp_close )},
     { LNILKEY, LNILVAL }
 };
 
