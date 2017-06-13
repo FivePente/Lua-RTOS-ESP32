@@ -300,7 +300,8 @@ static int ppp_init_gsm(lua_State* L){
 
                 if (timeoutCnt > GSM_MGR_InitCmds[gsmCmdIter].timeoutMs) {
                     ESP_LOGE(TAG, "Gsm Init Error");
-                    break;
+                    free(data);
+                    return 0;
                 }
             }
             gsmCmdIter++;
