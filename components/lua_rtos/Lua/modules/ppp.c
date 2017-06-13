@@ -125,6 +125,7 @@ static void ppp_status_cb(ppp_pcb *pcb, int err_code, void *ctx)
     switch (err_code) {
     case PPPERR_NONE: {
         ESP_LOGI(TAG, "status_cb: Connected\n");
+        conn_ok = 1;
 #if PPP_IPV4_SUPPORT
         ESP_LOGI(TAG, "   our_ipaddr  = %s\n", ipaddr_ntoa(&pppif->ip_addr));
         ESP_LOGI(TAG, "   his_ipaddr  = %s\n", ipaddr_ntoa(&pppif->gw));
@@ -133,8 +134,6 @@ static void ppp_status_cb(ppp_pcb *pcb, int err_code, void *ctx)
 #if PPP_IPV6_SUPPORT
         ESP_LOGI(TAG, "   our6_ipaddr = %s\n", ip6addr_ntoa(netif_ip6_addr(pppif, 0)));
 #endif /* PPP_IPV6_SUPPORT */
-
-        conn_ok = 1;
         break;
     }
     case PPPERR_PARAM: {
@@ -198,6 +197,7 @@ static void ppp_status_cb(ppp_pcb *pcb, int err_code, void *ctx)
      */
 
     if (err_code == PPPERR_NONE) {
+        conn_ok = 1;
         return;
     }
 
