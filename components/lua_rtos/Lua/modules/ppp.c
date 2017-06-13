@@ -362,6 +362,12 @@ static int ppp_sendAT(lua_State* L){
 }
 
 static int lppp_close(lua_State* L){
+
+    if(xHandle != NULL){
+        vTaskDelete(xHandle);
+        xHandle = NULL;
+    }
+
     err_t err = 0;
     err = pppapi_close(ppp , 0);
     if( err != 0){
