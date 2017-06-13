@@ -255,9 +255,10 @@ static void pppos_client_task()
                 if (timeoutCnt > GSM_MGR_InitCmds[gsmCmdIter].timeoutMs) {
                     ESP_LOGE(TAG, "Gsm Init Error");
                     free(data);
-                    return 0;
+                    return;
                 }
             }
+            
             gsmCmdIter++;
 
             if (gsmCmdIter >= GSM_MGR_InitCmdsSize) {
@@ -267,17 +268,13 @@ static void pppos_client_task()
 
         ESP_LOGI(TAG, "Gsm init end");
 
-        if(init_ok == 0){
-            ppp = pppapi_pppos_create(&ppp_netif,ppp_output_callback, ppp_status_cb, NULL);
+        ppp = pppapi_pppos_create(&ppp_netif,ppp_output_callback, ppp_status_cb, NULL);
 
-            ESP_LOGI(TAG, "After pppapi_pppos_create");
+        ESP_LOGI(TAG, "After pppapi_pppos_create");
 
-            if (ppp == NULL) {
-                ESP_LOGE(TAG, "Error init pppos");
-                return;
-            }
-
-            init_ok = 1;
+        if (ppp == NULL) {
+            ESP_LOGE(TAG, "Error init pppos");
+            return;
         }
 
         pppapi_set_default(ppp);
