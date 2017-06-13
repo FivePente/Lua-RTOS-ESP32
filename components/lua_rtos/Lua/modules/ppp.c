@@ -388,6 +388,7 @@ static int ppp_close(lua_State* L){
         vTaskDelete(xHandle);
         xHandle = NULL;
     }
+    uart_write_bytes(uart_num, "ATH\r", sizeof("ATH\r") - 1);
     return 0;
 }
 
