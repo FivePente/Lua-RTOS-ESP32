@@ -341,7 +341,8 @@ static int ppp_init_gsm(){
 }
 
 static int lppp_init_gsm(lua_State* L){
-    return ppp_init_gsm();
+    ppp_init_gsm();
+    return 0;
 }
 
 static int ppp_task_setup(lua_State* L){
