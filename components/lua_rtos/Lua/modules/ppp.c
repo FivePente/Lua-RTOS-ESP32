@@ -276,6 +276,8 @@ static void pppos_client_task()
                 ESP_LOGE(TAG, "Error init pppos");
                 return;
             }
+
+            init_ok = 1;
         }
 
         pppapi_set_default(ppp);
@@ -290,26 +292,21 @@ static void pppos_client_task()
 
         ESP_LOGI(TAG, "After pppapi_connect");
 
-        if(init_ok == 0){
-
-            while (1) {
-                memset(data, 0, BUF_SIZE);
-                int len = uart_read_bytes(uart_num, (uint8_t *)data, BUF_SIZE, 10 / portTICK_RATE_MS);
-                if (len > 0) {
-                    ESP_LOGI(TAG, "PPP rx len %d", len);
-                    pppos_input_tcpip(ppp, (u8_t *)data, len);
-                }
-
-                /*
-                if(conn_ok == 0){
-                    ESP_LOGE(TAG , "Disconnected, trying again...");
-                    pppapi_close(ppp , 0);
-                    vTaskDelay(1000 / portTICK_RATE_MS);
-                    break;
-                }*/
+        while (1) {
+            memset(data, 0, BUF_SIZE);
+            int len = uart_read_bytes(uart_num, (uint8_t *)data, BUF_SIZE, 10 / portTICK_RATE_MS);
+            if (len > 0) {
+                ESP_LOGI(TAG, "PPP rx len %d", len);
+                pppos_input_tcpip(ppp, (u8_t *)data, len);
             }
 
-            init_ok = 1;
+            /*
+            if(conn_ok == 0){
+                ESP_LOGE(TAG , "Disconnected, trying again...");
+                pppapi_close(ppp , 0);
+                vTaskDelay(1000 / portTICK_RATE_MS);
+                break;
+            }*/
         }
     }
 }
@@ -376,6 +373,11 @@ static int ppp_sendAT(lua_State* L){
 }
 
 static int lppp_close(lua_State* L){
+
+    if(xHandle != NULL){
+        vTaskDelete(xHandle);
+        xHandle = NULL;
+    }
     
     err_t err = 0;
     err = pppapi_close(ppp , 0);
