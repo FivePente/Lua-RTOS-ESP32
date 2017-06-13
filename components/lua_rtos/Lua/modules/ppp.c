@@ -353,13 +353,13 @@ static int ppp_sendAT(lua_State* L){
 }
 
 static int lppp_close(lua_State* L){
-    pppapi_close(ppp , 1);
+    pppapi_close(ppp , 0);
     pppapi_free(ppp);
+    uart_write_bytes(uart_num, "ATH\r", sizeof("ATH\r") - 1);
     if(xHandle != NULL){
         vTaskDelete(xHandle);
         xHandle = NULL;
     }
-    uart_write_bytes(uart_num, "ATH\r", sizeof("ATH\r") - 1);
     return 0;
 }
 
