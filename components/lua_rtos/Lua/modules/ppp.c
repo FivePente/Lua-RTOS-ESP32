@@ -373,12 +373,12 @@ static int lppp_close(lua_State* L){
     if( err != 0){
         ESP_LOGE(TAG, "pppapi_close error");
         return 0;
-    }/*
+    }
     err = pppapi_free(ppp);
     if( err != 0){
         ESP_LOGE(TAG, "pppapi_free error");
         return 0;
-    }*/
+    }
 
     return 0;
 }
