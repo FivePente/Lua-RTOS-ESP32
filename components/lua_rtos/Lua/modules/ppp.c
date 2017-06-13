@@ -277,42 +277,40 @@ static int ppp_init_gsm(lua_State* L){
 
     char *data = (char *) malloc(BUF_SIZE);
 
+    //init gsm
+    int gsmCmdIter = 0;
     while (1) {
-        //init gsm
-        int gsmCmdIter = 0;
+        ESP_LOGE(TAG, "%s", GSM_MGR_InitCmds[gsmCmdIter].cmd);
+        uart_write_bytes(uart_num, (const char *)GSM_MGR_InitCmds[gsmCmdIter].cmd,
+                            GSM_MGR_InitCmds[gsmCmdIter].cmdSize);
+
+        int timeoutCnt = 0;
         while (1) {
-            ESP_LOGE(TAG, "%s", GSM_MGR_InitCmds[gsmCmdIter].cmd);
-            uart_write_bytes(uart_num, (const char *)GSM_MGR_InitCmds[gsmCmdIter].cmd,
-                             GSM_MGR_InitCmds[gsmCmdIter].cmdSize);
-
-            int timeoutCnt = 0;
-            while (1) {
-                memset(data, 0, BUF_SIZE);
-                int len = uart_read_bytes(uart_num, (uint8_t *)data, BUF_SIZE, 500 / portTICK_RATE_MS);
-                if (len > 0) {
-                    ESP_LOGE(TAG, "%s", data);
-                }
-
-                timeoutCnt += 500;
-                if (strstr(data, GSM_MGR_InitCmds[gsmCmdIter].cmdResponseOnOk) != NULL) {
-                    break;
-                }
-
-                if (timeoutCnt > GSM_MGR_InitCmds[gsmCmdIter].timeoutMs) {
-                    ESP_LOGE(TAG, "Gsm Init Error");
-                    free(data);
-                    return 0;
-                }
+            memset(data, 0, BUF_SIZE);
+            int len = uart_read_bytes(uart_num, (uint8_t *)data, BUF_SIZE, 500 / portTICK_RATE_MS);
+            if (len > 0) {
+                ESP_LOGE(TAG, "%s", data);
             }
-            gsmCmdIter++;
 
-            if (gsmCmdIter >= GSM_MGR_InitCmdsSize) {
+            timeoutCnt += 500;
+            if (strstr(data, GSM_MGR_InitCmds[gsmCmdIter].cmdResponseOnOk) != NULL) {
                 break;
             }
-        }
 
-        ESP_LOGI(TAG, "Gsm init end");
+            if (timeoutCnt > GSM_MGR_InitCmds[gsmCmdIter].timeoutMs) {
+                ESP_LOGE(TAG, "Gsm Init Error");
+                free(data);
+                return 0;
+            }
+        }
+        gsmCmdIter++;
+
+        if (gsmCmdIter >= GSM_MGR_InitCmdsSize) {
+            break;
+        }
     }
+
+    ESP_LOGI(TAG, "Gsm init end");
 
     free(data);
 
