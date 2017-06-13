@@ -270,6 +270,7 @@ static int ppp_init_uart(lua_State* L){
     ESP_LOGI(TAG, "Configuring UART1 GPIOs: TX:%d RX:%d",UART1_TX_PIN, UART1_RX_PIN);
     uart_set_pin(uart_num, UART1_TX_PIN, UART1_RX_PIN, 0, 0);
     uart_driver_install(uart_num, BUF_SIZE * 2, BUF_SIZE * 2, 0, NULL, 0);
+    return 0;
 }
 
 static int ppp_init_gsm(lua_State* L){
@@ -299,7 +300,7 @@ static int ppp_init_gsm(lua_State* L){
 
                 if (timeoutCnt > GSM_MGR_InitCmds[gsmCmdIter].timeoutMs) {
                     ESP_LOGE(TAG, "Gsm Init Error");
-                    return;
+                    break;
                 }
             }
             gsmCmdIter++;
