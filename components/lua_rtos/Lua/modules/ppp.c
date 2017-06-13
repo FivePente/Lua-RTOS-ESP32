@@ -132,8 +132,8 @@ GSM_Cmd GSM_MGR_InitCmds[] = {
         .timeoutMs = 3000,
     },*/
     {
-        .cmd = "ATDT*99***1#\r\n",
-        .cmdSize = sizeof("ATDT*99***1#\r\n") - 1,
+        .cmd = "ATDT*99***1#\r",
+        .cmdSize = sizeof("ATDT*99***1#\r") - 1,
         .cmdResponseOnOk = "CONNECT",
         .timeoutMs = 30000,
     }
