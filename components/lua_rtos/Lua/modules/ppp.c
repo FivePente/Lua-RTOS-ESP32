@@ -226,26 +226,22 @@ static void pppos_client_task()
 {
     char *data = (char *) malloc(BUF_SIZE);
 
-    if(ppp_inited == 0){
-        ppp = pppapi_pppos_create(&ppp_netif,ppp_output_callback, ppp_status_cb, NULL);
+    ppp = pppapi_pppos_create(&ppp_netif,ppp_output_callback, ppp_status_cb, NULL);
 
-        ESP_LOGI(TAG, "After pppapi_pppos_create");
+    ESP_LOGI(TAG, "After pppapi_pppos_create");
 
-        if (ppp == NULL) {
-            ESP_LOGE(TAG, "Error init pppos");
-            return;
-        }
-
-        ppp_inited = 1;
-   
-        pppapi_set_default(ppp);
-
-        ESP_LOGI(TAG, "After pppapi_set_default");
-
-        pppapi_set_auth(ppp, PPPAUTHTYPE_PAP, PPP_User, PPP_Pass);
-
-        ESP_LOGI(TAG, "After pppapi_set_auth");
+    if (ppp == NULL) {
+        ESP_LOGE(TAG, "Error init pppos");
+        return;
     }
+
+    pppapi_set_default(ppp);
+
+    ESP_LOGI(TAG, "After pppapi_set_default");
+
+    pppapi_set_auth(ppp, PPPAUTHTYPE_PAP, PPP_User, PPP_Pass);
+
+    ESP_LOGI(TAG, "After pppapi_set_auth");
 
     pppapi_connect(ppp, 0);
 
@@ -371,7 +367,6 @@ static int lppp_close(lua_State* L){
 
     if(xHandle != NULL){
         vTaskDelete(xHandle);
-        xHandle = NULL;
     }
     
     err_t err = 0;
@@ -380,12 +375,11 @@ static int lppp_close(lua_State* L){
         ESP_LOGE(TAG, "pppapi_close error");
         return 0;
     }
-    /*
     err = pppapi_free(ppp);
     if( err != 0){
         ESP_LOGE(TAG, "pppapi_free error");
         return 0;
-    }*/
+    }
 
     return 0;
 }
