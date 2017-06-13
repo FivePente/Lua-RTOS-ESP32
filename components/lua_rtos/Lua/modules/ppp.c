@@ -207,7 +207,7 @@ static void ppp_status_cb(ppp_pcb *pcb, int err_code, void *ctx)
      * to do a much better signaling here ;-)
      */
     /*ppp_connect(pcb, 30);
-    /* OR ppp_listen(pcb); */
+     OR ppp_listen(pcb); */
 }
 
 
