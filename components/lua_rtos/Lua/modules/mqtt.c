@@ -136,7 +136,8 @@ void delivered(void *context, MQTTClient_deliveryToken dt)
 }
 
 
-static int connectionLost(void* context, char* cause);{
+static int connectionLost(void* context, char* cause)
+{
     mqtt_userdata *mqtt = (mqtt_userdata *)context;
 
     mtx_lock(&mqtt->callback_mtx);
