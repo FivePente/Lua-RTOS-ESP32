@@ -408,6 +408,9 @@ static int lmqtt_client_gc (lua_State *L) {
             callback = nextcallback;
         }
 
+        luaL_unref(L, LUA_REGISTRYINDEX, mqtt->delivered);
+        luaL_unref(L, LUA_REGISTRYINDEX, mqtt->connectionLost);
+
         mtx_unlock(&mqtt->callback_mtx);
 
         // Disconnect and destroy client
@@ -433,13 +436,15 @@ static const LUA_REG_TYPE lmqtt_map[] = {
 };
 
 static const LUA_REG_TYPE lmqtt_client_map[] = {
-  { LSTRKEY( "connect"     ),	 LFUNCVAL( lmqtt_connect    ) },
-  { LSTRKEY( "disconnect"  ),	 LFUNCVAL( lmqtt_disconnect ) },
-  { LSTRKEY( "subscribe"   ),	 LFUNCVAL( lmqtt_subscribe  ) },
-  { LSTRKEY( "publish"     ),	 LFUNCVAL( lmqtt_publish    ) },
-  { LSTRKEY( "__metatable" ),	 LROVAL  ( lmqtt_client_map ) },
-  { LSTRKEY( "__index"     ),    LROVAL  ( lmqtt_client_map ) },
-  { LSTRKEY( "__gc"        ),    LROVAL  ( lmqtt_client_gc  ) },
+  { LSTRKEY( "connect"              ),	 LFUNCVAL( lmqtt_connect    ) },
+  { LSTRKEY( "disconnect"           ),	 LFUNCVAL( lmqtt_disconnect ) },
+  { LSTRKEY( "subscribe"            ),	 LFUNCVAL( lmqtt_subscribe  ) },
+  { LSTRKEY( "publish"              ),	 LFUNCVAL( lmqtt_publish    ) },
+  { LSTRKEY( "setLostCallback"      ),	 LFUNCVAL( lmqtt_setConnectLostCallback    ) },
+  { LSTRKEY( "setDeliveredCallback" ),	 LFUNCVAL( lmqtt_setDeliveredCallback    ) },
+  { LSTRKEY( "__metatable"          ),	 LROVAL  ( lmqtt_client_map ) },
+  { LSTRKEY( "__index"              ),   LROVAL  ( lmqtt_client_map ) },
+  { LSTRKEY( "__gc"                 ),   LROVAL  ( lmqtt_client_gc  ) },
   { LNILKEY, LNILVAL }
 };
 
