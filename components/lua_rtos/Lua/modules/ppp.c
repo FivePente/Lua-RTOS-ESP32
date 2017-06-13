@@ -359,7 +359,6 @@ static int ppp_sendAT(lua_State* L){
 
     char *data = (char *) malloc(BUF_SIZE);
     int timeoutCnt = 0;
-    char *cmdResponseOnOk = GSM_OK_Str;
     while (1) {
         memset(data, 0, BUF_SIZE);
         int len = uart_read_bytes(uart_num, (uint8_t *)data, BUF_SIZE, 500 / portTICK_RATE_MS);
@@ -368,7 +367,7 @@ static int ppp_sendAT(lua_State* L){
         }
 
         timeoutCnt += 500;
-        if (strstr(data, cmdResponseOnOk != NULL)) {
+        if (strstr(data, &GSM_OK_Str != NULL)) {
             break;
         }
 
