@@ -356,8 +356,17 @@ static int ppp_sendAT(lua_State* L){
 }
 
 static int lppp_close(lua_State* L){
-    ppp_close();
-    ppp_free();
+    err_t err = 0;
+    err = pppapi_close(ppp , 0);
+    if( err != 0){
+        ESP_LOGE(TAG, "pppapi_close error");
+        return 0;
+    }
+    err = pppapi_free(ppp);
+    if( err != 0){
+        ESP_LOGE(TAG, "pppapi_free error");
+        return 0;
+    }
     uart_write_bytes(uart_num, "ATH\r", sizeof("ATH\r") - 1);
     readCallback();
     if(xHandle != NULL){
