@@ -75,12 +75,12 @@ const char *PPP_ApnATReq = "AT+CGDCONT=1,\"IP\",\"CMNET\"";
 static int uart_num = 2;
 
 /* The PPP control block */
-static ppp_pcb *ppp;
+ppp_pcb *ppp;
 
 /* The PPP IP interface */
 struct netif ppp_netif;
 
-static TaskHandle_t xHandle = NULL;
+TaskHandle_t xHandle = NULL;
 
 static const char *TAG = "example";
 
