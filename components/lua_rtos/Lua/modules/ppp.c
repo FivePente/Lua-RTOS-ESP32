@@ -348,6 +348,28 @@ static int ppp_step(lua_State* L){
 static int ppp_sendAT(lua_State* L){
     const char *cmd = luaL_checkstring( L, 1 );
     uart_write_bytes(uart_num, cmd , sizeof(cmd) - 1);
+
+    char *data = (char *) malloc(BUF_SIZE);
+    int timeoutCnt = 0;
+    while (1) {
+        memset(data, 0, BUF_SIZE);
+        int len = uart_read_bytes(uart_num, (uint8_t *)data, BUF_SIZE, 500 / portTICK_RATE_MS);
+        if (len > 0) {
+            ESP_LOGE(TAG, "%s", data);
+        }
+
+        timeoutCnt += 500;
+        if (strstr(data, GSM_MGR_InitCmds[gsmCmdIter].cmdResponseOnOk) != NULL) {
+            break;
+        }
+
+        if (timeoutCnt > GSM_MGR_InitCmds[gsmCmdIter].timeoutMs) {
+            ESP_LOGE(TAG, "AT Error");
+            break;
+        }
+    }
+
+    free(data);
     return 0;
 }
 
