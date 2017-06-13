@@ -200,6 +200,8 @@ static int lmqtt_connect( lua_State* L ) {
     int rc;
     int retries = 0;
     int keepAlive = 60;
+    int reliable = 0;
+    int cleansession = 0;
     const char *user;
     const char *password;
     mqtt_userdata *mqtt = NULL;
@@ -210,14 +212,16 @@ static int lmqtt_connect( lua_State* L ) {
     user = luaL_checkstring( L, 2 );
     password = luaL_checkstring( L, 3 );
     keepAlive = luaL_checkinteger( L, 4 );
+    reliable = luaL_checkinteger( L, 5 );
+    cleansession = luaL_checkinteger( L, 6 );
 
     MQTTClient_connectOptions conn_opts = MQTTClient_connectOptions_initializer;
     MQTTClient_SSLOptions ssl_opts = MQTTClient_SSLOptions_initializer;
     
     conn_opts.connectTimeout = 4;
     conn_opts.keepAliveInterval = keepAlive;
-    conn_opts.reliable = 0;
-    conn_opts.cleansession = 0;
+    conn_opts.reliable = reliable;
+    conn_opts.cleansession = cleansession;
     conn_opts.username = user;
     conn_opts.password = password;
     ssl_opts.enableServerCertAuth = 0;
