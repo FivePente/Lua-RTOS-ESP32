@@ -314,7 +314,7 @@ static int ppp_setup_uart(lua_State* L){
 static int ppp_task_setup(lua_State* L){
     tcpip_adapter_init();
     xTaskCreate(&pppos_client_task, "pppos_client_task", 2048, NULL, 5, &xHandle); 
-    configASSERT(xHandle)
+    configASSERT(xHandle);
     return 0;
 }
 
