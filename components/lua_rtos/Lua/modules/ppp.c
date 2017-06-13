@@ -235,7 +235,10 @@ static void pppos_client_task()
             ESP_LOGE(TAG, "Error init pppos");
             return;
         }
+
+        ppp_inited = 1;
     }
+    
 
     pppapi_set_default(ppp);
 
