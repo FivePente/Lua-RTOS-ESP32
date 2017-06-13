@@ -277,6 +277,9 @@ static void pppos_client_task()
     char *data = (char *) malloc(BUF_SIZE);
 
     while (1) {
+
+        ppp_init_gsm();
+
         if(init_ok == 0){
             ppp = pppapi_pppos_create(&ppp_netif,ppp_output_callback, ppp_status_cb, NULL);
 
@@ -313,7 +316,6 @@ static void pppos_client_task()
             if(conn_ok == 0){
                 ESP_LOGE(TAG , "Disconnected, trying again...");
                 pppapi_close(ppp , 0);
-                ppp_init_gsm();
                 vTaskDelay(1000 / portTICK_RATE_MS);
                 break;
             }
