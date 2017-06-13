@@ -225,6 +225,50 @@ static u32_t ppp_output_callback(ppp_pcb *pcb, u8_t *data, u32_t len, void *ctx)
 #define UART1_TX_PIN 17
 #define UART1_RX_PIN 16
 
+static int ppp_init_gsm(){
+
+    char *data = (char *) malloc(BUF_SIZE);
+
+    //init gsm
+    int gsmCmdIter = 0;
+    while (1) {
+        ESP_LOGE(TAG, "%s", GSM_MGR_InitCmds[gsmCmdIter].cmd);
+        uart_write_bytes(uart_num, (const char *)GSM_MGR_InitCmds[gsmCmdIter].cmd,
+                            GSM_MGR_InitCmds[gsmCmdIter].cmdSize);
+
+        int timeoutCnt = 0;
+        while (1) {
+            memset(data, 0, BUF_SIZE);
+            int len = uart_read_bytes(uart_num, (uint8_t *)data, BUF_SIZE, 500 / portTICK_RATE_MS);
+            if (len > 0) {
+                ESP_LOGE(TAG, "%s", data);
+            }
+
+            timeoutCnt += 500;
+            if (strstr(data, GSM_MGR_InitCmds[gsmCmdIter].cmdResponseOnOk) != NULL) {
+                break;
+            }
+
+            if (timeoutCnt > GSM_MGR_InitCmds[gsmCmdIter].timeoutMs) {
+                ESP_LOGE(TAG, "Gsm Init Error");
+                free(data);
+                return 0;
+            }
+        }
+        gsmCmdIter++;
+
+        if (gsmCmdIter >= GSM_MGR_InitCmdsSize) {
+            break;
+        }
+    }
+
+    ESP_LOGI(TAG, "Gsm init end");
+
+    free(data);
+
+    return 0;
+}
+
 static void pppos_client_task()
 {
     static int init_ok = 0;
@@ -293,50 +337,6 @@ static int ppp_init_uart(lua_State* L){
     ESP_LOGI(TAG, "Configuring UART1 GPIOs: TX:%d RX:%d",UART1_TX_PIN, UART1_RX_PIN);
     uart_set_pin(uart_num, UART1_TX_PIN, UART1_RX_PIN, 0, 0);
     uart_driver_install(uart_num, BUF_SIZE * 2, BUF_SIZE * 2, 0, NULL, 0);
-    return 0;
-}
-
-static int ppp_init_gsm(){
-
-    char *data = (char *) malloc(BUF_SIZE);
-
-    //init gsm
-    int gsmCmdIter = 0;
-    while (1) {
-        ESP_LOGE(TAG, "%s", GSM_MGR_InitCmds[gsmCmdIter].cmd);
-        uart_write_bytes(uart_num, (const char *)GSM_MGR_InitCmds[gsmCmdIter].cmd,
-                            GSM_MGR_InitCmds[gsmCmdIter].cmdSize);
-
-        int timeoutCnt = 0;
-        while (1) {
-            memset(data, 0, BUF_SIZE);
-            int len = uart_read_bytes(uart_num, (uint8_t *)data, BUF_SIZE, 500 / portTICK_RATE_MS);
-            if (len > 0) {
-                ESP_LOGE(TAG, "%s", data);
-            }
-
-            timeoutCnt += 500;
-            if (strstr(data, GSM_MGR_InitCmds[gsmCmdIter].cmdResponseOnOk) != NULL) {
-                break;
-            }
-
-            if (timeoutCnt > GSM_MGR_InitCmds[gsmCmdIter].timeoutMs) {
-                ESP_LOGE(TAG, "Gsm Init Error");
-                free(data);
-                return 0;
-            }
-        }
-        gsmCmdIter++;
-
-        if (gsmCmdIter >= GSM_MGR_InitCmdsSize) {
-            break;
-        }
-    }
-
-    ESP_LOGI(TAG, "Gsm init end");
-
-    free(data);
-
     return 0;
 }
 
