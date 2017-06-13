@@ -367,7 +367,7 @@ static int ppp_sendAT(lua_State* L){
         }
 
         timeoutCnt += 500;
-        if (strstr(data, GSM_OK_Str != NULL) {
+        if (strstr(data, GSM_OK_Str != NULL)) {
             break;
         }
 
