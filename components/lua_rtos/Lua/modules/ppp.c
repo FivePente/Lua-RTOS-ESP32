@@ -17,35 +17,6 @@
 #include <stdio.h>
 #include <assert.h>
 #include <signal.h>
-/*
-#include "lua.h"
-#include "lauxlib.h"
-#include "uart.h"
-#include "error.h"
-
-#include <drivers/gpio.h>
-#include <drivers/cpu.h>
-#include <drivers/uart.h>
-
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/event_groups.h"
-#include "esp_system.h"
-#include "esp_wifi.h"
-#include "esp_event_loop.h"
-#include "esp_log.h"
-#include "nvs_flash.h"
-
-#include "netif/ppp/pppos.h"
-#include "lwip/err.h"
-#include "lwip/sockets.h"
-#include "lwip/sys.h"
-#include "lwip/netdb.h"
-#include "lwip/dns.h"
-#include "lwip/pppapi.h"
-*/
-
-#include <string.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/event_groups.h"
@@ -235,7 +206,7 @@ static void ppp_status_cb(ppp_pcb *pcb, int err_code, void *ctx)
      * Try to reconnect in 30 seconds, if you need a modem chatscript you have
      * to do a much better signaling here ;-)
      */
-    //ppp_connect(pcb, 30);
+    ppp_connect(pcb, 30);
     /* OR ppp_listen(pcb); */
 }
 
