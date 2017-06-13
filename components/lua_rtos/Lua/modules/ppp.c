@@ -301,8 +301,6 @@ static void pppos_client_task()
 
         ESP_LOGI(TAG, "After pppapi_connect");
 
-        conn_ok = 1;
-
         while (1) {
             memset(data, 0, BUF_SIZE);
             int len = uart_read_bytes(uart_num, (uint8_t *)data, BUF_SIZE, 10 / portTICK_RATE_MS);
