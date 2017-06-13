@@ -367,11 +367,11 @@ static int ppp_sendAT(lua_State* L){
         }
 
         timeoutCnt += 500;
-        if (strstr(data, GSM_MGR_InitCmds[gsmCmdIter].cmdResponseOnOk) != NULL) {
+        if (strstr(data, GSM_OK_Str != NULL) {
             break;
         }
 
-        if (timeoutCnt > GSM_MGR_InitCmds[gsmCmdIter].timeoutMs) {
+        if (timeoutCnt > 3000) {
             ESP_LOGE(TAG, "AT Error");
             break;
         }
