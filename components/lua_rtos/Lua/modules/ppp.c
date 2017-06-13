@@ -46,7 +46,7 @@ const char *PPP_ApnATReq = "AT+CGDCONT=1,\"IP\",\"CMNET\"";
 static int uart_num = 2;
 
 /* The PPP control block */
-static ppp_pcb *ppp;
+ppp_pcb *ppp;
 
 /* The PPP IP interface */
 struct netif ppp_netif;
@@ -366,6 +366,7 @@ static int lppp_close(lua_State* L){
     if(xHandle != NULL){
         vTaskDelete(xHandle);
         xHandle = NULL;
+        sleep(100);
     }
     
     err_t err = 0;
