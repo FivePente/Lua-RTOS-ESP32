@@ -324,10 +324,7 @@ static int ppp_setup(lua_State* L){
     return 0;
 }
 
-static int ppp_sendAT(lua_State* L){
-    const char *cmd = luaL_checkstring( L, 1 );
-    uart_write_bytes(uart_num, cmd , sizeof(cmd) - 1);
-
+static void readCallback(){
     char *data = (char *) malloc(BUF_SIZE);
     int timeoutCnt = 0;
     while (1) {
@@ -349,6 +346,12 @@ static int ppp_sendAT(lua_State* L){
     }
 
     free(data);
+}
+
+static int ppp_sendAT(lua_State* L){
+    const char *cmd = luaL_checkstring( L, 1 );
+    uart_write_bytes(uart_num, cmd , sizeof(cmd) - 1);
+    readCallback();
     return 0;
 }
 
@@ -356,6 +359,7 @@ static int lppp_close(lua_State* L){
     pppapi_close(ppp , 0);
     pppapi_free(ppp);
     uart_write_bytes(uart_num, "ATH\r", sizeof("ATH\r") - 1);
+    readCallback();
     if(xHandle != NULL){
         vTaskDelete(xHandle);
         xHandle = NULL;
