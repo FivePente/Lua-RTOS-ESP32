@@ -132,11 +132,10 @@ void delivered(void *context, MQTTClient_deliveryToken dt)
     lua_call(mqtt->L, 1, 0);
 
     mtx_unlock(&mqtt->callback_mtx);
-    return 1;
 }
 
 
-static int connectionLost(void* context, char* cause)
+void connectionLost(void* context, char* cause)
 {
     mqtt_userdata *mqtt = (mqtt_userdata *)context;
 
@@ -149,7 +148,6 @@ static int connectionLost(void* context, char* cause)
     lua_call(mqtt->L, 1, 0);
 
     mtx_unlock(&mqtt->callback_mtx);
-    return 1;
 }
 
 static int messageArrived(void *context, char * topicName, int topicLen, MQTTClient_message* m) {
