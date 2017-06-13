@@ -72,15 +72,15 @@ const char *PPP_ApnATReq = "AT+CGDCONT=1,\"IP\",\"CMNET\"";
 #define BUF_SIZE (1024)
 
 /* UART */
-int uart_num = 2;
+static int uart_num = 2;
 
 /* The PPP control block */
-ppp_pcb *ppp;
+static ppp_pcb *ppp;
 
 /* The PPP IP interface */
 struct netif ppp_netif;
 
-TaskHandle_t xHandle = NULL;
+static TaskHandle_t xHandle = NULL;
 
 static const char *TAG = "example";
 
@@ -342,8 +342,8 @@ static int ppp_setup_uart(lua_State* L){
 
 static int ppp_task_setup(lua_State* L){
     tcpip_adapter_init();
-    xTaskCreate(&pppos_client_task, "pppos_client_task", 2048, NULL, 5, $xHandle); 
-    configASSERT(xHandle);
+    xTaskCreate(&pppos_client_task, "pppos_client_task", 2048, NULL, 5, &xHandle); 
+    configASSERT(xHandle)
     return 0;
 }
 
