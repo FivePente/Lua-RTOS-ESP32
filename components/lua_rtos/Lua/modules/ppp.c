@@ -312,6 +312,10 @@ static void pppos_client_task()
             if (len > 0) {
                 ESP_LOGI(TAG, "PPP rx len %d", len);
                 pppos_input_tcpip(ppp, (u8_t *)data, len);
+
+                if(conn_ok == 0){
+                    conn_ok = 1;
+                }
             }
 
             if(conn_ok == 0){
