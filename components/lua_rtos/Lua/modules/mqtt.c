@@ -127,9 +127,9 @@ void delivered(void *context, MQTTClient_deliveryToken dt)
     mtx_lock(&mqtt->callback_mtx);
     printf("Message with token value %d delivery confirmed\n", dt);
 
-    lua_rawgeti(mqtt->L, LUA_REGISTRYINDEX, mqtt->delivered);
-    lua_pushinteger(mqtt->L, dt);
-    lua_call(mqtt->L, 1, 0);
+    //lua_rawgeti(mqtt->L, LUA_REGISTRYINDEX, mqtt->delivered);
+    //lua_pushinteger(mqtt->L, dt);
+    //lua_call(mqtt->L, 1, 0);
 
     mtx_unlock(&mqtt->callback_mtx);
 }
@@ -143,9 +143,9 @@ void connectionLost(void* context, char* cause)
     printf("\nConnection lost\n");
     printf("     cause: %s\n", cause);
 
-    lua_rawgeti(mqtt->L, LUA_REGISTRYINDEX, mqtt->connectionLost);
-    lua_pushinteger(mqtt->L, cause);
-    lua_call(mqtt->L, 1, 0);
+    //lua_rawgeti(mqtt->L, LUA_REGISTRYINDEX, mqtt->connectionLost);
+    //lua_pushinteger(mqtt->L, cause);
+    //lua_call(mqtt->L, 1, 0);
 
     mtx_unlock(&mqtt->callback_mtx);
 }
