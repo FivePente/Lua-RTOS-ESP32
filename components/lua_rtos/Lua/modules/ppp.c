@@ -206,7 +206,7 @@ static void ppp_status_cb(ppp_pcb *pcb, int err_code, void *ctx)
      * Try to reconnect in 30 seconds, if you need a modem chatscript you have
      * to do a much better signaling here ;-)
      */
-    ppp_connect(pcb, 30);
+    /*ppp_connect(pcb, 30);
     /* OR ppp_listen(pcb); */
 }
 
@@ -367,7 +367,6 @@ static int lppp_close(lua_State* L){
         vTaskDelete(xHandle);
         xHandle = NULL;
     }
-
     
     err_t err = 0;
     err = pppapi_close(ppp , 0);
