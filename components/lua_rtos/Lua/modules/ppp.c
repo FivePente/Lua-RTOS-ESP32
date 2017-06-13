@@ -48,8 +48,6 @@ static int uart_num = 2;
 /* The PPP control block */
 static ppp_pcb *ppp;
 
-static int ppp_inited = 0;
-
 /* The PPP IP interface */
 struct netif ppp_netif;
 
@@ -133,6 +131,8 @@ static void ppp_status_cb(ppp_pcb *pcb, int err_code, void *ctx)
 #if PPP_IPV6_SUPPORT
         ESP_LOGI(TAG, "   our6_ipaddr = %s\n", ip6addr_ntoa(netif_ip6_addr(pppif, 0)));
 #endif /* PPP_IPV6_SUPPORT */
+
+        conn_ok = 1;
         break;
     }
     case PPPERR_PARAM: {
@@ -156,6 +156,7 @@ static void ppp_status_cb(ppp_pcb *pcb, int err_code, void *ctx)
         break;
     }
     case PPPERR_CONNECT: {
+        conn_ok = 0;
         ESP_LOGE(TAG, "status_cb: Connection lost\n");
         break;
     }
@@ -224,35 +225,54 @@ static u32_t ppp_output_callback(ppp_pcb *pcb, u8_t *data, u32_t len, void *ctx)
 
 static void pppos_client_task()
 {
+    static uint8_t conn_ok = 1;
+
+    static int init_ok = 0;
+
     char *data = (char *) malloc(BUF_SIZE);
 
-    ppp = pppapi_pppos_create(&ppp_netif,ppp_output_callback, ppp_status_cb, NULL);
-
-    ESP_LOGI(TAG, "After pppapi_pppos_create");
-
-    if (ppp == NULL) {
-        ESP_LOGE(TAG, "Error init pppos");
-        return;
-    }
-
-    pppapi_set_default(ppp);
-
-    ESP_LOGI(TAG, "After pppapi_set_default");
-
-    pppapi_set_auth(ppp, PPPAUTHTYPE_PAP, PPP_User, PPP_Pass);
-
-    ESP_LOGI(TAG, "After pppapi_set_auth");
-
-    pppapi_connect(ppp, 0);
-
-    ESP_LOGI(TAG, "After pppapi_connect");
-
     while (1) {
-        memset(data, 0, BUF_SIZE);
-        int len = uart_read_bytes(uart_num, (uint8_t *)data, BUF_SIZE, 10 / portTICK_RATE_MS);
-        if (len > 0) {
-            ESP_LOGI(TAG, "PPP rx len %d", len);
-            pppos_input_tcpip(ppp, (u8_t *)data, len);
+        if(init_ok == 0){
+            ppp = pppapi_pppos_create(&ppp_netif,ppp_output_callback, ppp_status_cb, NULL);
+
+            ESP_LOGI(TAG, "After pppapi_pppos_create");
+
+            if (ppp == NULL) {
+                ESP_LOGE(TAG, "Error init pppos");
+                return;
+            }
+
+            init_ok = 1;
+        }
+
+        pppapi_set_default(ppp);
+
+        ESP_LOGI(TAG, "After pppapi_set_default");
+
+        pppapi_set_auth(ppp, PPPAUTHTYPE_PAP, PPP_User, PPP_Pass);
+
+        ESP_LOGI(TAG, "After pppapi_set_auth");
+
+        pppapi_connect(ppp, 0);
+
+        ESP_LOGI(TAG, "After pppapi_connect");
+
+        while (1) {
+            memset(data, 0, BUF_SIZE);
+            int len = uart_read_bytes(uart_num, (uint8_t *)data, BUF_SIZE, 10 / portTICK_RATE_MS);
+            if (len > 0) {
+                ESP_LOGI(TAG, "PPP rx len %d", len);
+                pppos_input_tcpip(ppp, (u8_t *)data, len);
+            }
+
+            if(conn_ok == 0){
+                ESP_LOGE(TAG , "Disconnected, trying again...");
+                pppapi_close(ppp , 0);
+                ppp_init_gsm();
+                conn_ok = 10;
+                vTaskDelay(1000 / portTICK_RATE_MS);
+                break;
+            }
         }
     }
 }
@@ -275,7 +295,7 @@ static int ppp_init_uart(lua_State* L){
     return 0;
 }
 
-static int ppp_init_gsm(lua_State* L){
+static int ppp_init_gsm(){
 
     char *data = (char *) malloc(BUF_SIZE);
 
@@ -319,10 +339,13 @@ static int ppp_init_gsm(lua_State* L){
     return 0;
 }
 
+static int lppp_init_gsm(lua_State* L){
+    ppp_init_gsm();
+}
+
 static int ppp_task_setup(lua_State* L){
     tcpip_adapter_init();
     xTaskCreate(&pppos_client_task, "pppos_client_task", 2048, NULL, 5, &xHandle); 
-    configASSERT(xHandle);
     return 0;
 }
 
@@ -389,7 +412,7 @@ static const LUA_REG_TYPE ppp_map[] = {
     { LSTRKEY( "setupXTask" ),  LFUNCVAL( ppp_task_setup )},
     { LSTRKEY( "setup" ),  LFUNCVAL( ppp_setup )},
     { LSTRKEY( "initUART" ),  LFUNCVAL( ppp_init_uart )},
-    { LSTRKEY( "initGSM" ),  LFUNCVAL( ppp_init_gsm )},
+    { LSTRKEY( "initGSM" ),  LFUNCVAL( lppp_init_gsm )},
     { LSTRKEY( "sendAT" ),  LFUNCVAL( ppp_sendAT )},
     { LSTRKEY( "close" ),  LFUNCVAL( lppp_close )},
     { LNILKEY, LNILVAL }
