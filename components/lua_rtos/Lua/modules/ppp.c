@@ -372,13 +372,13 @@ static int lppp_close(lua_State* L){
     if( err != 0){
         ESP_LOGE(TAG, "pppapi_free error");
         return 0;
-    }
+    }/*
     uart_write_bytes(uart_num, "ATH\r", sizeof("ATH\r") - 1);
     readCallback();
     if(xHandle != NULL){
         vTaskDelete(xHandle);
         xHandle = NULL;
-    }
+    }*/
     return 0;
 }
 
