@@ -125,7 +125,6 @@ static void ppp_status_cb(ppp_pcb *pcb, int err_code, void *ctx)
     switch (err_code) {
     case PPPERR_NONE: {
         ESP_LOGI(TAG, "status_cb: Connected\n");
-        conn_ok = 1;
 #if PPP_IPV4_SUPPORT
         ESP_LOGI(TAG, "   our_ipaddr  = %s\n", ipaddr_ntoa(&pppif->ip_addr));
         ESP_LOGI(TAG, "   his_ipaddr  = %s\n", ipaddr_ntoa(&pppif->gw));
@@ -197,7 +196,6 @@ static void ppp_status_cb(ppp_pcb *pcb, int err_code, void *ctx)
      */
 
     if (err_code == PPPERR_NONE) {
-        conn_ok = 1;
         return;
     }
 
@@ -304,26 +302,21 @@ static void pppos_client_task()
 
         ESP_LOGI(TAG, "After pppapi_connect");
 
-        vTaskDelay(3000 / portTICK_RATE_MS);
-
         while (1) {
             memset(data, 0, BUF_SIZE);
             int len = uart_read_bytes(uart_num, (uint8_t *)data, BUF_SIZE, 10 / portTICK_RATE_MS);
             if (len > 0) {
                 ESP_LOGI(TAG, "PPP rx len %d", len);
                 pppos_input_tcpip(ppp, (u8_t *)data, len);
-
-                if(conn_ok == 0){
-                    conn_ok = 1;
-                }
             }
 
+            /*
             if(conn_ok == 0){
                 ESP_LOGE(TAG , "Disconnected, trying again...");
                 pppapi_close(ppp , 0);
                 vTaskDelay(1000 / portTICK_RATE_MS);
                 break;
-            }
+            }*/
         }
     }
 }
@@ -396,9 +389,6 @@ static int ppp_sendAT(lua_State* L){
 
 static int lppp_close(lua_State* L){
 
-    conn_ok = 0;
-
-    /*
     if(xHandle != NULL){
         vTaskDelete(xHandle);
     }
@@ -409,11 +399,6 @@ static int lppp_close(lua_State* L){
         ESP_LOGE(TAG, "pppapi_close error");
         return 0;
     }
-    err = pppapi_free(ppp);
-    if( err != 0){
-        ESP_LOGE(TAG, "pppapi_free error");
-        return 0;
-    }*/
 
     return 0;
 }
