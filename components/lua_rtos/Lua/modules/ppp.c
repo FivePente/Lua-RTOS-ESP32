@@ -256,7 +256,7 @@ static void pppos_client_task()
 }
 
 static int ppp_init_uart(lua_State* L){
-        uart_config_t uart_config = {
+    uart_config_t uart_config = {
         .baud_rate = 115200,
         .data_bits = UART_DATA_8_BITS,
         .parity = UART_PARITY_DISABLE,
@@ -368,23 +368,19 @@ static int lppp_close(lua_State* L){
         xHandle = NULL;
     }
 
+    
     err_t err = 0;
     err = pppapi_close(ppp , 0);
     if( err != 0){
         ESP_LOGE(TAG, "pppapi_close error");
         return 0;
-    }
+    }/*
     err = pppapi_free(ppp);
     if( err != 0){
         ESP_LOGE(TAG, "pppapi_free error");
         return 0;
-    }/*
-    uart_write_bytes(uart_num, "ATH\r", sizeof("ATH\r") - 1);
-    readCallback();
-    if(xHandle != NULL){
-        vTaskDelete(xHandle);
-        xHandle = NULL;
     }*/
+
     return 0;
 }
 
