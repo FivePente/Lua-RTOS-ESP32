@@ -237,16 +237,15 @@ static void pppos_client_task()
         }
 
         ppp_inited = 1;
+   
+        pppapi_set_default(ppp);
+
+        ESP_LOGI(TAG, "After pppapi_set_default");
+
+        pppapi_set_auth(ppp, PPPAUTHTYPE_PAP, PPP_User, PPP_Pass);
+
+        ESP_LOGI(TAG, "After pppapi_set_auth");
     }
-    
-
-    pppapi_set_default(ppp);
-
-    ESP_LOGI(TAG, "After pppapi_set_default");
-
-    pppapi_set_auth(ppp, PPPAUTHTYPE_PAP, PPP_User, PPP_Pass);
-
-    ESP_LOGI(TAG, "After pppapi_set_auth");
 
     pppapi_connect(ppp, 0);
 
