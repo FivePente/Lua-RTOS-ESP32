@@ -223,50 +223,6 @@ static u32_t ppp_output_callback(ppp_pcb *pcb, u8_t *data, u32_t len, void *ctx)
 #define UART1_TX_PIN 17
 #define UART1_RX_PIN 16
 
-static int ppp_init_gsm(){
-
-    char *data = (char *) malloc(BUF_SIZE);
-
-    //init gsm
-    int gsmCmdIter = 0;
-    while (1) {
-        ESP_LOGE(TAG, "%s", GSM_MGR_InitCmds[gsmCmdIter].cmd);
-        uart_write_bytes(uart_num, (const char *)GSM_MGR_InitCmds[gsmCmdIter].cmd,
-                            GSM_MGR_InitCmds[gsmCmdIter].cmdSize);
-
-        int timeoutCnt = 0;
-        while (1) {
-            memset(data, 0, BUF_SIZE);
-            int len = uart_read_bytes(uart_num, (uint8_t *)data, BUF_SIZE, 500 / portTICK_RATE_MS);
-            if (len > 0) {
-                ESP_LOGE(TAG, "%s", data);
-            }
-
-            timeoutCnt += 500;
-            if (strstr(data, GSM_MGR_InitCmds[gsmCmdIter].cmdResponseOnOk) != NULL) {
-                break;
-            }
-
-            if (timeoutCnt > GSM_MGR_InitCmds[gsmCmdIter].timeoutMs) {
-                ESP_LOGE(TAG, "Gsm Init Error");
-                free(data);
-                return 0;
-            }
-        }
-        gsmCmdIter++;
-
-        if (gsmCmdIter >= GSM_MGR_InitCmdsSize) {
-            break;
-        }
-    }
-
-    ESP_LOGI(TAG, "Gsm init end");
-
-    free(data);
-
-    return 0;
-}
-
 static void pppos_client_task()
 {
     static int init_ok = 0;
@@ -275,7 +231,41 @@ static void pppos_client_task()
 
     while (1) {
 
-        ppp_init_gsm();
+        //init gsm
+        int gsmCmdIter = 0;
+
+        while (1) {
+            ESP_LOGE(TAG, "%s", GSM_MGR_InitCmds[gsmCmdIter].cmd);
+            uart_write_bytes(uart_num, (const char *)GSM_MGR_InitCmds[gsmCmdIter].cmd,
+                                GSM_MGR_InitCmds[gsmCmdIter].cmdSize);
+
+            int timeoutCnt = 0;
+            while (1) {
+                memset(data, 0, BUF_SIZE);
+                int len = uart_read_bytes(uart_num, (uint8_t *)data, BUF_SIZE, 500 / portTICK_RATE_MS);
+                if (len > 0) {
+                    ESP_LOGE(TAG, "%s", data);
+                }
+
+                timeoutCnt += 500;
+                if (strstr(data, GSM_MGR_InitCmds[gsmCmdIter].cmdResponseOnOk) != NULL) {
+                    break;
+                }
+
+                if (timeoutCnt > GSM_MGR_InitCmds[gsmCmdIter].timeoutMs) {
+                    ESP_LOGE(TAG, "Gsm Init Error");
+                    free(data);
+                    return 0;
+                }
+            }
+            gsmCmdIter++;
+
+            if (gsmCmdIter >= GSM_MGR_InitCmdsSize) {
+                break;
+            }
+        }
+
+        ESP_LOGI(TAG, "Gsm init end");
 
         if(init_ok == 0){
             ppp = pppapi_pppos_create(&ppp_netif,ppp_output_callback, ppp_status_cb, NULL);
@@ -342,11 +332,6 @@ static int ppp_init_uart(lua_State* L){
     return 0;
 }
 
-static int lppp_init_gsm(lua_State* L){
-    ppp_init_gsm();
-    return 0;
-}
-
 static int ppp_task_setup(lua_State* L){
     tcpip_adapter_init();
     xTaskCreate(&pppos_client_task, "pppos_client_task", 2048, NULL, 5, &xHandle); 
@@ -407,7 +392,6 @@ static const LUA_REG_TYPE ppp_map[] = {
     { LSTRKEY( "setupXTask" ),  LFUNCVAL( ppp_task_setup )},
     { LSTRKEY( "setup" ),  LFUNCVAL( ppp_setup )},
     { LSTRKEY( "initUART" ),  LFUNCVAL( ppp_init_uart )},
-    { LSTRKEY( "initGSM" ),  LFUNCVAL( lppp_init_gsm )},
     { LSTRKEY( "sendAT" ),  LFUNCVAL( ppp_sendAT )},
     { LSTRKEY( "close" ),  LFUNCVAL( lppp_close )},
     { LNILKEY, LNILVAL }
