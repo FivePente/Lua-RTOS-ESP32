@@ -223,38 +223,89 @@ static u32_t ppp_output_callback(ppp_pcb *pcb, u8_t *data, u32_t len, void *ctx)
 static void pppos_client_task()
 {
     char *data = (char *) malloc(BUF_SIZE);
+    uart_config_t uart_config = {
+        .baud_rate = 115200,
+        .data_bits = UART_DATA_8_BITS,
+        .parity = UART_PARITY_DISABLE,
+        .stop_bits = UART_STOP_BITS_1,
+        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE
+    };
+    //Configure UART1 parameters
+    uart_param_config(uart_num, &uart_config);
 
-    ppp = pppapi_pppos_create(&ppp_netif,ppp_output_callback, ppp_status_cb, NULL);
-
-    ESP_LOGI(TAG, "After pppapi_pppos_create");
-
-    if (ppp == NULL) {
-        ESP_LOGE(TAG, "Error init pppos");
-        return;
-    }
-
-    pppapi_set_default(ppp);
-
-    ESP_LOGI(TAG, "After pppapi_set_default");
-
-    pppapi_set_auth(ppp, PPPAUTHTYPE_PAP, PPP_User, PPP_Pass);
-
-    ESP_LOGI(TAG, "After pppapi_set_auth");
-
-    pppapi_connect(ppp, 0);
-
-    ESP_LOGI(TAG, "After pppapi_connect");
+    // Configure UART1 pins (as set in example's menuconfig)
+    ESP_LOGI(TAG, "Configuring UART1 GPIOs: TX:%d RX:%d RTS:%d CTS: %d",
+             UART1_TX_PIN, UART1_RX_PIN, 0, 0);
+    uart_set_pin(uart_num, UART1_TX_PIN, UART1_RX_PIN, 0, 0);
+    uart_driver_install(uart_num, BUF_SIZE * 2, BUF_SIZE * 2, 0, NULL, 0);
 
     while (1) {
-        memset(data, 0, BUF_SIZE);
-        int len = uart_read_bytes(uart_num, (uint8_t *)data, BUF_SIZE, 10 / portTICK_RATE_MS);
-        if (len > 0) {
-            ESP_LOGI(TAG, "PPP rx len %d", len);
-            pppos_input_tcpip(ppp, (u8_t *)data, len);
+        //init gsm
+        int gsmCmdIter = 0;
+        while (1) {
+            ESP_LOGI(TAG, "%s", GSM_MGR_InitCmds[gsmCmdIter].cmd);
+            uart_write_bytes(uart_num, (const char *)GSM_MGR_InitCmds[gsmCmdIter].cmd,
+                             GSM_MGR_InitCmds[gsmCmdIter].cmdSize);
+
+            int timeoutCnt = 0;
+            while (1) {
+                memset(data, 0, BUF_SIZE);
+                int len = uart_read_bytes(uart_num, (uint8_t *)data, BUF_SIZE, 500 / portTICK_RATE_MS);
+                if (len > 0) {
+                    ESP_LOGI(TAG, "%s", data);
+                }
+
+                timeoutCnt += 500;
+                if (strstr(data, GSM_MGR_InitCmds[gsmCmdIter].cmdResponseOnOk) != NULL) {
+                    break;
+                }
+
+                if (timeoutCnt > GSM_MGR_InitCmds[gsmCmdIter].timeoutMs) {
+                    ESP_LOGE(TAG, "Gsm Init Error");
+                    return;
+                }
+            }
+            gsmCmdIter++;
+
+            if (gsmCmdIter >= GSM_MGR_InitCmdsSize) {
+                break;
+            }
+        }
+
+        ESP_LOGI(TAG, "Gsm init end");
+
+        ppp = pppapi_pppos_create(&ppp_netif,
+                                  ppp_output_callback, ppp_status_cb, NULL);
+
+        ESP_LOGI(TAG, "After pppapi_pppos_create");
+
+        if (ppp == NULL) {
+            ESP_LOGE(TAG, "Error init pppos");
+            return;
+        }
+
+        pppapi_set_default(ppp);
+
+        ESP_LOGI(TAG, "After pppapi_set_default");
+
+        pppapi_set_auth(ppp, PPPAUTHTYPE_PAP, PPP_User, PPP_Pass);
+
+        ESP_LOGI(TAG, "After pppapi_set_auth");
+
+        pppapi_connect(ppp, 0);
+
+        ESP_LOGI(TAG, "After pppapi_connect");
+
+        while (1) {
+            memset(data, 0, BUF_SIZE);
+            int len = uart_read_bytes(uart_num, (uint8_t *)data, BUF_SIZE, 10 / portTICK_RATE_MS);
+            if (len > 0) {
+                ESP_LOGI(TAG, "PPP rx len %d", len);
+                pppos_input_tcpip(ppp, (u8_t *)data, len);
+            }
         }
     }
 }
-
 static int ppp_init_uart(lua_State* L){
     uart_config_t uart_config = {
         .baud_rate = 115200,
@@ -320,7 +371,6 @@ static int ppp_init_gsm(lua_State* L){
 static int ppp_task_setup(lua_State* L){
     tcpip_adapter_init();
     xTaskCreate(&pppos_client_task, "pppos_client_task", 2048, NULL, 5, &xHandle); 
-    configASSERT(xHandle);
     return 0;
 }
 
