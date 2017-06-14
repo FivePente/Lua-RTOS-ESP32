@@ -54,8 +54,8 @@ static TaskHandle_t xHandle = NULL;
 
 static const char *TAG = "example";
 
-#define UART_GPIO_TX 17
-#define UART_GPIO_RX 16
+#define UART1_TX_PIN 17
+#define UART1_RX_PIN 16
 
 static int read_callback_index = 0;
 static int write_callback_index = 0;
