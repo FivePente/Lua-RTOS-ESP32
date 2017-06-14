@@ -24,6 +24,7 @@
 #include "nvs_flash.h"
 
 #include "driver/uart.h"
+#include <drivers/uart.h>
 
 #include "netif/ppp/pppos.h"
 #include "lwip/err.h"
@@ -235,9 +236,11 @@ static void ppp_status_cb(ppp_pcb *pcb, int err_code, void *ctx) {
 //--------------------------------------------------------------------------------
 static u32_t ppp_output_callback(ppp_pcb *pcb, u8_t *data, u32_t len, void *ctx) {
 	// *** Handle sending to GSM modem ***
-	uint32_t ret = uart_write_bytes(uart_num, (const char*)data, len);
-    uart_wait_tx_done(uart_num, 10 / portTICK_RATE_MS);
-    return ret;
+	//uint32_t ret = uart_write_bytes(uart_num, (const char*)data, len);
+    //uart_wait_tx_done(uart_num, 10 / portTICK_RATE_MS);
+
+    uart_writes(uart_num, (char *)data);
+    return len;
 }
 
 //-----------------------------
@@ -246,9 +249,11 @@ static void pppos_client_task()
 	uint8_t init_ok = 1;
 	int pass = 0;
 	char sresp[256] = {'\0'};
+    int res;
 
     char* data = (char*) malloc(BUF_SIZE);
 	
+    /*
 	uart_config_t uart_config = {
 			.baud_rate = UART_BDRATE,
 			.data_bits = UART_DATA_8_BITS,
@@ -264,6 +269,7 @@ static void pppos_client_task()
 	uart_driver_install(uart_num, BUF_SIZE * 2, BUF_SIZE * 2, 0, NULL, 0);
 
 	ESP_LOGI(TAG,"Gsm init start");
+
 	// *** Disconnect if connected ***
 	vTaskDelay(1000 / portTICK_PERIOD_MS);
 	while (uart_read_bytes(uart_num, (uint8_t*)data, BUF_SIZE, 100 / portTICK_RATE_MS)) {
@@ -271,6 +277,18 @@ static void pppos_client_task()
 	}
 	uart_write_bytes(uart_num, "+++", 3);
     uart_wait_tx_done(uart_num, 10 / portTICK_RATE_MS);
+	vTaskDelay(1000 / portTICK_PERIOD_MS);
+    */
+
+    driver_error_t *error;
+    error = uart_init(uart_num, UART_BDRATE, UART_DATA_8_BITS, UART_PARITY_DISABLE, UART_STOP_BITS_1, BUF_SIZE * 2);
+    error = uart_setup_interrupts(uart_num);
+
+	vTaskDelay(1000 / portTICK_PERIOD_MS);
+	while (uart_reads(uart_num, (uint8_t*)data, 0, 100 / portTICK_RATE_MS)) {
+		vTaskDelay(100 / portTICK_PERIOD_MS);
+	}
+    uart_writes(uart_num, "+++");
 	vTaskDelay(1000 / portTICK_PERIOD_MS);
 
 	conn_ok = 98;
@@ -292,12 +310,18 @@ static void pppos_client_task()
 			}
 			printf("[GSM INIT] >Cmd: [%s]\r\n", sresp);
 			vTaskDelay(100 / portTICK_PERIOD_MS);
+            /*
 			while (uart_read_bytes(uart_num, (uint8_t*)data, BUF_SIZE, 100 / portTICK_RATE_MS)) {
 				vTaskDelay(100 / portTICK_PERIOD_MS);
 			}
 			uart_write_bytes(uart_num, (const char*)GSM_MGR_InitCmds[gsmCmdIter].cmd,
 					GSM_MGR_InitCmds[gsmCmdIter].cmdSize);
-            uart_wait_tx_done(uart_num, 10 / portTICK_RATE_MS);
+            uart_wait_tx_done(uart_num, 10 / portTICK_RATE_MS);*/
+
+            while (uart_reads(uart_num, (uint8_t*)data, 0, 100 / portTICK_RATE_MS)) {
+                vTaskDelay(100 / portTICK_PERIOD_MS);
+            }
+			uart_writes(uart_num, (const char*)GSM_MGR_InitCmds[gsmCmdIter].cmd);
 
             // ** Wait for and check the response
             int timeoutCnt = 0;
@@ -308,8 +332,10 @@ static void pppos_client_task()
 			{
 				memset(data, 0, BUF_SIZE);
 				int len = 0;
-				len = uart_read_bytes(uart_num, (uint8_t*)data, BUF_SIZE, 10 / portTICK_RATE_MS);
-				if (len > 0) {
+				//len = uart_read_bytes(uart_num, (uint8_t*)data, BUF_SIZE, 10 / portTICK_RATE_MS);
+                res = uart_reads(uart_num, (uint8_t*)data, 0, 100 / portTICK_RATE_MS)
+				//if (len > 0) {
+                if(res)
 					for (int i=0; i<len;i++) {
 						if (idx < 255) {
 							if ((data[i] >= 0x20) && (data[i] < 0x80)) {
@@ -382,9 +408,12 @@ static void pppos_client_task()
 		// *** Handle GSM modem responses ***
 		while(1) {
 			memset(data, 0, BUF_SIZE);
-			int len = uart_read_bytes(uart_num, (uint8_t*)data, BUF_SIZE, 30 / portTICK_RATE_MS);
-			if(len > 0)	{
-				pppos_input_tcpip(ppp, (u8_t*)data, len);
+			//int len = uart_read_bytes(uart_num, (uint8_t*)data, BUF_SIZE, 30 / portTICK_RATE_MS);
+            res = uart_reads(uart_num, (uint8_t*)data, 0, 30 / portTICK_RATE_MS)
+			//if(len > 0)	{
+            if(res)
+				//pppos_input_tcpip(ppp, (u8_t*)data, len);
+                pppos_input_tcpip(ppp, (u8_t*)data, res);
 			}
 			// Check if disconnected
 			if (conn_ok == 0) {

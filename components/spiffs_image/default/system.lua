@@ -33,3 +33,10 @@ client:subscribe("code", mqtt.QOS0, function(len, message)
     --os.exit(1)
     print(message)
 end)]]
+--[[
+while true do                                                                   
+    client:publish("test", "{name:device1000xksjshj , speed:1726.3826 , type:1 , bool:true , ttt:1927373626 ,test:928282}", mqtt.QOS0)                                                                       
+    -- Wait                                                                     
+    tmr.delay(10)                                                                
+end 
+]]
