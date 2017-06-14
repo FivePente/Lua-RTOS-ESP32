@@ -64,6 +64,9 @@ static TaskHandle_t xHandle = NULL;
 
 static const char *TAG = "[PPPOS CLIENT]";
 
+static int read_callback_index = 0;
+static int write_callback_index = 0;
+
 typedef struct
 {
 	char *cmd;
@@ -236,10 +239,8 @@ static void ppp_status_cb(ppp_pcb *pcb, int err_code, void *ctx) {
 //--------------------------------------------------------------------------------
 static u32_t ppp_output_callback(ppp_pcb *pcb, u8_t *data, u32_t len, void *ctx) {
 	// *** Handle sending to GSM modem ***
-	//uint32_t ret = uart_write_bytes(uart_num, (const char*)data, len);
-    //uart_wait_tx_done(uart_num, 10 / portTICK_RATE_MS);
-
-    uart_writes(uart_num, (char *)data);
+	uint32_t ret = uart_write_bytes(uart_num, (const char*)data, len);
+    uart_wait_tx_done(uart_num, 10 / portTICK_RATE_MS);
     return len;
 }
 
@@ -253,7 +254,6 @@ static void pppos_client_task()
 
     char* data = (char*) malloc(BUF_SIZE);
 	
-    /*
 	uart_config_t uart_config = {
 			.baud_rate = UART_BDRATE,
 			.data_bits = UART_DATA_8_BITS,
@@ -278,23 +278,7 @@ static void pppos_client_task()
 	uart_write_bytes(uart_num, "+++", 3);
     uart_wait_tx_done(uart_num, 10 / portTICK_RATE_MS);
 	vTaskDelay(1000 / portTICK_PERIOD_MS);
-    */
-
-    driver_error_t *error;
-    error = uart_init(uart_num, UART_BDRATE, UART_DATA_8_BITS, UART_PARITY_DISABLE, UART_STOP_BITS_1, BUF_SIZE * 2);
-    error = uart_setup_interrupts(uart_num);
-
-    printf("step 1");
-
-	vTaskDelay(1000 / portTICK_PERIOD_MS);
-	while (uart_reads(uart_num, data, 1, 100 / portTICK_RATE_MS)) {
-		vTaskDelay(100 / portTICK_PERIOD_MS);
-	}
-    printf("step 2");
-    uart_writes(uart_num, "+++");
-	vTaskDelay(1000 / portTICK_PERIOD_MS);
-    printf("step 3");
-
+    
 	conn_ok = 98;
 	while(1)
 	{
@@ -314,18 +298,13 @@ static void pppos_client_task()
 			}
 			printf("[GSM INIT] >Cmd: [%s]\r\n", sresp);
 			vTaskDelay(100 / portTICK_PERIOD_MS);
-            /*
+            
 			while (uart_read_bytes(uart_num, (uint8_t*)data, BUF_SIZE, 100 / portTICK_RATE_MS)) {
 				vTaskDelay(100 / portTICK_PERIOD_MS);
 			}
 			uart_write_bytes(uart_num, (const char*)GSM_MGR_InitCmds[gsmCmdIter].cmd,
 					GSM_MGR_InitCmds[gsmCmdIter].cmdSize);
-            uart_wait_tx_done(uart_num, 10 / portTICK_RATE_MS);*/
-
-            while (uart_reads(uart_num, data, 1, 100 / portTICK_RATE_MS)) {
-                vTaskDelay(100 / portTICK_PERIOD_MS);
-            }
-			uart_writes(uart_num, GSM_MGR_InitCmds[gsmCmdIter].cmd);
+            uart_wait_tx_done(uart_num, 10 / portTICK_RATE_MS);
 
             // ** Wait for and check the response
             int timeoutCnt = 0;
@@ -336,10 +315,8 @@ static void pppos_client_task()
 			{
 				memset(data, 0, BUF_SIZE);
 				int len = 0;
-				//len = uart_read_bytes(uart_num, (uint8_t*)data, BUF_SIZE, 10 / portTICK_RATE_MS);
-                res = uart_reads(uart_num, data, 1, 100 / portTICK_RATE_MS);
-				//if (len > 0) {
-                if(res){
+				len = uart_read_bytes(uart_num, (uint8_t*)data, BUF_SIZE, 10 / portTICK_RATE_MS);
+				if (len > 0) {
 					for (int i=0; i<len;i++) {
 						if (idx < 255) {
 							if ((data[i] >= 0x20) && (data[i] < 0x80)) {
@@ -412,12 +389,9 @@ static void pppos_client_task()
 		// *** Handle GSM modem responses ***
 		while(1) {
 			memset(data, 0, BUF_SIZE);
-			//int len = uart_read_bytes(uart_num, (uint8_t*)data, BUF_SIZE, 30 / portTICK_RATE_MS);
-            res = uart_reads(uart_num, data, 1, 30 / portTICK_RATE_MS);
-			//if(len > 0)	{
-            if(res){
-				//pppos_input_tcpip(ppp, (u8_t*)data, len);
-                pppos_input_tcpip(ppp, (u8_t*)data, res);
+			int len = uart_read_bytes(uart_num, (uint8_t*)data, BUF_SIZE, 30 / portTICK_RATE_MS);
+			if(len > 0)	{
+				pppos_input_tcpip(ppp, (u8_t*)data, len);
 			}
 			// Check if disconnected
 			if (conn_ok == 0) {
@@ -430,6 +404,19 @@ static void pppos_client_task()
 			}
 		}
 	}
+}
+
+static int ppp_callback(lua_State* L ){
+    
+    luaL_checktype(L, 1 , LUA_TFUNCTION);
+    lua_pushvalue(L, 1); 
+    read_callback_index = luaL_ref(L, LUA_REGISTRYINDEX);
+
+    luaL_checktype(L, 2 , LUA_TFUNCTION);
+    lua_pushvalue(L, 2); 
+    write_callback_index = luaL_ref(L, LUA_REGISTRYINDEX);
+
+    return 0;
 }
 
 static int ppp_task_setup(lua_State* L){
@@ -472,6 +459,7 @@ static int lppp_close(lua_State* L){
 static const LUA_REG_TYPE ppp_map[] = {
     { LSTRKEY( "setupXTask" ),  LFUNCVAL( ppp_task_setup )},
     { LSTRKEY( "setup" ),  LFUNCVAL( ppp_setup )},
+    { LSTRKEY( "setCallback" ),  LFUNCVAL( ppp_callback )},
     { LSTRKEY( "close" ),  LFUNCVAL( lppp_close )},
     { LNILKEY, LNILVAL }
 };
