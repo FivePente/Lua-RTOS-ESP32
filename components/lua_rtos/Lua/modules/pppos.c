@@ -57,7 +57,7 @@ static const char *TAG = "example";
 static int read_callback_index = 0;
 static int write_callback_index = 0;
 
-static lua_State ppp_luaState = NULL;
+static lua_State *ppp_luaState;
 
 typedef struct {
     char *cmd;
@@ -242,9 +242,6 @@ static u32_t ppp_output_callback(ppp_pcb *pcb, u8_t *data, u32_t len, void *ctx)
     return len;
 }
 
-#define UART1_TX_PIN 17
-#define UART1_RX_PIN 16
-
 static int ppp_connect(lua_State* L){
 
     char *data = (char *) malloc(BUF_SIZE);
@@ -308,7 +305,8 @@ static int ppp_connect(lua_State* L){
 
     if (ppp == NULL) {
         ESP_LOGE(TAG, "Error init pppos");
-        return;
+        lua_pushinteger(L , 1);
+        return 0;
     }
 
     pppapi_set_default(ppp);
