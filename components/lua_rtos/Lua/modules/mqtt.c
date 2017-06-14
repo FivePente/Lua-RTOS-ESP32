@@ -142,9 +142,11 @@ void connectionLost(void* context, char* cause)
     mtx_lock(&mqtt->callback_mtx);
     printf("\nConnection lost\n");
 
-    //lua_rawgeti(mqtt->L, LUA_REGISTRYINDEX, mqtt->connectionLost);
-    //lua_pushinteger(mqtt->L, cause);
-    //lua_call(mqtt->L, 1, 0);
+    if(mqtt->connectionLost){
+        lua_rawgeti(mqtt->L, LUA_REGISTRYINDEX, mqtt->connectionLost);
+        lua_pushlstring(mqtt->L, cause);
+        lua_call(mqtt->L, 1, 1);
+    }
 
     mtx_unlock(&mqtt->callback_mtx);
 }
@@ -254,7 +256,7 @@ static int lmqtt_client( lua_State* L ){
     	return luaL_exception(L, LUA_MQTT_ERR_CANT_CREATE_CLIENT);
     }
 
-    rc = MQTTClient_setCallbacks(mqtt->client, mqtt, connectionLost, messageArrived, delivered);
+    rc = MQTTClient_setCallbacks(mqtt->client, mqtt, connectionLost, messageArrived, NULL);
     if (rc < 0){
     	return luaL_exception(L, LUA_MQTT_ERR_CANT_SET_CALLBACKS);
     }
