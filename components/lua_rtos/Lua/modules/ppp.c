@@ -163,7 +163,7 @@ static void ppp_status_cb(ppp_pcb *pcb, int err_code, void *ctx) {
 		ESP_LOGI(TAG,"   ip6addr   = %s\n", ip6addr_ntoa(netif_ip6_addr(pppif, 0)));
 #endif
 		conn_ok = 1;
-		printf("freedom: Connected ipaddr = %s\n" , ipaddr_ntoa(&pppif->ip_addr))
+		printf("freedom: Connected ipaddr = %s\n" , ipaddr_ntoa(&pppif->ip_addr));
 		break;
 	}
 	case PPPERR_PARAM: {
