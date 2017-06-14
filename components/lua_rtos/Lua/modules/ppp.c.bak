@@ -36,6 +36,8 @@
 #include "lwip/dns.h"
 #include "lwip/pppapi.h"
 
+
+
 const char *PPP_User = "";
 const char *PPP_Pass = "";
 const char *PPP_ApnATReq = "AT+CGDCONT=1,\"IP\",\"CMNET\"";
@@ -278,8 +280,7 @@ static void pppos_client_task()
 
         ESP_LOGI(TAG, "Gsm init end");
 
-        ppp = pppapi_pppos_create(&ppp_netif,
-                                  ppp_output_callback, ppp_status_cb, NULL);
+        ppp = pppapi_pppos_create(&ppp_netif,ppp_output_callback, ppp_status_cb, NULL);
 
         ESP_LOGI(TAG, "After pppapi_pppos_create");
 

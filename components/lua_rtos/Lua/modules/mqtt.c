@@ -141,7 +141,6 @@ void connectionLost(void* context, char* cause)
 
     mtx_lock(&mqtt->callback_mtx);
     printf("\nConnection lost\n");
-    printf("     cause: %s\n", cause);
 
     //lua_rawgeti(mqtt->L, LUA_REGISTRYINDEX, mqtt->connectionLost);
     //lua_pushinteger(mqtt->L, cause);
