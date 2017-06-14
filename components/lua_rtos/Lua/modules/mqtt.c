@@ -120,21 +120,6 @@ static int add_subs_callback(mqtt_userdata *mqtt, const char *topic, int call) {
     return 0;
 }
 
-void delivered(void *context, MQTTClient_deliveryToken dt)
-{
-    mqtt_userdata *mqtt = (mqtt_userdata *)context;
-
-    mtx_lock(&mqtt->callback_mtx);
-    printf("Message with token value %d delivery confirmed\n", dt);
-
-    //lua_rawgeti(mqtt->L, LUA_REGISTRYINDEX, mqtt->delivered);
-    //lua_pushinteger(mqtt->L, dt);
-    //lua_call(mqtt->L, 1, 0);
-
-    mtx_unlock(&mqtt->callback_mtx);
-}
-
-
 void connectionLost(void* context, char* cause)
 {
     mqtt_userdata *mqtt = (mqtt_userdata *)context;
@@ -142,7 +127,7 @@ void connectionLost(void* context, char* cause)
     mtx_lock(&mqtt->callback_mtx);
     printf("\nConnection lost\n");
 
-    if(mqtt->connectionLost){
+    if(mqtt->connectionLost != -1){
         lua_rawgeti(mqtt->L, LUA_REGISTRYINDEX, mqtt->connectionLost);
         lua_pushlstring(mqtt->L, cause);
         lua_call(mqtt->L, 1, 1);
@@ -199,25 +184,6 @@ static int lmqtt_setConnectLostCallback(lua_State* L ){
 }
 
 
-static int lmqtt_setDeliveredCallback(lua_State* L ){
-
-    mqtt_userdata *mqtt = NULL;
-    mqtt = (mqtt_userdata *)luaL_checkudata(L, 1, "mqtt.cli");
-    luaL_argcheck(L, mqtt, 1, "mqtt expected");
-    
-    luaL_checktype(L, 2, LUA_TFUNCTION);
-
-    // Copy argument (function) to the top of stack
-    lua_pushvalue(L, 2); 
-
-    // Copy function reference
-    mqtt->delivered = luaL_ref(L, LUA_REGISTRYINDEX);
-
-    return 0;
-}
-
-
-
 // Lua: result = setup( id, clock )
 static int lmqtt_client( lua_State* L ){
     int rc = 0;
@@ -240,6 +206,7 @@ static int lmqtt_client( lua_State* L ){
     mqtt = (mqtt_userdata *)lua_newuserdata(L, sizeof(mqtt_userdata));
     mqtt->L = L;
     mqtt->callbacks = NULL;
+    mqtt->connectionLost = -1;
     mqtt->secure = secure;
     mtx_init(&mqtt->callback_mtx, NULL, NULL, 0);
     
@@ -441,7 +408,6 @@ static const LUA_REG_TYPE lmqtt_client_map[] = {
   { LSTRKEY( "subscribe"            ),	 LFUNCVAL( lmqtt_subscribe  ) },
   { LSTRKEY( "publish"              ),	 LFUNCVAL( lmqtt_publish    ) },
   { LSTRKEY( "setLostCallback"      ),	 LFUNCVAL( lmqtt_setConnectLostCallback    ) },
-  { LSTRKEY( "setDeliveredCallback" ),	 LFUNCVAL( lmqtt_setDeliveredCallback    ) },
   { LSTRKEY( "__metatable"          ),	 LROVAL  ( lmqtt_client_map ) },
   { LSTRKEY( "__index"              ),   LROVAL  ( lmqtt_client_map ) },
   { LSTRKEY( "__gc"                 ),   LROVAL  ( lmqtt_client_gc  ) },
