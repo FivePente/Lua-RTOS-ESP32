@@ -59,8 +59,9 @@ ppp_pcb *ppp;
 // The PPP IP interface
 struct netif ppp_netif;
 
+static TaskHandle_t xHandle = NULL;
+
 static const char *TAG = "[PPPOS CLIENT]";
-static const char *TIME_TAG = "[SNTP]";
 
 typedef struct
 {
@@ -117,8 +118,8 @@ GSM_Cmd GSM_MGR_InitCmds[] =
 				.timeoutMs = 3000,
 		},
 		{
-				.cmd = "AT+CGDCONT=1,\"IP\",\"myapn\"\r",
-				.cmdSize = sizeof("AT+CGDCONT=1,\"IP\",\"myapn\"\r")-1,
+				.cmd = "AT+CGDCONT=1,\"IP\",\"playmetric\"\r",
+				.cmdSize = sizeof("AT+CGDCONT=1,\"IP\",\"playmetric\"\r")-1,
 				.cmdResponseOnOk = GSM_OK_Str,
 				.timeoutMs = 8000,
 		},
@@ -247,7 +248,6 @@ static void pppos_client_task()
 	char sresp[256] = {'\0'};
 
     char* data = (char*) malloc(BUF_SIZE);
-	char PPP_ApnATReq[sizeof(CONFIG_GSM_APN)+8];
 	
 	uart_config_t uart_config = {
 			.baud_rate = UART_BDRATE,
@@ -261,11 +261,6 @@ static void pppos_client_task()
 	//Set UART1 pins(TX, RX, RTS, CTS)
 	uart_set_pin(uart_num, UART_GPIO_TX, UART_GPIO_RX, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
 	uart_driver_install(uart_num, BUF_SIZE * 2, BUF_SIZE * 2, 0, NULL, 0);
-
-	// Set APN from config
-	sprintf(PPP_ApnATReq, "AT+CGDCONT=1,\"IP\",\"%s\"\r\n", "playmetric");
-	GSM_MGR_InitCmds[7].cmd = PPP_ApnATReq;
-	GSM_MGR_InitCmds[7].cmdSize = strlen(PPP_ApnATReq);
 
 	ESP_LOGI(TAG,"Gsm init start");
 	// *** Disconnect if connected ***
