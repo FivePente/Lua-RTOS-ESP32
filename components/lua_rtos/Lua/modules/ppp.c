@@ -284,12 +284,16 @@ static void pppos_client_task()
     error = uart_init(uart_num, UART_BDRATE, UART_DATA_8_BITS, UART_PARITY_DISABLE, UART_STOP_BITS_1, BUF_SIZE * 2);
     error = uart_setup_interrupts(uart_num);
 
+    printf("step 1");
+
 	vTaskDelay(1000 / portTICK_PERIOD_MS);
-	while (uart_reads(uart_num, data, 0, 100 / portTICK_RATE_MS)) {
+	while (uart_reads(uart_num, data, 1, 100 / portTICK_RATE_MS)) {
 		vTaskDelay(100 / portTICK_PERIOD_MS);
 	}
+    printf("step 2");
     uart_writes(uart_num, "+++");
 	vTaskDelay(1000 / portTICK_PERIOD_MS);
+    printf("step 3");
 
 	conn_ok = 98;
 	while(1)
@@ -318,7 +322,7 @@ static void pppos_client_task()
 					GSM_MGR_InitCmds[gsmCmdIter].cmdSize);
             uart_wait_tx_done(uart_num, 10 / portTICK_RATE_MS);*/
 
-            while (uart_reads(uart_num, data, 0, 100 / portTICK_RATE_MS)) {
+            while (uart_reads(uart_num, data, 1, 100 / portTICK_RATE_MS)) {
                 vTaskDelay(100 / portTICK_PERIOD_MS);
             }
 			uart_writes(uart_num, GSM_MGR_InitCmds[gsmCmdIter].cmd);
@@ -333,7 +337,7 @@ static void pppos_client_task()
 				memset(data, 0, BUF_SIZE);
 				int len = 0;
 				//len = uart_read_bytes(uart_num, (uint8_t*)data, BUF_SIZE, 10 / portTICK_RATE_MS);
-                res = uart_reads(uart_num, data, 0, 100 / portTICK_RATE_MS);
+                res = uart_reads(uart_num, data, 1, 100 / portTICK_RATE_MS);
 				//if (len > 0) {
                 if(res){
 					for (int i=0; i<len;i++) {
@@ -409,7 +413,7 @@ static void pppos_client_task()
 		while(1) {
 			memset(data, 0, BUF_SIZE);
 			//int len = uart_read_bytes(uart_num, (uint8_t*)data, BUF_SIZE, 30 / portTICK_RATE_MS);
-            res = uart_reads(uart_num, data, 0, 30 / portTICK_RATE_MS);
+            res = uart_reads(uart_num, data, 1, 30 / portTICK_RATE_MS);
 			//if(len > 0)	{
             if(res){
 				//pppos_input_tcpip(ppp, (u8_t*)data, len);
