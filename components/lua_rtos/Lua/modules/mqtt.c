@@ -129,7 +129,7 @@ void connectionLost(void* context, char* cause)
 
     if(mqtt->connectionLost != -1){
         lua_rawgeti(mqtt->L, LUA_REGISTRYINDEX, mqtt->connectionLost);
-        lua_pushlstring(mqtt->L, cause);
+        lua_pushstring(mqtt->L, cause);
         lua_call(mqtt->L, 1, 1);
     }
 
