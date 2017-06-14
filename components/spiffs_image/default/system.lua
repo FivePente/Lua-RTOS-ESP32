@@ -35,7 +35,20 @@ client:subscribe("code", mqtt.QOS0, function(len, message)
 end)]]
 --[[
 
+function inputHandler(data)
+
+end
+
+function ouputHandler(data)
+    uart.write(uart.UART2 , data)
+end
+
+ppp.setup()
+ppp.connect()
+ppp.setCallback(inputHandler , ouputHandler)
+
 uart.attach(uart.UART2, 115200, 8, uart.PARNONE, uart.STOP1 , 2048)
+
 
 function output(data)
 
