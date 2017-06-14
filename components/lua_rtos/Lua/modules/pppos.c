@@ -54,6 +54,9 @@ static TaskHandle_t xHandle = NULL;
 
 static const char *TAG = "example";
 
+#define UART_GPIO_TX 17
+#define UART_GPIO_RX 16
+
 static int read_callback_index = 0;
 static int write_callback_index = 0;
 
@@ -242,7 +245,7 @@ static u32_t ppp_output_callback(ppp_pcb *pcb, u8_t *data, u32_t len, void *ctx)
     return len;
 }
 
-static int ppp_connect(lua_State* L){
+static int lppp_connect(lua_State* L){
 
     char *data = (char *) malloc(BUF_SIZE);
     uart_config_t uart_config = {
@@ -416,7 +419,7 @@ static const LUA_REG_TYPE ppp_map[] = {
     { LSTRKEY( "setupXTask" ),  LFUNCVAL( ppp_task_setup )},
     { LSTRKEY( "setup" ),  LFUNCVAL( ppp_setup )},
     { LSTRKEY( "input" ),  LFUNCVAL( ppp_input )},
-    { LSTRKEY( "connect" ),  LFUNCVAL( ppp_connect )},
+    { LSTRKEY( "connect" ),  LFUNCVAL( lppp_connect )},
     { LSTRKEY( "setCallback" ),  LFUNCVAL( ppp_callback )},
     { LSTRKEY( "close" ),  LFUNCVAL( lppp_close )},
     { LNILKEY, LNILVAL }
