@@ -230,6 +230,9 @@ static void pppos_client_task()
         .stop_bits = UART_STOP_BITS_1,
         .flow_ctrl = UART_HW_FLOWCTRL_DISABLE
     };
+
+    uart_driver_delete(uart_num);
+
     //Configure UART1 parameters
     uart_param_config(uart_num, &uart_config);
 
@@ -262,6 +265,7 @@ static void pppos_client_task()
 
                 if (timeoutCnt > GSM_MGR_InitCmds[gsmCmdIter].timeoutMs) {
                     ESP_LOGE(TAG, "Gsm Init Error");
+                    vTaskDelete(NULL);
                     return;
                 }
             }
@@ -281,6 +285,7 @@ static void pppos_client_task()
 
         if (ppp == NULL) {
             ESP_LOGE(TAG, "Error init pppos");
+            vTaskDelete(NULL);
             return;
         }
 
@@ -306,67 +311,7 @@ static void pppos_client_task()
         }
     }
 }
-static int ppp_init_uart(lua_State* L){
-    uart_config_t uart_config = {
-        .baud_rate = 115200,
-        .data_bits = UART_DATA_8_BITS,
-        .parity = UART_PARITY_DISABLE,
-        .stop_bits = UART_STOP_BITS_1,
-        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE
-    };
-    //Configure UART1 parameters
-    uart_param_config(uart_num, &uart_config);
 
-    // Configure UART1 pins (as set in example's menuconfig)
-    ESP_LOGI(TAG, "Configuring UART1 GPIOs: TX:%d RX:%d",UART1_TX_PIN, UART1_RX_PIN);
-    uart_set_pin(uart_num, UART1_TX_PIN, UART1_RX_PIN, 0, 0);
-    uart_driver_install(uart_num, BUF_SIZE * 2, BUF_SIZE * 2, 0, NULL, 0);
-    return 0;
-}
-
-static int ppp_init_gsm(lua_State* L){
-
-    char *data = (char *) malloc(BUF_SIZE);
-
-    //init gsm
-    int gsmCmdIter = 0;
-    while (1) {
-        ESP_LOGE(TAG, "%s", GSM_MGR_InitCmds[gsmCmdIter].cmd);
-        uart_write_bytes(uart_num, (const char *)GSM_MGR_InitCmds[gsmCmdIter].cmd,
-                            GSM_MGR_InitCmds[gsmCmdIter].cmdSize);
-
-        int timeoutCnt = 0;
-        while (1) {
-            memset(data, 0, BUF_SIZE);
-            int len = uart_read_bytes(uart_num, (uint8_t *)data, BUF_SIZE, 500 / portTICK_RATE_MS);
-            if (len > 0) {
-                ESP_LOGE(TAG, "%s", data);
-            }
-
-            timeoutCnt += 500;
-            if (strstr(data, GSM_MGR_InitCmds[gsmCmdIter].cmdResponseOnOk) != NULL) {
-                break;
-            }
-
-            if (timeoutCnt > GSM_MGR_InitCmds[gsmCmdIter].timeoutMs) {
-                ESP_LOGE(TAG, "Gsm Init Error");
-                free(data);
-                return 0;
-            }
-        }
-        gsmCmdIter++;
-
-        if (gsmCmdIter >= GSM_MGR_InitCmdsSize) {
-            break;
-        }
-    }
-
-    ESP_LOGI(TAG, "Gsm init end");
-
-    free(data);
-
-    return 0;
-}
 
 static int ppp_task_setup(lua_State* L){
     tcpip_adapter_init();
@@ -380,43 +325,7 @@ static int ppp_setup(lua_State* L){
     return 0;
 }
 
-static void readCallback(){
-    char *data = (char *) malloc(BUF_SIZE);
-    int timeoutCnt = 0;
-    while (1) {
-        memset(data, 0, BUF_SIZE);
-        int len = uart_read_bytes(uart_num, (uint8_t *)data, BUF_SIZE, 500 / portTICK_RATE_MS);
-        if (len > 0) {
-            ESP_LOGE(TAG, "%s", data);
-        }
-
-        timeoutCnt += 500;
-        if (strstr(data, GSM_OK_Str) != NULL) {
-            break;
-        }
-
-        if (timeoutCnt > 3000) {
-            ESP_LOGE(TAG, "AT Error");
-            break;
-        }
-    }
-
-    free(data);
-}
-
-static int ppp_sendAT(lua_State* L){
-    const char *cmd = luaL_checkstring( L, 1 );
-    uart_write_bytes(uart_num, cmd , sizeof(cmd) - 1);
-    readCallback();
-    return 0;
-}
-
 static int lppp_close(lua_State* L){
-
-    if(xHandle != NULL){
-        vTaskDelete(xHandle);
-        xHandle = NULL;
-    }
     
     err_t err = 0;
     err = pppapi_close(ppp , 0);
@@ -424,6 +333,12 @@ static int lppp_close(lua_State* L){
         ESP_LOGE(TAG, "pppapi_close error");
         return 0;
     }
+
+    if(xHandle != NULL){
+        vTaskDelete(xHandle);
+        vTaskDelete(NULL);
+    }
+
     /*
     err = pppapi_free(ppp);
     if( err != 0){
@@ -438,9 +353,6 @@ static int lppp_close(lua_State* L){
 static const LUA_REG_TYPE ppp_map[] = {
     { LSTRKEY( "setupXTask" ),  LFUNCVAL( ppp_task_setup )},
     { LSTRKEY( "setup" ),  LFUNCVAL( ppp_setup )},
-    { LSTRKEY( "initUART" ),  LFUNCVAL( ppp_init_uart )},
-    { LSTRKEY( "initGSM" ),  LFUNCVAL( ppp_init_gsm )},
-    { LSTRKEY( "sendAT" ),  LFUNCVAL( ppp_sendAT )},
     { LSTRKEY( "close" ),  LFUNCVAL( lppp_close )},
     { LNILKEY, LNILVAL }
 };

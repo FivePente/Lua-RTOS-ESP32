@@ -24,6 +24,8 @@ client:publish("test", "{name:device1000xksjshj , speed:1726.3826 , type:1 , boo
 
 client = mqtt.client("esp32", "60.205.82.208", 1883, false)
 client:connect("","" , 30 , 0 , 1)
+client:setLostCallback(function(mes) print(mes) end)
+client:setDeliveredCallback(function(mes) print(mes) end)
 client:subscribe("code", mqtt.QOS0, function(len, message)
     --local file2 = io.open("autorun.lua","w+")
     --file2:write(message)
