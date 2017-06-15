@@ -67,7 +67,6 @@ static lua_State *luaState;
 static const char *TAG = "[PPPOS CLIENT]";
 
 static int status_callback_index = -1;
-static int write_callback_index = -1;
 
 typedef struct
 {
