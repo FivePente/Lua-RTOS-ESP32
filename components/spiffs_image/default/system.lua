@@ -96,7 +96,6 @@ end
 while true do
     if pppConnected == 1 then
         startTask()
-        initI2C()
         break
     end
 end
