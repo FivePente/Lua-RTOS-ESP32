@@ -268,7 +268,7 @@ static u32_t ppp_output_callback(ppp_pcb *pcb, u8_t *data, u32_t len, void *ctx)
 	// *** Handle sending to GSM modem ***
 	uint32_t ret = uart_write_bytes(uart_num, (const char*)data, len);
     uart_wait_tx_done(uart_num, 10 / portTICK_RATE_MS);
-    return len;
+    return ret;
 }
 
 //-----------------------------
