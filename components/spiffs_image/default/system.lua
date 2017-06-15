@@ -16,7 +16,7 @@ local useWIFI = 0
 local mqttConnectTry = 0
 local pppConnected = 0
 local mqttConnected = 0
-local inited = 0
+inited = 0
 
 dis = 0
 x = 0
