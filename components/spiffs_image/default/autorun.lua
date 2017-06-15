@@ -126,7 +126,7 @@ function getYAngle(x , y , z)
 end
 
 while true do
-    if pppConnected == 1 then
+    if pppConnected == 1 and updateCode == 0 then
         if inited == 0 then
             inited = 1
             startTask()

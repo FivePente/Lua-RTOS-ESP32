@@ -17,6 +17,8 @@ mqttConnectTry = 0
 pppConnected = 0
 mqttConnected = 0
 
+updateCode = 0;
+
 if useWIFI == 1 then
     net.wf.scan()
     net.wf.setup(net.wf.mode.STA, "HiWiFi_3B0F16","Freedom0806")
@@ -41,6 +43,8 @@ function initMainSubscribe(mqttClient)
     end)
 
     mqttClient:subscribe("code", mqtt.QOS0, function(len, message)
+        updateCode = 1
+        tmr.delayms(10)
         local file2 = io.open("autorun.lua","w+")
         file2:write(message)
         file2:close()
