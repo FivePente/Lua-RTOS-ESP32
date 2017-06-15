@@ -93,7 +93,7 @@ GSM_Cmd GSM_MGR_InitCmds[] =
 				.cmdSize = sizeof("ATZ\r\n")-1,
 				.cmdResponseOnOk = GSM_OK_Str,
 				.timeoutMs = 3000,
-		},/*
+		},
 		{
 				.cmd = "AT+CFUN=4\r\n",
 				.cmdSize = sizeof("ATCFUN=4\r\n")-1,
@@ -105,7 +105,7 @@ GSM_Cmd GSM_MGR_InitCmds[] =
 				.cmdSize = sizeof("ATCFUN=4,0\r\n")-1,
 				.cmdResponseOnOk = GSM_OK_Str,
 				.timeoutMs = 3000,
-		},*/
+		},
 		{
 				.cmd = "ATE0\r\n",
 				.cmdSize = sizeof("ATE0\r\n")-1,
@@ -127,23 +127,23 @@ GSM_Cmd GSM_MGR_InitCmds[] =
 				.timeoutMs = 3000,
 		},
 		{
-				.cmd = "AT+CGDCONT=1,\"IP\",\"CMNET\"\r",
-				.cmdSize = sizeof("AT+CGDCONT=1,\"IP\",\"CMNET\"\r")-1,
+				.cmd = "AT+CGDCONT=1,\"IP\",\"playmetric\"\r",
+				.cmdSize = sizeof("AT+CGDCONT=1,\"IP\",\"playmetric\"\r")-1,
 				.cmdResponseOnOk = GSM_OK_Str,
 				.timeoutMs = 8000,
 		},
-		{
+		/*{
 				.cmd = "ATDT*99***1#\r\n",
 				.cmdSize = sizeof("ATDT*99***1#\r\n")-1,
 				.cmdResponseOnOk = "CONNECT",
 				.timeoutMs = 30000,
-		}
-		/*{
+		}*/
+		{
 				.cmd = "AT+CGDATA=\"PPP\",1\r\n",
 				.cmdSize = sizeof("AT+CGDATA=\"PPP\",1\r\n")-1,
 				.cmdResponseOnOk = "CONNECT",
 				.timeoutMs = 30000,
-		}*/
+		}
 };
 
 #define GSM_MGR_InitCmdsSize  (sizeof(GSM_MGR_InitCmds)/sizeof(GSM_Cmd))
