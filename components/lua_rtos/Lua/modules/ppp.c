@@ -138,18 +138,18 @@ GSM_Cmd GSM_MGR_InitCmds[] =
 				.cmdResponseOnOk = GSM_OK_Str,
 				.timeoutMs = 8000,
 		},
-		/*{
+		{
 				.cmd = "ATDT*99***1#\r\n",
 				.cmdSize = sizeof("ATDT*99***1#\r\n")-1,
 				.cmdResponseOnOk = "CONNECT",
 				.timeoutMs = 30000,
-		}*/
-		{
+		}
+		/*{
 				.cmd = "AT+CGDATA=\"PPP\",1\r\n",
 				.cmdSize = sizeof("AT+CGDATA=\"PPP\",1\r\n")-1,
 				.cmdResponseOnOk = "CONNECT",
 				.timeoutMs = 30000,
-		}
+		}*/
 };
 
 #define GSM_MGR_InitCmdsSize  (sizeof(GSM_MGR_InitCmds)/sizeof(GSM_Cmd))
