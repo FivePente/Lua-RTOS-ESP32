@@ -149,14 +149,14 @@ GSM_Cmd GSM_MGR_InitCmds[] =
 void sendStatus(int err_code , char* msg)
 { 
     if(status_callback_index != -1){
-		mtx_lock(callback_mtx);
+		mtx_lock(&callback_mtx);
 
         lua_rawgeti(luaState, LUA_REGISTRYINDEX, status_callback_index);
         lua_pushinteger(luaState, err_code);
 		lua_pushstring(luaState, msg);
         lua_call(luaState, 2, 0);
-		
-		mtx_unlock(callback_mtx);
+
+		mtx_unlock(&callback_mtx);
     }
 }
 
