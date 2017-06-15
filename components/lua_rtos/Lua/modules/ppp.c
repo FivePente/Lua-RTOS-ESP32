@@ -113,6 +113,18 @@ GSM_Cmd GSM_MGR_InitCmds[] =
 				.timeoutMs = 3000,
 		},
 		{
+				.cmd = "AT+CGATT=1\r\n",
+				.cmdSize = sizeof("AT+CGATT=1\r\n")-1,
+				.cmdResponseOnOk = GSM_OK_Str,
+				.timeoutMs = 3000,
+		},
+		{
+				.cmd = "AT+CGACT=1,1\r\n",
+				.cmdSize = sizeof("AT+CGACT=1\r\n")-1,
+				.cmdResponseOnOk = GSM_OK_Str,
+				.timeoutMs = 3000,
+		},
+		{
 				.cmd = "AT+CPIN?\r\n",
 				.cmdSize = sizeof("AT+CPIN?\r\n")-1,
 				.cmdResponseOnOk = "CPIN: READY",
@@ -459,36 +471,11 @@ static int ppp_setup(lua_State* L){
     return 0;
 }
 
-static int lppp_close(lua_State* L){
-    
-    err_t err = 0;
-    err = pppapi_close(ppp , 0);
-    if( err != 0){
-        ESP_LOGE(TAG, "pppapi_close error");
-        return 0;
-    }
-
-    if(xHandle != NULL){
-        vTaskDelete(xHandle);
-        vTaskDelete(NULL);
-    }
-
-    /*
-    err = pppapi_free(ppp);
-    if( err != 0){
-        ESP_LOGE(TAG, "pppapi_free error");
-        return 0;
-    }*/
-
-    return 0;
-}
-
 //class map
 static const LUA_REG_TYPE ppp_map[] = {
     { LSTRKEY( "setupXTask" ),  LFUNCVAL( ppp_task_setup )},
     { LSTRKEY( "setup" ),  LFUNCVAL( ppp_setup )},
     { LSTRKEY( "setCallback" ),  LFUNCVAL( ppp_callback )},
-    { LSTRKEY( "close" ),  LFUNCVAL( lppp_close )},
     { LNILKEY, LNILVAL }
 };
 

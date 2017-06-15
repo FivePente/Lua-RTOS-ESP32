@@ -13,7 +13,8 @@ os.history(false)          -- Enable/disable history
 
 local useGSM = 1
 local useWIFI = 0
-local mqttConnectTry = 0;
+local mqttConnectTry = 0
+local pppConnected = 0
 
 if useWIFI == 1 then
     net.wf.scan()
@@ -25,17 +26,25 @@ if useGSM == 1 then
     ppp.setCallback(function (err_code , message)
         print("ppp state: " , message)
         if err_code == 0 then
-            tmr.delayms(2000)
-            startTask()
+            pppConnected = 1
+        else
+            pppConnected = 0;
         end
     end)
     ppp.setupXTask()
 end
 
 function initMainSubscribe(mqttClient)
-    mqttClient:subscribe("code", mqtt.QOS0, function(len, message)
+    mqttClient:subscribe("message", mqtt.QOS0, function(len, message)
         print(message)
     end)
+
+    mqttClient:subscribe("code", mqtt.QOS0, function(len, message)
+        local file2 = io.open("autorun.lua","w+")
+        file2:write(message)
+        file2:close()
+        os.exit()
+    end)  
 end
 
 function startTask()
@@ -75,35 +84,3 @@ end
 thread.start(function()
    ppp.step()
 end)
-
-client:publish("test", "{name:device1000xksjshj , speed:1726.3826 , type:1 , bool:true , ttt:1927373626 ,test:928282}", mqtt.QOS0)
-
-ppp.setCallback(function(errCode, message)
-    print(errCode , "  " , message)
-end)
-
-client = mqtt.client("esp32", "60.205.82.208", 1883, false)
-client:setLostCallback(function(mes) 
-    print(mes)
-    tmr.delayms(1000)
-    client:connect("","" , 30 , 0 , 1)
-    client:subscribe("code", mqtt.QOS0, function(len, message)
-        --local file2 = io.open("autorun.lua","w+")
-        --file2:write(message)
-        --file2:close()
-        --os.exit(1)
-        print(message)
-    end)
-end)
-
-client:connect("","" , 30 , 0 , 1)
-
-]]
---[[
-while true do
-
-    client:publish("test", "{name:device1000xksjshj , speed:1726.3826 , type:1 , bool:true , ttt:1927373626 ,test:928282}", mqtt.QOS0)                                                                       
-    -- Wait                                                                     
-    tmr.delay(10)                                                                
-end 
-]]
