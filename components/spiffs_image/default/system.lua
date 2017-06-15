@@ -26,7 +26,7 @@ xAngle = 0
 yAngle = 0
 
 --distance threshold
-dTH = 1.00
+dTH = 0.00
 
 --x angle threshold
 xATH = 0.00
@@ -121,7 +121,6 @@ check = function()
         local odis = 0
         local ldis = {}
         local tdis = 0
-
 
         while(true) do
                 if t > 30 then
@@ -218,7 +217,7 @@ while true do
             startTask()
         end
         if mqttConnected == 1 then
-            client:publish("data", string.format('{"dis":%0.2f, "x":%0.2f , "y":%0.2f"}' , dOut , xOut , yOut) ,mqtt.QOS0) 
+            --client:publish("data", string.format('{"dis":%0.2f, "x":%0.2f , "y":%0.2f}' , dOut , xOut , yOut) ,mqtt.QOS0) 
             tmr.delayms(10000)
         end
     end
