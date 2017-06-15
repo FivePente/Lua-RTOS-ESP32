@@ -119,12 +119,6 @@ GSM_Cmd GSM_MGR_InitCmds[] =
 				.timeoutMs = 3000,
 		},
 		{
-				.cmd = "AT+CGACT=1,1\r\n",
-				.cmdSize = sizeof("AT+CGACT=1\r\n")-1,
-				.cmdResponseOnOk = GSM_OK_Str,
-				.timeoutMs = 3000,
-		},
-		{
 				.cmd = "AT+CPIN?\r\n",
 				.cmdSize = sizeof("AT+CPIN?\r\n")-1,
 				.cmdResponseOnOk = "CPIN: READY",
