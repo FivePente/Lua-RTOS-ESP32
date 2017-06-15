@@ -68,6 +68,8 @@ static const char *TAG = "[PPPOS CLIENT]";
 
 static int status_callback_index = -1;
 
+struct mtx callback_mtx;
+
 typedef struct
 {
 	char *cmd;
@@ -145,12 +147,16 @@ GSM_Cmd GSM_MGR_InitCmds[] =
 #define GSM_MGR_InitCmdsSize  (sizeof(GSM_MGR_InitCmds)/sizeof(GSM_Cmd))
 
 void sendStatus(int err_code , char* msg)
-{
+{ 
     if(status_callback_index != -1){
+		mtx_lock(callback_mtx);
+
         lua_rawgeti(luaState, LUA_REGISTRYINDEX, status_callback_index);
         lua_pushinteger(luaState, err_code);
 		lua_pushstring(luaState, msg);
         lua_call(luaState, 2, 0);
+		
+		mtx_unlock(callback_mtx);
     }
 }
 
@@ -441,6 +447,7 @@ static int ppp_callback(lua_State* L ){
 }
 
 static int ppp_task_setup(lua_State* L){
+	mtx_init(&callback_mtx, NULL, NULL, 0);
     tcpip_adapter_init();
     xTaskCreate(&pppos_client_task, "pppos_client_task", 2048, NULL, 5, &xHandle); 
     return 0;

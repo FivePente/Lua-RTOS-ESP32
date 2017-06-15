@@ -41,25 +41,24 @@ end
 function startTask()
     print("start connection mqtt")
     local err = 0
-    if client == nil then
-        client = mqtt.client("esp32", "60.205.82.208", 1883, false)
-        client:setLostCallback(function(msg) 
-            print(msg)
-            tmr.delayms(1000)
-            client:connect("","" , 30 , 0 , 1)
-            initMainSubscribe(client)
-        end)
-    end
+    client = mqtt.client("esp32", "60.205.82.208", 1883, false)
+    client:setLostCallback(function(msg) 
+        client:disconnect()
+        print(msg)
+        tmr.delayms(1000)
+        startTask()
+    end)
 
     err = client:connect("","" , 30 , 0 , 1)
 
-    if err == 0 then
+    if err == nil then
         initMainSubscribe(client)
     else
         mqttConnectTry = mqttConnectTry + 1
         if mqttConnectTry < 4 then
             print("connect fail , trying again...")
             tmr.delayms(3000)
+            client:disconnect()
             startTask()
         else
             print("connect fail , reboot...")
