@@ -199,7 +199,7 @@ check = function()
 
                         print(string.format("dis %0.2f, x %0.2f , y %0.2f" , odis - dis , xOut , yOut))
                 end
-        end
+        --end
 end
 
 function getXAngle(x , y , z)
