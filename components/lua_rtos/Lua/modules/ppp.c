@@ -276,7 +276,6 @@ static void pppos_client_task()
 	uint8_t init_ok = 1;
 	int pass = 0;
 	char sresp[256] = {'\0'};
-    int res;
 
     char* data = (char*) malloc(BUF_SIZE);
 	
