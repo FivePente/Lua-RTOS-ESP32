@@ -13,30 +13,9 @@ os.history(false)          -- Enable/disable history
 
 local useGSM = 1
 local useWIFI = 0
-local mqttConnectTry = 0
-local pppConnected = 0
-local mqttConnected = 0
-inited = 0
-
-dis = 0
-x = 0
-y = 0
-z = 0
-xAngle = 0
-yAngle = 0
-
---distance threshold
-dTH = 0.00
-
---x angle threshold
-xATH = 0.00
-
---y angle threshold
-yATH = 0.00
-
-dOut = 0
-xOut = 0
-yOut = 0
+mqttConnectTry = 0
+pppConnected = 0
+mqttConnected = 0
 
 if useWIFI == 1 then
     net.wf.scan()
@@ -50,7 +29,7 @@ if useGSM == 1 then
         if err_code == 0 then
             pppConnected = 1
         else
-            pppConnected = 0;
+            pppConnected = 0
         end
     end)
     ppp.setupXTask()
@@ -73,7 +52,7 @@ function startTask()
     print("start connection mqtt")
     local err = 0
     client = mqtt.client("esp32", "60.205.82.208", 1883, false)
-    client:setLostCallback(function(msg) 
+    client:setLostCallback(function(msg)
         mqttConnected = 0
         client:disconnect()
         print(msg)
