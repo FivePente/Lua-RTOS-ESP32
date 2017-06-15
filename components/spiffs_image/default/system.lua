@@ -25,6 +25,7 @@ if useGSM == 1 then
     ppp.setCallback(function (err_code , message)
         print("ppp state: " , message)
         if err_code == 0 then
+            tmr.delayms(300)
             startTask()
         end
     end)
