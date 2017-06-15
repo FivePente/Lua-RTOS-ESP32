@@ -40,7 +40,7 @@ function initI2C()
 end
 
 function check ()
-    if t > 30 then
+    while true do
             t = 0
             ldis[m] = ad:getDistance()
 
@@ -59,7 +59,10 @@ function check ()
                     dis = odis
                 end
                 tdis = 0
+                break
             end
+
+            tmr.delayms(500)
     end
 
     t = t + 1
@@ -125,18 +128,14 @@ function getYAngle(x , y , z)
     return math.deg(res) --res * 180 / 3.1415926
 end
 
-while true do
-    if pppConnected == 1 and updateCode == 0 then
-        if inited == 0 then
-            inited = 1
-            startTask()
-            initI2C()
-            tmr.delayms(500)
-        end
-
-        if mqttConnected == 1 then
-            client:publish("data", string.format('{"dis":%0.2f, "x":%0.2f , "y":%0.2f}' , dOut , xOut , yOut) ,mqtt.QOS0) 
-            tmr.delayms(10000)
+function runDevice()
+    tmr.delayms(1000)
+    while true do
+        if pppConnected == 1 and updateCode == 0 then
+            if mqttConnected == 1 then
+                check()
+                client:publish("data", string.format('{"dis":%0.2f, "x":%0.2f , "y":%0.2f}' , dOut , xOut , yOut) ,mqtt.QOS0) 
+            end
         end
     end
 end

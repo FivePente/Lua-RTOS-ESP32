@@ -69,6 +69,10 @@ function startTask()
     if err == nil then
         mqttConnected = 1
         initMainSubscribe(client)
+
+        if inited == 0 then
+            runDevice()
+        end
     else
         mqttConnectTry = mqttConnectTry + 1
         if mqttConnectTry < 4 then
@@ -80,6 +84,17 @@ function startTask()
             print("connect fail , reboot...")
             tmr.delayms(1000)
             os.exit(1)
+        end
+    end
+end
+
+while true do
+    if pppConnected == 1 then
+        if inited == 0 then
+            startTask()
+            initI2C()
+            inited = 1
+            break
         end
     end
 end
