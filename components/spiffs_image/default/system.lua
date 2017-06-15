@@ -223,8 +223,3 @@ while true do
         end
     end
 end
-
---[[
-thread.start(function()
-   ppp.step()
-end)
