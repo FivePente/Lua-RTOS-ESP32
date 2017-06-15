@@ -31,7 +31,14 @@ if useGSM == 1 then
     ppp.setupXTask()
 end
 
+function initMainSubscribe(mqttClient)
+    mqttClient:subscribe("code", mqtt.QOS0, function(len, message)
+        print(message)
+    end)
+end
+
 function startTask()
+    print("start connection mqtt")
     local err = 0
     if client == nil then
         client = mqtt.client("esp32", "60.205.82.208", 1883, false)
@@ -61,11 +68,6 @@ function startTask()
     end
 end
 
-function initMainSubscribe(mqttClient)
-    mqttClient:subscribe("code", mqtt.QOS0, function(len, message)
-        print(message)
-    end)
-end
 
 
 
