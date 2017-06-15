@@ -256,7 +256,7 @@ static int lmqtt_connect( lua_State* L ) {
     MQTTClient_connectOptions conn_opts = MQTTClient_connectOptions_initializer;
     MQTTClient_SSLOptions ssl_opts = MQTTClient_SSLOptions_initializer;
     
-    conn_opts.connectTimeout = 4;
+    conn_opts.connectTimeout = 30;
     conn_opts.keepAliveInterval = keepAlive;
     conn_opts.reliable = reliable;
     conn_opts.cleansession = cleansession;
