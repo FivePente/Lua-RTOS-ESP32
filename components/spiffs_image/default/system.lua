@@ -22,42 +22,32 @@ end)
 
 client:publish("test", "{name:device1000xksjshj , speed:1726.3826 , type:1 , bool:true , ttt:1927373626 ,test:928282}", mqtt.QOS0)
 
+ppp.setCallback(function(errCode, message)
+    print(errCode , "  " , message)
+end)
+
 client = mqtt.client("esp32", "60.205.82.208", 1883, false)
-client:setLostCallback(function(mes) print(mes) end)
+client:setLostCallback(function(mes) 
+    print(mes)
+    tmr.delayms(1000)
+    client:connect("","" , 30 , 0 , 1)
+    client:subscribe("code", mqtt.QOS0, function(len, message)
+        --local file2 = io.open("autorun.lua","w+")
+        --file2:write(message)
+        --file2:close()
+        --os.exit(1)
+        print(message)
+    end)
+end)
+
 client:connect("","" , 30 , 0 , 1)
 
-client:subscribe("code", mqtt.QOS0, function(len, message)
-    --local file2 = io.open("autorun.lua","w+")
-    --file2:write(message)
-    --file2:close()
-    --os.exit(1)
-    print(message)
-end)]]
+]]
 --[[
-
-function inputHandler(data)
-
-end
-
-function ouputHandler(data)
-    uart.write(uart.UART2 , data)
-end
-
-ppp.setup()
-ppp.connect()
-ppp.setCallback(inputHandler , ouputHandler)
-
-uart.attach(uart.UART2, 115200, 8, uart.PARNONE, uart.STOP1 , 2048)
-
-
-function output(data)
-
-end
-
 while true do
 
     client:publish("test", "{name:device1000xksjshj , speed:1726.3826 , type:1 , bool:true , ttt:1927373626 ,test:928282}", mqtt.QOS0)                                                                       
     -- Wait                                                                     
-    tmr.delayms(10)                                                                
+    tmr.delay(10)                                                                
 end 
 ]]

@@ -62,10 +62,12 @@ struct netif ppp_netif;
 
 static TaskHandle_t xHandle = NULL;
 
+static lua_State *luaState;
+
 static const char *TAG = "[PPPOS CLIENT]";
 
-static int read_callback_index = 0;
-static int write_callback_index = 0;
+static int status_callback_index = -1;
+static int write_callback_index = -1;
 
 typedef struct
 {
@@ -143,6 +145,16 @@ GSM_Cmd GSM_MGR_InitCmds[] =
 
 #define GSM_MGR_InitCmdsSize  (sizeof(GSM_MGR_InitCmds)/sizeof(GSM_Cmd))
 
+void sendStatus(char* err_code , char* msg)
+{
+    if(status_callback_index != -1){
+        lua_rawgeti(luaState, LUA_REGISTRYINDEX, status_callback_index);
+        lua_pushstring(luaState, err_code);
+		lua_pushstring(luaState, msg);
+        lua_call(luaState, 2, 2);
+    }
+}
+
 
 // PPP status callback
 //----------------------------------------------------------------
@@ -163,59 +175,73 @@ static void ppp_status_cb(ppp_pcb *pcb, int err_code, void *ctx) {
 		ESP_LOGI(TAG,"   ip6addr   = %s\n", ip6addr_ntoa(netif_ip6_addr(pppif, 0)));
 #endif
 		conn_ok = 1;
+		sendStatus(err_code , "connected");
 		printf("freedom: Connected ipaddr = %s\n" , ipaddr_ntoa(&pppif->ip_addr));
 		break;
 	}
 	case PPPERR_PARAM: {
+		sendStatus(err_code , "Invalid parameter");
 		ESP_LOGE(TAG,"status_cb: Invalid parameter\n");
 		break;
 	}
 	case PPPERR_OPEN: {
+		sendStatus(err_code , "Unable to open PPP session");
 		ESP_LOGE(TAG,"status_cb: Unable to open PPP session\n");
 		break;
 	}
 	case PPPERR_DEVICE: {
+		sendStatus(err_code , "Invalid I/O device for PPP");
 		ESP_LOGE(TAG,"status_cb: Invalid I/O device for PPP\n");
 		break;
 	}
 	case PPPERR_ALLOC: {
+		sendStatus(err_code , "Unable to allocate resources");
 		ESP_LOGE(TAG,"status_cb: Unable to allocate resources\n");
 		break;
 	}
 	case PPPERR_USER: {
+		sendStatus(err_code , "User interrupt");
 		ESP_LOGE(TAG,"status_cb: User interrupt\n");
 		break;
 	}
 	case PPPERR_CONNECT: {
+		sendStatus(err_code , "Connection lost");
 		ESP_LOGE(TAG,"status_cb: Connection lost\n");
 		conn_ok = 0;
 		break;
 	}
 	case PPPERR_AUTHFAIL: {
+		sendStatus(err_code , "Failed authentication challenge");
 		ESP_LOGE(TAG,"status_cb: Failed authentication challenge\n");
 		break;
 	}
 	case PPPERR_PROTOCOL: {
+		sendStatus(err_code , "Failed to meet protocol");
 		ESP_LOGE(TAG,"status_cb: Failed to meet protocol\n");
 		break;
 	}
 	case PPPERR_PEERDEAD: {
+		sendStatus(err_code , "Connection timeout");
 		ESP_LOGE(TAG,"status_cb: Connection timeout\n");
 		break;
 	}
 	case PPPERR_IDLETIMEOUT: {
+		sendStatus(err_code , "Idle Timeout");
 		ESP_LOGE(TAG,"status_cb: Idle Timeout\n");
 		break;
 	}
 	case PPPERR_CONNECTTIME: {
+		sendStatus(err_code , "Max connect time reached");
 		ESP_LOGE(TAG,"status_cb: Max connect time reached\n");
 		break;
 	}
 	case PPPERR_LOOPBACK: {
+		sendStatus(err_code , "Loopback detected");
 		ESP_LOGE(TAG,"status_cb: Loopback detected\n");
 		break;
 	}
 	default: {
+		sendStatus(err_code , "Unknown error code");
 		ESP_LOGE(TAG,"status_cb: Unknown error code %d\n", err_code);
 		break;
 	}
@@ -411,11 +437,7 @@ static int ppp_callback(lua_State* L ){
     
     luaL_checktype(L, 1 , LUA_TFUNCTION);
     lua_pushvalue(L, 1); 
-    read_callback_index = luaL_ref(L, LUA_REGISTRYINDEX);
-
-    luaL_checktype(L, 2 , LUA_TFUNCTION);
-    lua_pushvalue(L, 2); 
-    write_callback_index = luaL_ref(L, LUA_REGISTRYINDEX);
+    status_callback_index = luaL_ref(L, LUA_REGISTRYINDEX);
 
     return 0;
 }
@@ -467,6 +489,7 @@ static const LUA_REG_TYPE ppp_map[] = {
 
 
 LUALIB_API int luaopen_ppp( lua_State *L ) {
+	luaState = L;
 #if !LUA_USE_ROTABLE
     luaL_newlib(L, ppp_map);
     return 1;
