@@ -145,13 +145,13 @@ GSM_Cmd GSM_MGR_InitCmds[] =
 
 #define GSM_MGR_InitCmdsSize  (sizeof(GSM_MGR_InitCmds)/sizeof(GSM_Cmd))
 
-void sendStatus(char* err_code , char* msg)
+void sendStatus(int err_code , char* msg)
 {
     if(status_callback_index != -1){
         lua_rawgeti(luaState, LUA_REGISTRYINDEX, status_callback_index);
-        lua_pushstring(luaState, err_code);
+        lua_pushinteger(luaState, err_code);
 		lua_pushstring(luaState, msg);
-        lua_call(luaState, 2, 2);
+        lua_call(luaState, 2, 0);
     }
 }
 
