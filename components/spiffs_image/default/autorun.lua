@@ -1,3 +1,5 @@
+--[[
+
 t = 0
 c = 0
 m = 1
@@ -138,4 +140,4 @@ function runDevice()
             end
         end
     end
-end
+end]]

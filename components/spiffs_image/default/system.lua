@@ -37,6 +37,10 @@ if useGSM == 1 then
     ppp.setupXTask()
 end
 
+function runDevice()
+    print("empty autorun.lua")
+end
+
 function initMainSubscribe(mqttClient)
     mqttClient:subscribe("message", mqtt.QOS0, function(len, message)
         print(message)
@@ -71,6 +75,7 @@ function startTask()
         initMainSubscribe(client)
 
         if inited == 0 then
+            inited = 1
             runDevice()
         end
     else
@@ -90,11 +95,8 @@ end
 
 while true do
     if pppConnected == 1 then
-        if inited == 0 then
-            startTask()
-            initI2C()
-            inited = 1
-            break
-        end
+        startTask()
+        initI2C()
+        break
     end
 end
