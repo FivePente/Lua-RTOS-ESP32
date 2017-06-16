@@ -63,9 +63,9 @@ function startTask()
     client:setLostCallback(function(msg)
         print(msg)
         mqttConnected = 0
-        client:disconnect()
-        tmr.delayms(1000)
-        startTask()
+        --client:disconnect()
+        --tmr.delayms(1000)
+        --startTask()
     end)
 
     err = client:connect("","" , 30 , 0 , 1)
