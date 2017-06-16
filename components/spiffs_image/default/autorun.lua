@@ -1,5 +1,3 @@
---[[
-
 t = 0
 c = 0
 m = 1
@@ -10,7 +8,6 @@ zt = 0
 odis = 0
 ldis = {}
 tdis = 0
-inited = 0
 
 dis = 0
 x = 0
@@ -43,40 +40,40 @@ end
 
 function check ()
     while true do
-            t = 0
-            ldis[m] = ad:getDistance()
+        ldis[m] = ad:getDistance()
+        m = m + 1
+        if m == 14 then
+            m = 1
+            table.sort(ldis)
+            print(table.concat(ldis, ", "))
 
-            m = m + 1
-            if m == 14 then
-                m = 1
-                table.sort(ldis)
-                print(table.concat(ldis, ", "))
-
-                for i= 3, 12 do
-                    tdis = tdis + ldis[i]
-                end
-
-                odis = tdis / 10.00
-                if dis == 0 then
-                    dis = odis
-                end
-                tdis = 0
-                break
+            for i= 3, 12 do
+                tdis = tdis + ldis[i]
             end
 
-            tmr.delayms(500)
+            odis = tdis / 10.00
+            if dis == 0 then
+                dis = odis
+            end
+            tdis = 0
+            break
+        end
+
+        tmr.delayms(500)
     end
 
-    t = t + 1
-    x ,y , z = cd:read()
+    while true do
 
-    xt = xt + x
-    yt = yt + y
-    zt = zt + z
+        t = t + 1
+        x ,y , z = cd:read()
 
-    c = c + 1
+        xt = xt + x
+        yt = yt + y
+        zt = zt + z
 
-    if c == 10 then
+        c = c + 1
+
+        if c == 10 then
 
             c = 0
 
@@ -92,29 +89,31 @@ function check ()
             local oy = getYAngle(x , y , z)
 
             if xAngle == 0 then
-                    xAngle = ox
-                    yAngle = oy
+                xAngle = ox
+                yAngle = oy
             end
 
             if math.abs(xAngle - ox) >= xATH then
-                    xOut = xAngle - ox
+                xOut = xAngle - ox
             else
-                    xOut = 0
+                xOut = 0
             end
 
             if math.abs(yAngle - oy) >= yATH then
-                    yOut = yAngle - oy
+                yOut = yAngle - oy
             else
-                    yOut = 0
+                yOut = 0
             end  
 
             if math.abs(odis - dis) >= dTH then
-                    dOut = odis - dis
+                dOut = odis - dis
             else
-                    dOut = 0
+                dOut = 0
             end  
 
             print(string.format("dis %0.2f, x %0.2f , y %0.2f" , odis - dis , xOut , yOut))
+            break
+        end
     end
 end
 
@@ -131,13 +130,21 @@ function getYAngle(x , y , z)
 end
 
 function runDevice()
+    initI2C()
     tmr.delayms(1000)
     while true do
         if pppConnected == 1 and updateCode == 0 then
             if mqttConnected == 1 then
                 check()
                 client:publish("data", string.format('{"dis":%0.2f, "x":%0.2f , "y":%0.2f}' , dOut , xOut , yOut) ,mqtt.QOS0) 
+                tmr.delayms(10000)
+            else
+                client:disconnect()
+                tmr.delayms(1000)
+                startTask()
             end
         end
     end
-end]]
+end
+
+runDevice()

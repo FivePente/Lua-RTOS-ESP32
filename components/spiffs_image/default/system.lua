@@ -61,9 +61,9 @@ function startTask()
     local err = 0
     client = mqtt.client("esp32", "60.205.82.208", 1883, false)
     client:setLostCallback(function(msg)
+        print(msg)
         mqttConnected = 0
         client:disconnect()
-        print(msg)
         tmr.delayms(1000)
         startTask()
     end)
@@ -76,7 +76,7 @@ function startTask()
 
         if inited == 0 then
             inited = 1
-            runDevice()
+            --runDevice()
         end
     else
         mqttConnectTry = mqttConnectTry + 1
