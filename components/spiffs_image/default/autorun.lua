@@ -144,6 +144,7 @@ function runDevice()
 
                     function(where,line,error,message)
                         print(message)
+                        mqttConnected = 0
                     end
                 )
 
