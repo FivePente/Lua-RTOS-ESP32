@@ -87,7 +87,6 @@ function startTask()
             if mqttConnectTry < 4 then
                 print("connect fail , trying again...")
                 tmr.delayms(3000)
-                client:disconnect()
                 startTask()
             else
                 print("connect fail , reboot...")
