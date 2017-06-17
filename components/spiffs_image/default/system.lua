@@ -68,7 +68,7 @@ function startTask()
         --startTask()
     end)
 
-    try{
+    try(
         function()
             client:connect("","" , 30 , 0 , 1)
 
@@ -95,7 +95,7 @@ function startTask()
                 os.exit(1)
             end
         end
-    }
+    )
 end
 
 while true do
