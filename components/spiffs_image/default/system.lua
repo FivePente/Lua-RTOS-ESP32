@@ -52,7 +52,7 @@ function initMainSubscribe(mqttClient)
         local file2 = io.open("autorun.lua","w+")
         file2:write(message)
         file2:close()
-        os.exit()
+        os.exit(0)
     end)  
 end
 
@@ -68,29 +68,34 @@ function startTask()
         --startTask()
     end)
 
-    err = client:connect("","" , 30 , 0 , 1)
+    try{
+        function()
+            client:connect("","" , 30 , 0 , 1)
 
-    if err == nil then
-        mqttConnected = 1
-        initMainSubscribe(client)
+            mqttConnected = 1
+            initMainSubscribe(client)
 
-        if inited == 0 then
-            inited = 1
-            --runDevice()
+            if inited == 0 then
+                inited = 1
+                --runDevice()
+            end
+        end,
+        function(where,line,error,message)
+            print(message)
+
+            mqttConnectTry = mqttConnectTry + 1
+            if mqttConnectTry < 4 then
+                print("connect fail , trying again...")
+                tmr.delayms(3000)
+                client:disconnect()
+                startTask()
+            else
+                print("connect fail , reboot...")
+                tmr.delayms(1000)
+                os.exit(1)
+            end
         end
-    else
-        mqttConnectTry = mqttConnectTry + 1
-        if mqttConnectTry < 4 then
-            print("connect fail , trying again...")
-            tmr.delayms(3000)
-            client:disconnect()
-            startTask()
-        else
-            print("connect fail , reboot...")
-            tmr.delayms(1000)
-            os.exit(1)
-        end
-    end
+    }
 end
 
 while true do

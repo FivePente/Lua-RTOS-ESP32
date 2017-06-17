@@ -136,13 +136,25 @@ function runDevice()
         if pppConnected == 1 then
             if mqttConnected == 1 then
                 check()
-                client:publish("data", string.format('{"dis":%0.2f, "x":%0.2f , "y":%0.2f}' , dOut , xOut , yOut) ,mqtt.QOS0) 
-                tmr.delayms(10000)
+                try{
+                    function()
+                        client:publish("data", string.format('{"dis":%0.2f, "x":%0.2f , "y":%0.2f}' , dOut , xOut , yOut) ,mqtt.QOS0) 
+                        tmr.delayms(10000)
+                    end,
+
+                    function(where,line,error,message)
+                        print(message)
+                    end
+                }
+
             else
-                client:disconnect()
+                --client:disconnect()
                 tmr.delayms(1000)
                 startTask()
             end
+        else
+            print("Network Disconnected...")
+            tmr.delayms(3000)
         end
     end
 end
