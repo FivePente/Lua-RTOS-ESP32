@@ -1,42 +1,21 @@
-t = 0
-c = 0
-m = 1
+local ver = 1.0
 
-xt = 0
-yt = 0
-zt = 0
-odis = 0
-ldis = {}
-tdis = 0
+startX = 0
+startY = 0
+startDis = 0
 
-dis = 0
-x = 0
-y = 0
-z = 0
-xAngle = 0
-yAngle = 0
-
---distance threshold
-dTH = 0.00
-
---x angle threshold
-xATH = 0.00
-
---y angle threshold
-yATH = 0.00
-
-dOut = 0
+disOut = 0
 xOut = 0
 yOut = 0
 
 temperature = 0
 
 function initI2C() 
-    cd = adxl345.init(i2c.I2C0 , i2c.MASTER , 400 , pio.GPIO19 , pio.GPIO18)
+    cd = adxl345.init(i2c.I2C0 , i2c.MASTER , 400 , pio.GPIO18 , pio.GPIO19)
     cd:write(0x2D , 0x08)
     cd:write(0x31 , 0x2B)
     cd:write(0x2C , 0x08)
-    ad = vl53l0x.init(i2c.I2C0 , i2c.MASTER , 400 , 0x29 , pio.GPIO19 , pio.GPIO18)
+    ad = vl53l0x.init(i2c.I2C0 , i2c.MASTER , 400 , 0x29 , pio.GPIO18 , pio.GPIO19)
     ad:startRanging(2)
 
     s1 = sensor.attach("DS1820", pio.GPIO21, 0x28ff900f, 0xb316041a)
@@ -45,14 +24,27 @@ function initI2C()
     s1:set("resolution", 10)
 end
 
+function saveConfig()
+    local file2 = io.open("config.lua","w+")
+    file2:write( "startDis="..startDis.." startX="..startX.." startY="..startY )
+    file2:close()
+    print("save config...")
+end
 
+function initConfig()
+    checkAll()
+    saveConfig()
+end
 
-function check ()
+function checkDistance ()
+    local ldis = {}
+    local index = 0
     while true do
-        ldis[m] = ad:getDistance()
-        m = m + 1
-        if m == 14 then
-            m = 1
+        ldis[index] = ad:getDistance()
+        index = index + 1
+        if index == 14 then
+
+            local tdis = 0
             table.sort(ldis)
             print(table.concat(ldis, ", "))
 
@@ -60,72 +52,60 @@ function check ()
                 tdis = tdis + ldis[i]
             end
 
-            odis = tdis / 10.00
-            if dis == 0 then
-                dis = odis
+            disOut = tdis / 10.00
+            if startDis == 0 then
+                startDis = disOut
+                saveConfig()
             end
-            tdis = 0
             break
         end
-
-        tmr.delayms(500)
     end
+end
+
+function checkAngle()
+    local x , y , z
+    local xt = 0
+    local yt = 0
+    local zt = 0
+    local cont = 0
+    local index = 0
 
     while true do
 
-        t = t + 1
-        x ,y , z = cd:read()
+        x , y , z = cd:read()
 
         xt = xt + x
         yt = yt + y
         zt = zt + z
 
-        c = c + 1
+        index = index + 1
 
-        if c == 10 then
+        if index == 10 then
 
-            c = 0
+            index = 0
 
             x = xt / 10
             y = yt / 10
             z = zt / 10
 
-            xt = 0
-            yt = 0
-            zt = 0
+            xOut = getXAngle(x , y , z)
+            yOut = getYAngle(x , y , z)
 
-            local ox = getXAngle(x , y , z)
-            local oy = getYAngle(x , y , z)
-
-            if xAngle == 0 then
-                xAngle = ox
-                yAngle = oy
+            if startX == 0 then
+                startX = xOut
+                startY = yOut
+                saveConfig()
             end
-
-            if math.abs(xAngle - ox) >= xATH then
-                xOut = xAngle - ox
-            else
-                xOut = 0
-            end
-
-            if math.abs(yAngle - oy) >= yATH then
-                yOut = yAngle - oy
-            else
-                yOut = 0
-            end  
-
-            if math.abs(odis - dis) >= dTH then
-                dOut = odis - dis
-            else
-                dOut = 0
-            end  
-
-            temperature = s1:read("temperature")
-
-            print(string.format("dis %0.2f, x %0.2f , y %0.2f , tmp %0.2f" , odis - dis , xOut , yOut , temperature))
             break
         end
     end
+end
+
+function checkAll()
+    checkDistance()
+    checkAngle()
+    temperature = s1:read("temperature")
+    print(string.format("dis %0.2f, x %0.2f , y %0.2f , tmp %0.2f" , disOut - startDis , xOut - startX , yOut - startY , temperature))
 end
 
 function getXAngle(x , y , z)
@@ -141,15 +121,31 @@ function getYAngle(x , y , z)
 end
 
 function runDevice()
+
+    local loadConfig = false
+
+    local file , err = io.open("config.lua")
+    if file ~= nil then
+        loadConfig = true
+        file:close()
+    end
+
+    if loadConfig then
+        dofile("config.lua")
+        print("load config.lua")
+    end
+
+    print("init data startDis:"..startDis.." startX:"..startX.." startY:"..startY)
+    
     initI2C()
     tmr.delayms(1000)
     while true do
         if pppConnected == 1 then
             if mqttConnected == 1 then
-                check()
+                checkAll()
                 try(
                     function()
-                        client:publish("data", string.format('{"dis":%0.2f, "x":%0.2f , "y":%0.2f , "tmp":%0.2f}' , dOut , xOut , yOut , temperature) ,mqtt.QOS0) 
+                        client:publish("data", string.format('{"dis":%0.2f, "x":%0.2f , "y":%0.2f , "tmp":%0.2f}' , disOut - startDis , xOut - startX , yOut - startY , temperature) ,mqtt.QOS0) 
                         tmr.delayms(10000)
                     end,
 
@@ -171,4 +167,4 @@ function runDevice()
     end
 end
 
-runDevice()
+thread.start(runDevice)

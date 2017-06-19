@@ -41,6 +41,10 @@ function runDevice()
     print("empty autorun.lua")
 end
 
+function initConfig()
+    print("initConfig function empty")
+end
+
 function initMainSubscribe(mqttClient)
     mqttClient:subscribe("message", mqtt.QOS0, function(len, message)
         print(message)
@@ -52,6 +56,12 @@ function initMainSubscribe(mqttClient)
         local file2 = io.open("autorun.lua","w+")
         file2:write(message)
         file2:close()
+        os.exit(0)
+    end)  
+    mqttClient:subscribe("initConfig", mqtt.QOS0, function(len, message)
+        updateCode = 1
+        tmr.delayms(10)
+        initConfig()
         os.exit(0)
     end)  
 end
