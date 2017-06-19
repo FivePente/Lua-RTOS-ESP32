@@ -53,7 +53,10 @@ function saveConfig()
 end
 
 function initConfig()
-    checkAll()
+    --checkAll()
+    startDis = disOut
+    startX = xOut
+    startY = yOut
     saveConfig()
 end
 
