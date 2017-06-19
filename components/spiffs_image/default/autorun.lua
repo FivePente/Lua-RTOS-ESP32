@@ -29,14 +29,23 @@ dOut = 0
 xOut = 0
 yOut = 0
 
+temperature = 0
+
 function initI2C() 
-    cd = adxl345.init(i2c.I2C0 , i2c.MASTER , 400 , pio.GPIO18 , pio.GPIO19)
+    cd = adxl345.init(i2c.I2C0 , i2c.MASTER , 400 , pio.GPIO19 , pio.GPIO18)
     cd:write(0x2D , 0x08)
     cd:write(0x31 , 0x2B)
     cd:write(0x2C , 0x08)
-    ad = vl53l0x.init(i2c.I2C0 , i2c.MASTER , 400 , 0x29 , pio.GPIO18 , pio.GPIO19)
+    ad = vl53l0x.init(i2c.I2C0 , i2c.MASTER , 400 , 0x29 , pio.GPIO19 , pio.GPIO18)
     ad:startRanging(2)
+
+    s1 = sensor.attach("DS1820", pio.GPIO21, 0x28ff900f, 0xb316041a)
+
+    --Configure sensor resolution
+    s1:set("resolution", 10)
 end
+
+
 
 function check ()
     while true do
@@ -111,7 +120,9 @@ function check ()
                 dOut = 0
             end  
 
-            print(string.format("dis %0.2f, x %0.2f , y %0.2f" , odis - dis , xOut , yOut))
+            temperature = s1:read("temperature")
+
+            print(string.format("dis %0.2f, x %0.2f , y %0.2f , tmp %0.2f" , odis - dis , xOut , yOut , temperature))
             break
         end
     end
@@ -138,7 +149,7 @@ function runDevice()
                 check()
                 try(
                     function()
-                        client:publish("data", string.format('{"dis":%0.2f, "x":%0.2f , "y":%0.2f}' , dOut , xOut , yOut) ,mqtt.QOS0) 
+                        client:publish("data", string.format('{"dis":%0.2f, "x":%0.2f , "y":%0.2f , "tmp":%0.2f}' , dOut , xOut , yOut , temperature) ,mqtt.QOS0) 
                         tmr.delayms(10000)
                     end,
 
