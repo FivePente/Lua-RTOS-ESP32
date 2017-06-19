@@ -8,6 +8,27 @@ disOut = 0
 xOut = 0
 yOut = 0
 
+disAlarmExceed = 3
+angleAlarmExceed = 3
+tmpAlarmExceed = 3
+
+disExceedCount = 0
+angleXExceedCount = 0
+angleYExceedCount = 0
+tmpExceedCount = 0
+
+hTmpAlarm = 60
+lTmpAlarm = -20
+
+hDisAlarm = 1
+lDisAlarm = -1
+
+hXAlarm = 1
+lXAlarm = -1
+
+hYAlarm = 1
+lYAlarm = -1
+
 temperature = 0
 
 function initI2C() 
@@ -145,7 +166,54 @@ function runDevice()
                 checkAll()
                 try(
                     function()
-                        client:publish("data", string.format('{"dis":%0.2f, "x":%0.2f , "y":%0.2f , "tmp":%0.2f}' , disOut - startDis , xOut - startX , yOut - startY , temperature) ,mqtt.QOS0) 
+
+                        local disOffset = disOut - startDis
+
+                        if disOffset > hDisAlarm or disOffset < lDisAlarm then
+                            disExceedCount = disExceedCount + 1
+                        else
+                            disExceedCount = 0
+                        end
+
+                        if disExceedCount >= disAlarmExceed then
+                            client:publish("alarm", string.format('{"type":1 , "d":%0.2f}' , disOffset) ,mqtt.QOS1)
+                        end
+
+                        local xAngleOffset = xOut - startX 
+
+                        if xAngleOffset > hXAlarm or xAngleOffset < lXAlarm then
+                            angleXExceedCount = angleXExceedCount + 1
+                        else
+                            angleXExceedCount = 0
+                        end
+
+                        if angleXExceedCount >= angleAlarmExceed then
+                            client:publish("alarm", string.format('{"type":2 , "x":%0.2f}' , xAngleOffset) ,mqtt.QOS1)
+                        end                        
+
+                        local yAngleOffset = yOut - startY
+
+                        if yAngleOffset > hYAlarm or yAngleOffset < lYAlarm then
+                            angleYExceedCount = angleYExceedCount + 1
+                        else
+                            angleYExceedCount = 0
+                        end
+
+                        if angleYExceedCount >= angleAlarmExceed then
+                            client:publish("alarm", string.format('{"type":3 , "y":%0.2f}' , xAngleOffset) ,mqtt.QOS1)
+                        end  
+
+                        if temperature > hTmpAlarm or temperature < lTmpAlarm then
+                            tmpExceedCount = tmpExceedCount + 1
+                        else
+                            tmpExceedCount = 0
+                        end
+
+                        if tmpExceedCount >= tmpAlarmExceed then
+                            client:publish("alarm", string.format('{"type":4 , "tmp":%0.2f}' , temperature) ,mqtt.QOS1)
+                        end
+
+                        client:publish("data", string.format('{"dis":%0.2f, "x":%0.2f , "y":%0.2f , "tmp":%0.2f}' , disOffset , xAngleOffset , yAngleOffset , temperature) ,mqtt.QOS0)
                         tmr.delayms(10000)
                     end,
 
