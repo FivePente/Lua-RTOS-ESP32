@@ -60,9 +60,7 @@ function initMainSubscribe(mqttClient)
     end)  
     mqttClient:subscribe("initConfig", mqtt.QOS0, function(len, message)
         updateCode = 1
-        tmr.delayms(10)
         initConfig()
-        os.exit(0)
     end)  
 end
 
