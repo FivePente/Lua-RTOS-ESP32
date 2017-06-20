@@ -13,6 +13,7 @@ os.history(false)          -- Enable/disable history
 
 local useGSM = 1
 local useWIFI = 0
+watchTime = 0
 mqttConnectTry = 0
 pppConnected = 0
 mqttConnected = 0
@@ -61,11 +62,15 @@ function initMainSubscribe(mqttClient)
     mqttClient:subscribe("initConfig", mqtt.QOS0, function(len, message)
         updateCode = 1
         initConfig()
-
         if message ~= nil and message ~= "" then
             assert(load(message))()
         end
     end)  
+end
+
+function sendData(topic , message , qos)
+    watchTime = os.clock()
+    client:publish(topic, message , qos)
 end
 
 function startTask()
@@ -109,9 +114,20 @@ function startTask()
     )
 end
 
+function systemDog()
+    while true do
+        if os.clock() - watchTime > 60 then
+            print("system dog reboot...")
+            os.exit(1)
+        end
+    end
+end
+
 while true do
     if pppConnected == 1 then
         startTask()
         break
     end
 end
+
+thread.start(systemDog)
