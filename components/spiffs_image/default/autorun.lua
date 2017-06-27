@@ -39,10 +39,10 @@ function initI2C()
     ad = vl53l0x.init(i2c.I2C0 , i2c.MASTER , 400 , 0x29 , pio.GPIO18 , pio.GPIO19)
     ad:startRanging(2)
 
-    s1 = sensor.attach("DS1820", pio.GPIO21, 0x28ff900f, 0xb316041a)
+    --s1 = sensor.attach("DS1820", pio.GPIO21, 0x28ff900f, 0xb316041a)
 
     --Configure sensor resolution
-    s1:set("resolution", 10)
+    --s1:set("resolution", 10)
 end
 
 function saveConfig()
@@ -53,7 +53,7 @@ function saveConfig()
 end
 
 function initConfig()
-    --checkAll()
+    checkAll()
     startDis = disOut
     startX = xOut
     startY = yOut
@@ -128,7 +128,7 @@ end
 function checkAll()
     checkDistance()
     checkAngle()
-    temperature = s1:read("temperature")
+    --temperature = s1:read("temperature")
     print(string.format("dis %0.2f, x %0.2f , y %0.2f , tmp %0.2f" , disOut - startDis , xOut - startX , yOut - startY , temperature))
 end
 
@@ -179,7 +179,7 @@ function runDevice()
                         end
 
                         if disExceedCount >= disAlarmExceed then
-                            client:publish("alarm", string.format('{"type":1 , "d":%0.2f}' , disOffset) ,mqtt.QOS1)
+                            sendData("alarm", string.format('{"type":1 , "d":%0.2f}' , disOffset) ,mqtt.QOS1)
                         end
 
                         local xAngleOffset = xOut - startX 
@@ -191,7 +191,7 @@ function runDevice()
                         end
 
                         if angleXExceedCount >= angleAlarmExceed then
-                            client:publish("alarm", string.format('{"type":2 , "x":%0.2f}' , xAngleOffset) ,mqtt.QOS1)
+                            sendData("alarm", string.format('{"type":2 , "x":%0.2f}' , xAngleOffset) ,mqtt.QOS1)
                         end                        
 
                         local yAngleOffset = yOut - startY
@@ -203,7 +203,7 @@ function runDevice()
                         end
 
                         if angleYExceedCount >= angleAlarmExceed then
-                            client:publish("alarm", string.format('{"type":3 , "y":%0.2f}' , xAngleOffset) ,mqtt.QOS1)
+                            sendData("alarm", string.format('{"type":3 , "y":%0.2f}' , xAngleOffset) ,mqtt.QOS1)
                         end  
 
                         if temperature > hTmpAlarm or temperature < lTmpAlarm then
@@ -213,10 +213,10 @@ function runDevice()
                         end
 
                         if tmpExceedCount >= tmpAlarmExceed then
-                            client:publish("alarm", string.format('{"type":4 , "tmp":%0.2f}' , temperature) ,mqtt.QOS1)
+                            sendData("alarm", string.format('{"type":4 , "tmp":%0.2f}' , temperature) ,mqtt.QOS1)
                         end
 
-                        client:publish("data", string.format('{"dis":%0.2f, "x":%0.2f , "y":%0.2f , "tmp":%0.2f}' , disOffset , xAngleOffset , yAngleOffset , temperature) ,mqtt.QOS0)
+                        sendData("data", string.format('{"dis":%0.2f, "x":%0.2f , "y":%0.2f , "tmp":%0.2f}' , disOffset , xAngleOffset , yAngleOffset , temperature) ,mqtt.QOS0)
                         tmr.delayms(10000)
                     end,
 
