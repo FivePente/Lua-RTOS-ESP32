@@ -31,8 +31,6 @@ lYAlarm = -1
 
 temperature = 0
 
-
-
 function initI2C() 
     cd = adxl345.init(i2c.I2C0 , i2c.MASTER , 400 , pio.GPIO18 , pio.GPIO19)
     cd:write(0x2D , 0x08)
@@ -45,6 +43,8 @@ function initI2C()
 
     --Configure sensor resolution
     s1:set("resolution", 10)
+
+    sensorInited = 1
 end
 
 function saveConfig()
