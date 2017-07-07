@@ -17,8 +17,10 @@ watchTime = 0
 mqttConnectTry = 0
 pppConnected = 0
 mqttConnected = 0
-
 updateCode = 0;
+
+led_pin = pio.GPIO27
+pio.pin.setdir(pio.OUTPUT, led_pin)
 
 if useWIFI == 1 then
     net.wf.scan()
@@ -99,7 +101,6 @@ function startTask()
         end,
         function(where,line,error,message)
             print(message)
-
             mqttConnectTry = mqttConnectTry + 1
             if mqttConnectTry < 4 then
                 print("connect fail , trying again...")
@@ -116,6 +117,32 @@ end
 
 function systemDog()
     while true do
+        if pppConnected == 0 then
+            pio.pin.sethigh(led_pin)
+            tmr.delayms(30)
+            pio.pin.setlow(led_pin)
+            tmr.delayms(10)
+            pio.pin.sethigh(led_pin)
+            tmr.delayms(30)
+            pio.pin.setlow(led_pin)
+            tmr.delayms(1000)
+        end
+
+        if mqttConnected == 0 then
+            pio.pin.sethigh(led_pin)
+            tmr.delayms(30)
+            pio.pin.setlow(led_pin)
+            tmr.delayms(10)
+            pio.pin.sethigh(led_pin)
+            tmr.delayms(30)
+            pio.pin.setlow(led_pin)
+            tmr.delayms(10)
+            pio.pin.sethigh(led_pin)
+            tmr.delayms(30)
+            pio.pin.setlow(led_pin)
+            tmr.delayms(1000)
+        end
+        
         if os.clock() - watchTime > 60 then
             print("system dog reboot...")
             os.exit(1)

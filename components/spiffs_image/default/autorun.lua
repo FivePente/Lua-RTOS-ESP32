@@ -31,6 +31,8 @@ lYAlarm = -1
 
 temperature = 0
 
+
+
 function initI2C() 
     cd = adxl345.init(i2c.I2C0 , i2c.MASTER , 400 , pio.GPIO18 , pio.GPIO19)
     cd:write(0x2D , 0x08)
@@ -39,21 +41,21 @@ function initI2C()
     ad = vl53l0x.init(i2c.I2C0 , i2c.MASTER , 400 , 0x29 , pio.GPIO18 , pio.GPIO19)
     ad:startRanging(2)
 
-    --s1 = sensor.attach("DS1820", pio.GPIO21, 0x28ff900f, 0xb316041a)
+    s1 = sensor.attach("DS1820", pio.GPIO21, 0x28ff900f, 0xb316041a)
 
     --Configure sensor resolution
-    --s1:set("resolution", 10)
+    s1:set("resolution", 10)
 end
 
 function saveConfig()
     local file2 = io.open("config.lua","w+")
-    file2:write( "startDis="..startDis.." startX="..startX.." startY="..startY )
+    file2:write( "startDis="..startDis.." startX="..startX.." startY="..startY.." tmp="..temperature )
     file2:close()
     print("save config...")
 end
 
 function initConfig()
-    checkAll()
+    --checkAll()
     startDis = disOut
     startX = xOut
     startY = yOut
@@ -128,7 +130,7 @@ end
 function checkAll()
     checkDistance()
     checkAngle()
-    --temperature = s1:read("temperature")
+    temperature = s1:read("temperature")
     print(string.format("dis %0.2f, x %0.2f , y %0.2f , tmp %0.2f" , disOut - startDis , xOut - startX , yOut - startY , temperature))
 end
 
@@ -217,6 +219,10 @@ function runDevice()
                         end
 
                         sendData("data", string.format('{"dis":%0.2f, "x":%0.2f , "y":%0.2f , "tmp":%0.2f}' , disOffset , xAngleOffset , yAngleOffset , temperature) ,mqtt.QOS0)
+
+                        pio.pin.sethigh(led_pin)
+                        tmr.delayms(30)
+                        pio.pin.setlow(led_pin)
                         tmr.delayms(10000)
                     end,
 
