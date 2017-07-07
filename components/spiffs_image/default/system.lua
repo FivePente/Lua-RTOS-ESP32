@@ -11,14 +11,14 @@ os.logcons(true)           -- Enable/disable sys log messages to console
 os.shell(true)             -- Enable/disable shell
 os.history(false)          -- Enable/disable history
 
-local useGSM = 0
-local useWIFI = 1
+local useGSM = 1
+local useWIFI = 0
 watchTime = 0
 mqttConnectTry = 0
 pppConnected = 0
 mqttConnected = 0
-updateCode = 0;
-sensorInited = 0;
+updateCode = 0
+sensorInited = 0
 
 led_pin = pio.GPIO27
 pio.pin.setdir(pio.OUTPUT, led_pin)
