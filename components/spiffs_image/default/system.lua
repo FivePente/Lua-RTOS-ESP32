@@ -28,32 +28,19 @@ function systemDog()
             pio.pin.sethigh(led_pin)
             tmr.delayms(30)
             pio.pin.setlow(led_pin)
-            tmr.delayms(10)
-            pio.pin.sethigh(led_pin)
-            tmr.delayms(30)
-            pio.pin.setlow(led_pin)
             tmr.delayms(1000)
-        end
-
-        if mqttConnected == 0 then
+        else if mqttConnected == 0 then
             pio.pin.sethigh(led_pin)
             tmr.delayms(30)
             pio.pin.setlow(led_pin)
-            tmr.delayms(10)
-            pio.pin.sethigh(led_pin)
-            tmr.delayms(30)
-            pio.pin.setlow(led_pin)
-            tmr.delayms(10)
-            pio.pin.sethigh(led_pin)
-            tmr.delayms(30)
-            pio.pin.setlow(led_pin)
-            tmr.delayms(1000)
+            tmr.delayms(2000)
         end
         
+        --[[
         if os.clock() - watchTime > 60 then
             print("system dog reboot...")
             os.exit(1)
-        end
+        end]]
     end
 end
 
