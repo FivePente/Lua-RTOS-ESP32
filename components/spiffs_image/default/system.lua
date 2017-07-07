@@ -22,6 +22,43 @@ updateCode = 0;
 led_pin = pio.GPIO27
 pio.pin.setdir(pio.OUTPUT, led_pin)
 
+function systemDog()
+    while true do
+        if pppConnected == 0 then
+            pio.pin.sethigh(led_pin)
+            tmr.delayms(30)
+            pio.pin.setlow(led_pin)
+            tmr.delayms(10)
+            pio.pin.sethigh(led_pin)
+            tmr.delayms(30)
+            pio.pin.setlow(led_pin)
+            tmr.delayms(1000)
+        end
+
+        if mqttConnected == 0 then
+            pio.pin.sethigh(led_pin)
+            tmr.delayms(30)
+            pio.pin.setlow(led_pin)
+            tmr.delayms(10)
+            pio.pin.sethigh(led_pin)
+            tmr.delayms(30)
+            pio.pin.setlow(led_pin)
+            tmr.delayms(10)
+            pio.pin.sethigh(led_pin)
+            tmr.delayms(30)
+            pio.pin.setlow(led_pin)
+            tmr.delayms(1000)
+        end
+        
+        if os.clock() - watchTime > 60 then
+            print("system dog reboot...")
+            os.exit(1)
+        end
+    end
+end
+
+thread.start(systemDog)
+
 if useWIFI == 1 then
     net.wf.scan()
     net.wf.setup(net.wf.mode.STA, "HiWiFi_3B0F16","Freedom0806")
@@ -115,41 +152,6 @@ function startTask()
     )
 end
 
-function systemDog()
-    while true do
-        if pppConnected == 0 then
-            pio.pin.sethigh(led_pin)
-            tmr.delayms(30)
-            pio.pin.setlow(led_pin)
-            tmr.delayms(10)
-            pio.pin.sethigh(led_pin)
-            tmr.delayms(30)
-            pio.pin.setlow(led_pin)
-            tmr.delayms(1000)
-        end
-
-        if mqttConnected == 0 then
-            pio.pin.sethigh(led_pin)
-            tmr.delayms(30)
-            pio.pin.setlow(led_pin)
-            tmr.delayms(10)
-            pio.pin.sethigh(led_pin)
-            tmr.delayms(30)
-            pio.pin.setlow(led_pin)
-            tmr.delayms(10)
-            pio.pin.sethigh(led_pin)
-            tmr.delayms(30)
-            pio.pin.setlow(led_pin)
-            tmr.delayms(1000)
-        end
-        
-        if os.clock() - watchTime > 60 then
-            print("system dog reboot...")
-            os.exit(1)
-        end
-    end
-end
-
 while true do
     if pppConnected == 1 then
         startTask()
@@ -157,4 +159,3 @@ while true do
     end
 end
 
-thread.start(systemDog)
