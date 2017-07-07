@@ -20,7 +20,6 @@ mqttConnected = 0
 updateCode = 0;
 sensorInited = 0;
 
-
 led_pin = pio.GPIO27
 pio.pin.setdir(pio.OUTPUT, led_pin)
 
@@ -31,12 +30,12 @@ function systemDog()
             tmr.delayms(30)
             pio.pin.setlow(led_pin)
             tmr.delayms(500)
-        else if mqttConnected == 0 then
+        elseif mqttConnected == 0 then
             pio.pin.sethigh(led_pin)
             tmr.delayms(30)
             pio.pin.setlow(led_pin)
             tmr.delayms(1000)
-        else if sensorInited == 0 then
+        elseif sensorInited == 0 then
             pio.pin.sethigh(led_pin)
             tmr.delayms(30)
             pio.pin.setlow(led_pin)
