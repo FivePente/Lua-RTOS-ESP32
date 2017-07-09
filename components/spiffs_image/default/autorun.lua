@@ -30,6 +30,8 @@ hYAlarm = 1
 lYAlarm = -1
 
 temperature = 0
+maxTemp = 50
+minTemp = -15
 
 function initI2C() 
     cd = adxl345.init(i2c.I2C0 , i2c.MASTER , 400 , pio.GPIO18 , pio.GPIO19)
@@ -128,9 +130,16 @@ function checkAngle()
 end
 
 function checkAll()
-    checkDistance()
-    checkAngle()
     temperature = s1:read("temperature")
+
+    if temperature > maxTemp or temperature < minTemp then
+        sendData("alarm", string.format('{"type":5 , "tmp":%0.2f}' , temperature) ,mqtt.QOS1)
+        return
+    else
+        checkDistance()
+        checkAngle()
+    end
+    
     print(string.format("dis %0.2f, x %0.2f , y %0.2f , tmp %0.2f" , disOut - startDis , xOut - startX , yOut - startY , temperature))
 end
 
@@ -233,12 +242,13 @@ function runDevice()
                 )
 
             else
+                print("mqtt disconnected...")
                 --client:disconnect()
                 tmr.delayms(1000)
                 startTask()
             end
         else
-            print("Network Disconnected...")
+            print("Network disconnected...")
             tmr.delayms(3000)
         end
     end
