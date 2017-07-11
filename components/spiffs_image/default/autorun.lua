@@ -99,6 +99,11 @@ function checkAngle()
     local lX = {}
     local lY = {}
     local lZ = {}
+    local FILTER_A = 0.01
+    local tX = 0
+    local tY = 0
+    local tZ = 0
+
 
     while true do
 
@@ -125,14 +130,18 @@ function checkAngle()
             y = y / 10.00
             z = z / 10.00
 
-            xOut = getXAngle(x , y , z)
-            yOut = getYAngle(x , y , z)
+            tX = getXAngle(x , y , z)
+            tY = getYAngle(x , y , z)
 
             if startX == 0 then
                 startX = xOut
                 startY = yOut
                 saveConfig()
             end
+
+            xOut = tX * FILTER_A + (1.0 - FILTER_A) * xOut
+            yOut = tY * FILTER_A + (1.0 - FILTER_A) * yOut
+
             break
         end
     end
