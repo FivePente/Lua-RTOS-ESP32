@@ -91,32 +91,28 @@ function checkDistance ()
 end
 
 function checkAngle()
-    if sensorInited == 1 and mqttConnected == 1 then
-        local x = 0
-        local y = 0
-        local z = 0
-        local cont = 0
-        local index = 0
-        local lX = {}
-        local lY = {}
-        local lZ = {}
-        local FILTER_A = 0.01
-        local tX = 0
-        local tY = 0
-        local tZ = 0
+    while true do
+        if sensorInited == 1 and mqttConnected == 1 then
+            local x = 0
+            local y = 0
+            local z = 0
+            local FILTER_A = 0.01
+            local tX = 0
+            local tY = 0
 
-        x, y , z = cd:read()
-        tX = getXAngle(x , y , z)
-        tY = getYAngle(x , y , z)
+            x, y , z = cd:read()
+            tX = getXAngle(x , y , z)
+            tY = getYAngle(x , y , z)
 
-        if startX == 0 then
-            startX = xOut
-            startY = yOut
-            saveConfig()
+            if startX == 0 then
+                startX = tX
+                startY = tY
+                saveConfig()
+            end
+
+            xOut = tX * FILTER_A + (1.0 - FILTER_A) * xOut
+            yOut = tY * FILTER_A + (1.0 - FILTER_A) * yOut
         end
-
-        xOut = tX * FILTER_A + (1.0 - FILTER_A) * xOut
-        yOut = tY * FILTER_A + (1.0 - FILTER_A) * yOut
     end
 end
 
