@@ -13,7 +13,7 @@ yOutCount = 0
 indexA = 0
 
 disAlarmExceed = 3
-angleAlarmExceed = 3
+angleAlarmExceed = 6
 tmpAlarmExceed = 3
 
 disExceedCount = 0
@@ -27,11 +27,11 @@ lTmpAlarm = -20
 hDisAlarm = 1
 lDisAlarm = -1
 
-hXAlarm = 1
-lXAlarm = -1
+hXAlarm = 0.3
+lXAlarm = -0.3
 
-hYAlarm = 1
-lYAlarm = -1
+hYAlarm = 0.3
+lYAlarm = -0.3
 
 temperature = 0
 maxTemp = 50
@@ -95,41 +95,46 @@ function checkDistance()
     end
 end
 
+xList = {}
+yList = {}
+
 function checkAngle()
     local x = 0
     local y = 0
     local z = 0
-    local FILTER_A = 0.01
+    local FILTER_A = 0.001
     local tX = 0
     local tY = 0
 
     x, y , z = cd:read()
+
     tX = getXAngle(x , y , z)
     tY = getYAngle(x , y , z)
-
-    if startX == 0 then
-        startX = tX
-        startY = tY
-        saveConfig()
-    end
 
     xOut = tX * FILTER_A + (1.0 - FILTER_A) * xOut
     yOut = tY * FILTER_A + (1.0 - FILTER_A) * yOut
 
-    xOutCount = xOutCount + xOut
-    yOutCount = yOutCount + yOut
+    if indexA < 100 then
+        xList[indexA] = xOut
+        yList[indexA] = yOut
+    end
 
     indexA = indexA + 1
-end
 
-function checkAngleP()
-    xOut = xOutCount / indexA
-    yOut = yOutCount / indexA
+    if indexA == 101 then
+        table.sort(xList)
+        table.sort(yList)
 
-    xOutCount = 0
-    yOutCount = 0
+        xOut = xList[50]
+        yOut = yList[50]
+        indexA = 0
 
-    indexA = 0
+        if startX == 0 then
+            startX = xOut
+            startY = yOut
+            saveConfig()
+        end
+    end
 end
 
 function checkAll()
@@ -139,8 +144,6 @@ function checkAll()
         return
     else
         checkDistance()
-        checkAngleP()
-        --checkAngle()
     end
     
     print(string.format("dis %0.2f, x %0.2f , y %0.2f , tmp %0.2f" , disOut - startDis , xOut - startX , yOut - startY , temperature))
@@ -179,6 +182,7 @@ function runDevice()
     tmr.delayms(1000)
 
     local timer = os.clock()
+    watchTime = timer
     while true do
         if pppConnected == 1 then
             if mqttConnected == 1 then
@@ -236,6 +240,8 @@ function runDevice()
                             end
 
                             sendData("data", string.format('{"dis":%0.2f, "x":%0.2f , "y":%0.2f , "tmp":%0.2f}' , disOffset , xAngleOffset , yAngleOffset , temperature) ,mqtt.QOS0)
+
+                            watchTime = os.clock()
 
                             pio.pin.sethigh(led_pin)
                             tmr.delayms(30)

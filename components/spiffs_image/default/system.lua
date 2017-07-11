@@ -13,9 +13,10 @@ os.history(false)          -- Enable/disable history
 
 local useGSM = 1
 local useWIFI = 0
-watchTime = 0
+
 mqttConnectTry = 0
 pppConnected = 0
+watchTime = 0
 
 mqttConnected = 0
 updateCode = 0
@@ -43,11 +44,10 @@ function systemDog()
             tmr.delayms(2000)
         end
         
-        --[[
         if os.clock() - watchTime > 60 then
             print("system dog reboot...")
             os.exit(1)
-        end]]
+        end
     end
 end
 
