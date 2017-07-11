@@ -8,6 +8,10 @@ disOut = 0
 xOut = 0
 yOut = 0
 
+xOutCount = 0
+yOutCount = 0
+indexA = 0
+
 disAlarmExceed = 3
 angleAlarmExceed = 3
 tmpAlarmExceed = 3
@@ -64,7 +68,7 @@ function initConfig()
     saveConfig()
 end
 
-function checkDistance ()
+function checkDistance()
     local ldis = {}
     local index = 0
     while true do
@@ -110,6 +114,18 @@ function checkAngle()
 
     xOut = tX * FILTER_A + (1.0 - FILTER_A) * xOut
     yOut = tY * FILTER_A + (1.0 - FILTER_A) * yOut
+
+    xOutCount = xOutCount + xOut
+    yOutCount = yOutCount + yOut
+
+    indexA = indexA + 1
+end
+
+function checkAngleP()
+    xOut = xOutCount / indexA
+    yOut = yOutCount / indexA
+
+    indexA = 0
 end
 
 function checkAll()
@@ -119,6 +135,7 @@ function checkAll()
         return
     else
         checkDistance()
+        checkAngleP()
         --checkAngle()
     end
     
