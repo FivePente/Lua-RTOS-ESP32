@@ -69,6 +69,7 @@ function initConfig()
 end
 
 function checkDistance()
+
     local ldis = {}
     local index = 0
     while true do
