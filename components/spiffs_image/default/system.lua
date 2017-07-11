@@ -43,8 +43,6 @@ function systemDog()
             pio.pin.setlow(led_pin)
             tmr.delayms(2000)
         end
-
-        print("system timer "..(os.clock() - watchTime ))
         
         if os.clock() - watchTime > 60 then
             print("system dog reboot...")
