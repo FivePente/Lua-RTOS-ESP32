@@ -91,59 +91,32 @@ function checkDistance ()
 end
 
 function checkAngle()
-    local x = 0
-    local y = 0
-    local z = 0
-    local cont = 0
-    local index = 0
-    local lX = {}
-    local lY = {}
-    local lZ = {}
-    local FILTER_A = 0.01
-    local tX = 0
-    local tY = 0
-    local tZ = 0
+    if sensorInited == 1 and mqttConnected == 1 then
+        local x = 0
+        local y = 0
+        local z = 0
+        local cont = 0
+        local index = 0
+        local lX = {}
+        local lY = {}
+        local lZ = {}
+        local FILTER_A = 0.01
+        local tX = 0
+        local tY = 0
+        local tZ = 0
 
+        x, y , z = cd:read()
+        tX = getXAngle(x , y , z)
+        tY = getYAngle(x , y , z)
 
-    while true do
-
-        lX[index] , lY[index] , lZ[index] = cd:read()
-        index = index + 1
-        if index == 30 then
-            table.sort(lX)
-            print(table.concat(lX, ", "))
-
-            table.sort(lY)
-            print(table.concat(lY, ", "))
-
-            table.sort(lZ)
-            print(table.concat(lZ, ", "))
-            index = 0
-
-            for i= 11 , 20 do
-                x = x + lX[i]
-                y = y + lY[i]
-                z = z + lZ[i]
-            end
-
-            x = x / 10.00
-            y = y / 10.00
-            z = z / 10.00
-
-            tX = getXAngle(x , y , z)
-            tY = getYAngle(x , y , z)
-
-            if startX == 0 then
-                startX = xOut
-                startY = yOut
-                saveConfig()
-            end
-
-            xOut = tX * FILTER_A + (1.0 - FILTER_A) * xOut
-            yOut = tY * FILTER_A + (1.0 - FILTER_A) * yOut
-
-            break
+        if startX == 0 then
+            startX = xOut
+            startY = yOut
+            saveConfig()
         end
+
+        xOut = tX * FILTER_A + (1.0 - FILTER_A) * xOut
+        yOut = tY * FILTER_A + (1.0 - FILTER_A) * yOut
     end
 end
 
@@ -155,7 +128,7 @@ function checkAll()
         return
     else
         checkDistance()
-        checkAngle()
+        --checkAngle()
     end
     
     print(string.format("dis %0.2f, x %0.2f , y %0.2f , tmp %0.2f" , disOut - startDis , xOut - startX , yOut - startY , temperature))
@@ -273,3 +246,4 @@ function runDevice()
 end
 
 thread.start(runDevice)
+thread.start(checkAngle)
