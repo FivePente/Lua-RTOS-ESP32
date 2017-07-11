@@ -104,7 +104,7 @@ function initMainSubscribe(mqttClient)
 end
 
 function sendData(topic , message , qos)
-    watchTime = os.clock()
+    --watchTime = os.clock()
     client:publish(topic, message , qos)
 end
 

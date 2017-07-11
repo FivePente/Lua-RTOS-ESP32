@@ -243,8 +243,6 @@ function runDevice()
 
                             sendData("data", string.format('{"dis":%0.2f, "x":%0.2f , "y":%0.2f , "tmp":%0.2f}' , disOffset , xAngleOffset , yAngleOffset , temperature) ,mqtt.QOS0)
 
-                            --watchTime = os.clock()
-
                             pio.pin.sethigh(led_pin)
                             tmr.delayms(30)
                             pio.pin.setlow(led_pin)
