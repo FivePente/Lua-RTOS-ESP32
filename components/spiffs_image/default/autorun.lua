@@ -91,30 +91,39 @@ function checkDistance ()
 end
 
 function checkAngle()
-    local x , y , z
-    local xt = 0
-    local yt = 0
-    local zt = 0
+    local x = 0
+    local y = 0
+    local z = 0
     local cont = 0
     local index = 0
+    local lX = {}
+    local lY = {}
+    local lZ = {}
 
     while true do
 
-        x , y , z = cd:read()
-
-        xt = xt + x
-        yt = yt + y
-        zt = zt + z
-
+        lX[index] , lY[index] , lZ[index] = cd:read()
         index = index + 1
+        if index == 30 then
+            table.sort(lX)
+            print(table.concat(lX, ", "))
 
-        if index == 10 then
+            table.sort(lY)
+            print(table.concat(lY, ", "))
 
+            table.sort(lZ)
+            print(table.concat(lZ, ", "))
             index = 0
 
-            x = xt / 10
-            y = yt / 10
-            z = zt / 10
+            for i= 11 , 20 do
+                x = x + lX[i]
+                y = y + lY[i]
+                z = z + lZ[i]
+            end
+
+            x = x / 10.00
+            y = y / 10.00
+            z = z / 10.00
 
             xOut = getXAngle(x , y , z)
             yOut = getYAngle(x , y , z)

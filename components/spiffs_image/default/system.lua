@@ -16,6 +16,7 @@ local useWIFI = 0
 watchTime = 0
 mqttConnectTry = 0
 pppConnected = 0
+
 mqttConnected = 0
 updateCode = 0
 sensorInited = 0
