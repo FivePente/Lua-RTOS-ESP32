@@ -114,7 +114,6 @@ end
 
 function checkAll()
     temperature = s1:read("temperature")
-
     if temperature > maxTemp or temperature < minTemp then
         sendData("alarm", string.format('{"type":5 , "tmp":%0.2f}' , temperature) ,mqtt.QOS1)
         return
@@ -220,7 +219,6 @@ function runDevice()
                             pio.pin.sethigh(led_pin)
                             tmr.delayms(30)
                             pio.pin.setlow(led_pin)
-                            tmr.delayms(10000)
                         end,
 
                         function(where,line,error,message)
