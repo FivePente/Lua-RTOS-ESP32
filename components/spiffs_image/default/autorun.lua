@@ -125,6 +125,9 @@ function checkAngleP()
     xOut = xOutCount / indexA
     yOut = yOutCount / indexA
 
+    xOutCount = 0
+    yOutCount = 0
+
     indexA = 0
 end
 
