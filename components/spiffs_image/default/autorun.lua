@@ -173,6 +173,8 @@ function runDevice()
 
     if loadConfig then
         dofile("config.lua")
+        xOut = startX
+        yOut = startY
         print("load config.lua")
     end
 
@@ -181,13 +183,13 @@ function runDevice()
     initI2C()
     tmr.delayms(1000)
 
-    local timer = os.clock()
-    watchTime = timer
+    local timer = 0
+    watchTime = os.clock()
     while true do
         if pppConnected == 1 then
             if mqttConnected == 1 then
                 checkAngle()
-                if os.clock() - timer >= 10 then
+                if timer == 0 or os.clock() - timer >= 10 then
                     timer = os.clock()
                     checkAll()
                     try(
@@ -241,7 +243,7 @@ function runDevice()
 
                             sendData("data", string.format('{"dis":%0.2f, "x":%0.2f , "y":%0.2f , "tmp":%0.2f}' , disOffset , xAngleOffset , yAngleOffset , temperature) ,mqtt.QOS0)
 
-                            watchTime = os.clock()
+                            --watchTime = os.clock()
 
                             pio.pin.sethigh(led_pin)
                             tmr.delayms(30)
