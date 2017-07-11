@@ -91,7 +91,7 @@ function initMainSubscribe(mqttClient)
         file2:write(message)
         file2:close()
         os.exit(0)
-    end)  
+    end)
     mqttClient:subscribe("initConfig", mqtt.QOS0, function(len, message)
         updateCode = 1
         initConfig()

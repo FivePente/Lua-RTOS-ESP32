@@ -91,29 +91,25 @@ function checkDistance ()
 end
 
 function checkAngle()
-    while true do
-        if sensorInited == 1 and mqttConnected == 1 then
-            local x = 0
-            local y = 0
-            local z = 0
-            local FILTER_A = 0.01
-            local tX = 0
-            local tY = 0
+    local x = 0
+    local y = 0
+    local z = 0
+    local FILTER_A = 0.01
+    local tX = 0
+    local tY = 0
 
-            x, y , z = cd:read()
-            tX = getXAngle(x , y , z)
-            tY = getYAngle(x , y , z)
+    x, y , z = cd:read()
+    tX = getXAngle(x , y , z)
+    tY = getYAngle(x , y , z)
 
-            if startX == 0 then
-                startX = tX
-                startY = tY
-                saveConfig()
-            end
-
-            xOut = tX * FILTER_A + (1.0 - FILTER_A) * xOut
-            yOut = tY * FILTER_A + (1.0 - FILTER_A) * yOut
-        end
+    if startX == 0 then
+        startX = tX
+        startY = tY
+        saveConfig()
     end
+
+    xOut = tX * FILTER_A + (1.0 - FILTER_A) * xOut
+    yOut = tY * FILTER_A + (1.0 - FILTER_A) * yOut
 end
 
 function checkAll()
@@ -161,72 +157,78 @@ function runDevice()
     
     initI2C()
     tmr.delayms(1000)
+
+    local timer = os.clock()
     while true do
         if pppConnected == 1 then
             if mqttConnected == 1 then
-                checkAll()
-                try(
-                    function()
+                checkAngle()
+                if os.clock() - timer >= 10 then
+                    timer = os.clock()
+                    checkAll()
+                    try(
+                        function()
 
-                        local disOffset = disOut - startDis
+                            local disOffset = disOut - startDis
 
-                        if disOffset > hDisAlarm or disOffset < lDisAlarm then
-                            disExceedCount = disExceedCount + 1
-                        else
-                            disExceedCount = 0
+                            if disOffset > hDisAlarm or disOffset < lDisAlarm then
+                                disExceedCount = disExceedCount + 1
+                            else
+                                disExceedCount = 0
+                            end
+
+                            if disExceedCount >= disAlarmExceed then
+                                sendData("alarm", string.format('{"type":1 , "d":%0.2f}' , disOffset) ,mqtt.QOS1)
+                            end
+
+                            local xAngleOffset = xOut - startX 
+
+                            if xAngleOffset > hXAlarm or xAngleOffset < lXAlarm then
+                                angleXExceedCount = angleXExceedCount + 1
+                            else
+                                angleXExceedCount = 0
+                            end
+
+                            if angleXExceedCount >= angleAlarmExceed then
+                                sendData("alarm", string.format('{"type":2 , "x":%0.2f}' , xAngleOffset) ,mqtt.QOS1)
+                            end                        
+
+                            local yAngleOffset = yOut - startY
+
+                            if yAngleOffset > hYAlarm or yAngleOffset < lYAlarm then
+                                angleYExceedCount = angleYExceedCount + 1
+                            else
+                                angleYExceedCount = 0
+                            end
+
+                            if angleYExceedCount >= angleAlarmExceed then
+                                sendData("alarm", string.format('{"type":3 , "y":%0.2f}' , xAngleOffset) ,mqtt.QOS1)
+                            end  
+
+                            if temperature > hTmpAlarm or temperature < lTmpAlarm then
+                                tmpExceedCount = tmpExceedCount + 1
+                            else
+                                tmpExceedCount = 0
+                            end
+
+                            if tmpExceedCount >= tmpAlarmExceed then
+                                sendData("alarm", string.format('{"type":4 , "tmp":%0.2f}' , temperature) ,mqtt.QOS1)
+                            end
+
+                            sendData("data", string.format('{"dis":%0.2f, "x":%0.2f , "y":%0.2f , "tmp":%0.2f}' , disOffset , xAngleOffset , yAngleOffset , temperature) ,mqtt.QOS0)
+
+                            pio.pin.sethigh(led_pin)
+                            tmr.delayms(30)
+                            pio.pin.setlow(led_pin)
+                            tmr.delayms(10000)
+                        end,
+
+                        function(where,line,error,message)
+                            print(message)
+                            mqttConnected = 0
                         end
-
-                        if disExceedCount >= disAlarmExceed then
-                            sendData("alarm", string.format('{"type":1 , "d":%0.2f}' , disOffset) ,mqtt.QOS1)
-                        end
-
-                        local xAngleOffset = xOut - startX 
-
-                        if xAngleOffset > hXAlarm or xAngleOffset < lXAlarm then
-                            angleXExceedCount = angleXExceedCount + 1
-                        else
-                            angleXExceedCount = 0
-                        end
-
-                        if angleXExceedCount >= angleAlarmExceed then
-                            sendData("alarm", string.format('{"type":2 , "x":%0.2f}' , xAngleOffset) ,mqtt.QOS1)
-                        end                        
-
-                        local yAngleOffset = yOut - startY
-
-                        if yAngleOffset > hYAlarm or yAngleOffset < lYAlarm then
-                            angleYExceedCount = angleYExceedCount + 1
-                        else
-                            angleYExceedCount = 0
-                        end
-
-                        if angleYExceedCount >= angleAlarmExceed then
-                            sendData("alarm", string.format('{"type":3 , "y":%0.2f}' , xAngleOffset) ,mqtt.QOS1)
-                        end  
-
-                        if temperature > hTmpAlarm or temperature < lTmpAlarm then
-                            tmpExceedCount = tmpExceedCount + 1
-                        else
-                            tmpExceedCount = 0
-                        end
-
-                        if tmpExceedCount >= tmpAlarmExceed then
-                            sendData("alarm", string.format('{"type":4 , "tmp":%0.2f}' , temperature) ,mqtt.QOS1)
-                        end
-
-                        sendData("data", string.format('{"dis":%0.2f, "x":%0.2f , "y":%0.2f , "tmp":%0.2f}' , disOffset , xAngleOffset , yAngleOffset , temperature) ,mqtt.QOS0)
-
-                        pio.pin.sethigh(led_pin)
-                        tmr.delayms(30)
-                        pio.pin.setlow(led_pin)
-                        tmr.delayms(10000)
-                    end,
-
-                    function(where,line,error,message)
-                        print(message)
-                        mqttConnected = 0
-                    end
-                )
+                    )
+                end
 
             else
                 print("mqtt disconnected...")
@@ -242,4 +244,3 @@ function runDevice()
 end
 
 thread.start(runDevice)
-thread.start(checkAngle)
