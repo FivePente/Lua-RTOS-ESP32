@@ -38,6 +38,7 @@ maxTemp = 50
 minTemp = -15
 
 function initI2C() 
+
     cd = adxl345.init(i2c.I2C0 , i2c.MASTER , 400 , pio.GPIO18 , pio.GPIO19)
     cd:write(0x2D , 0x08)
     cd:write(0x31 , 0x28)
@@ -127,17 +128,17 @@ function checkAngle()
         tX = 0
         tY = 0
 
-        for i= 3, 12 do
+        for i= 5, 10 do
             tX = tX + xList[i]
             tY = tY + yList[i]
         end
 
-        xOutCount = xOutCount + tX / 10.00
-        yOutCount = yOutCount + tY / 10.00
+        xOutCount = xOutCount + tX / 6.00
+        yOutCount = yOutCount + tY / 6.00
 
         --print(xOutCount)
 
-        indexCount = indexCount + 10
+        indexCount = indexCount + 6
         indexA = 0
         --print(indexCount)
     end
