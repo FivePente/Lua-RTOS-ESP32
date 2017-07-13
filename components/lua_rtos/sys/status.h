@@ -55,6 +55,8 @@
 #define STATUS_SPI_ETH_STARTED         0x000e
 #define STATUS_SPI_ETH_CONNECTED       0x000f
 
+#define STATUS_PPP_CONNECTED           0x0010
+
 extern uint32_t LuaOS_status[];
 
 void IRAM_ATTR status_set(uint16_t flag);
