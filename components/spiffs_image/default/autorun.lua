@@ -1,5 +1,7 @@
 local ver = 1.0
 
+nan = 0
+
 startX = 0
 startY = 0
 startDis = 0
@@ -104,7 +106,6 @@ function checkAngle()
     local x = 0
     local y = 0
     local z = 0
-    local FILTER_A = 0.01
     local tX = 0
     local tY = 0
 
@@ -123,8 +124,6 @@ function checkAngle()
         table.sort(xList)
         table.sort(yList)
 
-        --print(table.concat(xList, ", "))
-
         tX = 0
         tY = 0
 
@@ -136,20 +135,9 @@ function checkAngle()
         xOutCount = xOutCount + tX / 6.00
         yOutCount = yOutCount + tY / 6.00
 
-        --print(xOutCount)
-
         indexCount = indexCount + 6
         indexA = 0
-        --print(indexCount)
     end
-
-
-    -- 一阶滞后滤波法
-    --xOut = tX * FILTER_A + (1.0 - FILTER_A) * xOut
-    --yOut = tY * FILTER_A + (1.0 - FILTER_A) * yOut
-
-    --xOutCount = xOutCount + xOut
-    --yOutCount = yOutCount + yOut  
 end
 
 function checkAngleP()
@@ -161,7 +149,7 @@ function checkAngleP()
     yOutCount = 0
     indexCount = 0
 
-    if startX == 0 then
+    if startX == 0 or startX == nil then
         startX = xOut
         startY = yOut
         saveConfig()
@@ -215,13 +203,13 @@ function runDevice()
     initI2C()
     tmr.delayms(1000)
 
-    local timer = 0
+    local timer = os.clock()
     watchTime = os.clock()
     while true do
         if pppConnected == 1 then
             if mqttConnected == 1 then
                 checkAngle()
-                if timer == 0 or os.clock() - timer >= 10 then
+                if os.clock() - timer >= 10 then
                     timer = os.clock()
                     checkAll()
                     try(
@@ -273,7 +261,7 @@ function runDevice()
                                 sendData("alarm", string.format('{"type":4 , "tmp":%0.2f}' , temperature) ,mqtt.QOS1)
                             end
 
-                            sendData("data", string.format('{"tp":%d , t"dis":%0.2f, "x":%0.2f , "y":%0.2f , "tmp":%0.2f}' , os.time() , disOffset , xAngleOffset , yAngleOffset , temperature) ,mqtt.QOS0)
+                            sendData("data", string.format('{"tp":%d , "dis":%0.2f, "x":%0.2f , "y":%0.2f , "tmp":%0.2f}' , os.time() , disOffset , xAngleOffset , yAngleOffset , temperature) ,mqtt.QOS0)
 
                             pio.pin.sethigh(led_pin)
                             tmr.delayms(30)

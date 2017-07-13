@@ -34,6 +34,8 @@
 #include "lwip/dns.h"
 #include "lwip/pppapi.h"
 
+#include <sys/status.h>
+
 static uint8_t conn_ok = 0;
 
 /* The examples use simple GSM configuration that you can set via
@@ -180,6 +182,7 @@ static void ppp_status_cb(ppp_pcb *pcb, int err_code, void *ctx) {
 		ESP_LOGI(TAG,"   ip6addr   = %s\n", ip6addr_ntoa(netif_ip6_addr(pppif, 0)));
 #endif
 		conn_ok = 1;
+		status_set(STATUS_PPP_CONNECTED);
 		sendStatus(err_code , "connected");
 		printf("freedom: Connected ipaddr = %s\n" , ipaddr_ntoa(&pppif->ip_addr));
 		break;
