@@ -102,8 +102,8 @@ function initMainSubscribe(mqttClient)
 end
 
 function sendData(topic , message , qos)
-    --watchTime = os.clock()
     client:publish(topic, message , qos)
+    watchTime = os.clock()
 end
 
 function startTask()
@@ -127,13 +127,14 @@ function startTask()
 
             if inited == 0 then
                 inited = 1
+                watchTime = os.clock()
                 --runDevice()
             end
         end,
         function(where,line,error,message)
             print(message)
             mqttConnectTry = mqttConnectTry + 1
-            if mqttConnectTry < 4 then
+            if mqttConnectTry < 2 then
                 print("connect fail , trying again...")
                 tmr.delayms(3000)
                 startTask()

@@ -40,8 +40,8 @@ minTemp = -15
 function initI2C() 
     cd = adxl345.init(i2c.I2C0 , i2c.MASTER , 400 , pio.GPIO18 , pio.GPIO19)
     cd:write(0x2D , 0x08)
-    cd:write(0x31 , 0x2B)
-    cd:write(0x2C , 0x08)
+    cd:write(0x31 , 0x28)
+    cd:write(0x2C , 0x0C)
     ad = vl53l0x.init(i2c.I2C0 , i2c.MASTER , 400 , 0x29 , pio.GPIO18 , pio.GPIO19)
     ad:startRanging(2)
 
@@ -97,12 +97,13 @@ end
 
 xList = {}
 yList = {}
+indexCount = 0
 
 function checkAngle()
     local x = 0
     local y = 0
     local z = 0
-    local FILTER_A = 0.001
+    local FILTER_A = 0.01
     local tX = 0
     local tY = 0
 
@@ -111,29 +112,58 @@ function checkAngle()
     tX = getXAngle(x , y , z)
     tY = getYAngle(x , y , z)
 
-    xOut = tX * FILTER_A + (1.0 - FILTER_A) * xOut
-    yOut = tY * FILTER_A + (1.0 - FILTER_A) * yOut
-
-    if indexA < 100 then
-        xList[indexA] = xOut
-        yList[indexA] = yOut
-    end
+    xList[indexA] = tX
+    yList[indexA] = tY
 
     indexA = indexA + 1
 
-    if indexA == 101 then
+    if indexA == 14 then
+    
         table.sort(xList)
         table.sort(yList)
 
-        xOut = xList[50]
-        yOut = yList[50]
-        indexA = 0
+        --print(table.concat(xList, ", "))
 
-        if startX == 0 then
-            startX = xOut
-            startY = yOut
-            saveConfig()
+        tX = 0
+        tY = 0
+
+        for i= 3, 12 do
+            tX = tX + xList[i]
+            tY = tY + yList[i]
         end
+
+        xOutCount = xOutCount + tX / 10.00
+        yOutCount = yOutCount + tY / 10.00
+
+        --print(xOutCount)
+
+        indexCount = indexCount + 10
+        indexA = 0
+        --print(indexCount)
+    end
+
+
+    -- 一阶滞后滤波法
+    --xOut = tX * FILTER_A + (1.0 - FILTER_A) * xOut
+    --yOut = tY * FILTER_A + (1.0 - FILTER_A) * yOut
+
+    --xOutCount = xOutCount + xOut
+    --yOutCount = yOutCount + yOut  
+end
+
+function checkAngleP()
+    xOut = xOutCount / indexCount
+    yOut = yOutCount / indexCount
+
+    indexA = 0
+    xOutCount = 0
+    yOutCount = 0
+    indexCount = 0
+
+    if startX == 0 then
+        startX = xOut
+        startY = yOut
+        saveConfig()
     end
 end
 
@@ -143,6 +173,7 @@ function checkAll()
         sendData("alarm", string.format('{"type":5 , "tmp":%0.2f}' , temperature) ,mqtt.QOS1)
         return
     else
+        checkAngleP()
         checkDistance()
     end
     
@@ -246,6 +277,7 @@ function runDevice()
                             pio.pin.sethigh(led_pin)
                             tmr.delayms(30)
                             pio.pin.setlow(led_pin)
+                            watchTime = os.clock()
                         end,
 
                         function(where,line,error,message)
