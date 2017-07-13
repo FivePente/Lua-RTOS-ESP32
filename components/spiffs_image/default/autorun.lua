@@ -224,7 +224,7 @@ function runDevice()
                             end
 
                             if disExceedCount >= disAlarmExceed then
-                                sendData("alarm", string.format('{"type":1 , "d":%0.2f}' , disOffset) ,mqtt.QOS1)
+                                sendData("alarm", string.format('{"t":%d , "d":%0.2f}' , os.time() , disOffset) ,mqtt.QOS1)
                             end
 
                             local xAngleOffset = xOut - startX 
@@ -236,7 +236,7 @@ function runDevice()
                             end
 
                             if angleXExceedCount >= angleAlarmExceed then
-                                sendData("alarm", string.format('{"type":2 , "x":%0.2f}' , xAngleOffset) ,mqtt.QOS1)
+                                sendData("alarm", string.format('{"t":%d , "x":%0.2f}' , os.time() , xAngleOffset) ,mqtt.QOS1)
                             end                        
 
                             local yAngleOffset = yOut - startY
@@ -248,7 +248,7 @@ function runDevice()
                             end
 
                             if angleYExceedCount >= angleAlarmExceed then
-                                sendData("alarm", string.format('{"type":3 , "y":%0.2f}' , xAngleOffset) ,mqtt.QOS1)
+                                sendData("alarm", string.format('{"t":%d , "y":%0.2f}' , os.time() , xAngleOffset) ,mqtt.QOS1)
                             end  
 
                             if temperature > hTmpAlarm or temperature < lTmpAlarm then
@@ -258,10 +258,10 @@ function runDevice()
                             end
 
                             if tmpExceedCount >= tmpAlarmExceed then
-                                sendData("alarm", string.format('{"type":4 , "tmp":%0.2f}' , temperature) ,mqtt.QOS1)
+                                sendData("alarm", string.format('{"t":%d , "w":%0.2f}' , os.time() , temperature) ,mqtt.QOS1)
                             end
 
-                            sendData("data", string.format('{"tp":%d , "dis":%0.2f, "x":%0.2f , "y":%0.2f , "tmp":%0.2f}' , os.time() , disOffset , xAngleOffset , yAngleOffset , temperature) ,mqtt.QOS0)
+                            sendData("data", string.format('{"t":%d , "d":%0.2f, "x":%0.2f , "y":%0.2f , "w":%0.2f}' , os.time() , disOffset , xAngleOffset , yAngleOffset , temperature) ,mqtt.QOS0)
 
                             pio.pin.sethigh(led_pin)
                             tmr.delayms(30)

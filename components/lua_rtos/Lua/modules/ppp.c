@@ -216,6 +216,7 @@ static void ppp_status_cb(ppp_pcb *pcb, int err_code, void *ctx) {
 		sendStatus(err_code , "Connection lost");
 		ESP_LOGE(TAG,"status_cb: Connection lost\n");
 		conn_ok = 0;
+		status_clear(STATUS_PPP_CONNECTED);
 		break;
 	}
 	case PPPERR_AUTHFAIL: {
