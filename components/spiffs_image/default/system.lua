@@ -149,8 +149,8 @@ end
 
 while true do
     if pppConnected == 1 then
-        net.service.sntp.start()
-        net.service.sntp.stop()
+        --net.service.sntp.start()
+        --net.service.sntp.stop()
         startTask()
         break
     end

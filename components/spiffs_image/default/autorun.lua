@@ -273,7 +273,7 @@ function runDevice()
                                 sendData("alarm", string.format('{"type":4 , "tmp":%0.2f}' , temperature) ,mqtt.QOS1)
                             end
 
-                            sendData("data", string.format('{"dis":%0.2f, "x":%0.2f , "y":%0.2f , "tmp":%0.2f}' , disOffset , xAngleOffset , yAngleOffset , temperature) ,mqtt.QOS0)
+                            sendData("data", string.format('{"tp":%d , t"dis":%0.2f, "x":%0.2f , "y":%0.2f , "tmp":%0.2f}' , os.time() , disOffset , xAngleOffset , yAngleOffset , temperature) ,mqtt.QOS0)
 
                             pio.pin.sethigh(led_pin)
                             tmr.delayms(30)
