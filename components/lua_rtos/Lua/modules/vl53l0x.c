@@ -71,15 +71,11 @@ typedef struct {
 
 typedef vl53l0x_user_data_t* VL53L0X_USER_DATA;
 
-static void print_pal_error(VL53L0X_Error Status , VL53L0X_DEV Dev)
+static void print_pal_error(VL53L0X_Error Status)
 {
     char buf[VL53L0X_MAX_STRING_LENGTH];
     VL53L0X_GetPalErrorString(Status, buf);
     printf("API Status: %i : %s\n", Status, buf);
-
-    if(Status != VL53L0X_ERROR_NONE){
-        VL53L0X_ResetDevice(Dev);
-    }
 }
 
 static VL53L0X_Error WaitMeasurementDataReady(VL53L0X_DEV Dev)
@@ -435,7 +431,7 @@ static void startRanging(VL53L0X_USER_DATA userData, int mode)
                 printf("Call of VL53L0X_SetAddress\n");
             }
 
-            print_pal_error(Status , pMyDevice[objNumber]);
+            print_pal_error(Status);
         }
         else
         {
@@ -528,7 +524,7 @@ static void stopRanging(VL53L0X_USER_DATA userData)
                     VL53L0X_REG_SYSTEM_INTERRUPT_GPIO_NEW_SAMPLE_READY);
             }
 
-            print_pal_error(Status , pMyDevice[objNumber]);
+            print_pal_error(Status);
 
             free(pMyDevice[objNumber]);
         }
