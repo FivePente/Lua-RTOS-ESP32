@@ -15,8 +15,12 @@ yOutCount = 0
 indexA = 0
 
 disAlarmExceed = 3
-angleAlarmExceed = 6
+angleAlarmExceed = 3
 tmpAlarmExceed = 3
+
+disAlarmOn = 0
+angleAlarmOn = 0
+tmpAlarmOn = 0
 
 disExceedCount = 0
 angleXExceedCount = 0
@@ -29,11 +33,11 @@ lTmpAlarm = -20
 hDisAlarm = 1
 lDisAlarm = -1
 
-hXAlarm = 0.3
-lXAlarm = -0.3
+hXAlarm = 0.03
+lXAlarm = -0.03
 
-hYAlarm = 0.3
-lYAlarm = -0.3
+hYAlarm = 0.03
+lYAlarm = -0.03
 
 temperature = 0
 maxTemp = 50
@@ -41,19 +45,25 @@ minTemp = -15
 
 function initI2C() 
 
-    cd = adxl345.init(i2c.I2C0 , i2c.MASTER , 400 , pio.GPIO18 , pio.GPIO19)
+    s1 = sensor.attach("DS1820", pio.GPIO21, 0x28ff900f, 0xb316041a)
+    s1:set("resolution", 10)
+
+    cd = adxl345.init(i2c.I2C0 , i2c.MASTER , 100 , pio.GPIO18 , pio.GPIO19)
     cd:write(0x2D , 0x08)
     cd:write(0x31 , 0x28)
     cd:write(0x2C , 0x0C)
-    ad = vl53l0x.init(i2c.I2C0 , i2c.MASTER , 400 , 0x29 , pio.GPIO18 , pio.GPIO19)
+
+    ad = vl53l0x.init(i2c.I2C0 , i2c.MASTER , 100 , 0x29 , pio.GPIO18 , pio.GPIO19)
     ad:startRanging(2)
 
-    s1 = sensor.attach("DS1820", pio.GPIO21, 0x28ff900f, 0xb316041a)
-
-    --Configure sensor resolution
-    s1:set("resolution", 10)
-
     sensorInited = 1
+end
+
+function restart()
+    if ad ~= nil then
+        ad:stopRanging()
+    end
+    os.exit(1)
 end
 
 function saveConfig()
@@ -78,17 +88,18 @@ function checkDistance()
     while true do
         ldis[index] = ad:getDistance()
         index = index + 1
+        
         if index == 14 then
 
             local tdis = 0
             table.sort(ldis)
             print(table.concat(ldis, ", "))
 
-            for i= 3, 12 do
+            for i= 2, 13 do
                 tdis = tdis + ldis[i]
             end
 
-            disOut = tdis / 10.00
+            disOut = tdis / 12
             if startDis == 0 then
                 startDis = disOut
                 saveConfig()
@@ -127,15 +138,15 @@ function checkAngle()
         tX = 0
         tY = 0
 
-        for i= 5, 10 do
+        for i= 3, 12 do
             tX = tX + xList[i]
             tY = tY + yList[i]
         end
 
-        xOutCount = xOutCount + tX / 6.00
-        yOutCount = yOutCount + tY / 6.00
+        xOutCount = xOutCount + tX / 10
+        yOutCount = yOutCount + tY / 10
 
-        indexCount = indexCount + 6
+        indexCount = indexCount + 10
         indexA = 0
     end
 end
@@ -143,6 +154,8 @@ end
 function checkAngleP()
     xOut = xOutCount / indexCount
     yOut = yOutCount / indexCount
+
+    print("angle count "..indexCount)
 
     indexA = 0
     xOutCount = 0
@@ -166,19 +179,33 @@ function checkAll()
         checkDistance()
     end
     
-    print(string.format("dis %0.2f, x %0.2f , y %0.2f , tmp %0.2f" , disOut - startDis , xOut - startX , yOut - startY , temperature))
+    print(string.format("dis %0.2f, x %0.3f , y %0.3f , tmp %0.2f" , disOut - startDis , xOut - startX , yOut - startY , temperature))
 end
 
 function getXAngle(x , y , z)
     local tmp = x / math.sqrt(y*y + z*z)
     local res = math.atan(tmp)
-    return math.deg(res)-- * 180 / 3.1415926
+    return res * 180 / 3.1415926
 end
 
 function getYAngle(x , y , z)
     local tmp = y / math.sqrt(x*x + z*z)
     local res = math.atan(tmp)
-    return math.deg(res) --res * 180 / 3.1415926
+    return res * 180 / 3.1415926
+end
+
+function cutNumber(v)
+    local x,y = math.modf(v * 100)
+    print("y....."..math.abs(y))
+    if math.abs(y) > 0.75 then
+        if x >= 0 then
+            x = x + 1
+        elseif x < 0 then
+            x = x - 1
+        end
+    end
+
+    return x / 100
 end
 
 function runDevice()
@@ -204,18 +231,19 @@ function runDevice()
     tmr.delayms(1000)
 
     local timer = os.clock()
-    watchTime = os.clock()
+    watchTime = timer
     while true do
         if pppConnected == 1 then
             if mqttConnected == 1 then
                 checkAngle()
                 if os.clock() - timer >= 10 then
-                    timer = os.clock()
                     checkAll()
+                    timer = os.clock()
                     try(
                         function()
 
                             local disOffset = disOut - startDis
+                            local tAlarm = '{'
 
                             if disOffset > hDisAlarm or disOffset < lDisAlarm then
                                 disExceedCount = disExceedCount + 1
@@ -224,10 +252,10 @@ function runDevice()
                             end
 
                             if disExceedCount >= disAlarmExceed then
-                                sendData("alarm", string.format('{"t":%d , "d":%0.2f}' , os.time() , disOffset) ,mqtt.QOS1)
+                                tAlarm = tAlarm..string.format('"d":%0.2f , ', disOffset)
                             end
 
-                            local xAngleOffset = xOut - startX 
+                            local xAngleOffset = xOut - startX
 
                             if xAngleOffset > hXAlarm or xAngleOffset < lXAlarm then
                                 angleXExceedCount = angleXExceedCount + 1
@@ -236,7 +264,7 @@ function runDevice()
                             end
 
                             if angleXExceedCount >= angleAlarmExceed then
-                                sendData("alarm", string.format('{"t":%d , "x":%0.2f}' , os.time() , xAngleOffset) ,mqtt.QOS1)
+                                tAlarm = tAlarm..string.format('"x":%0.2f , ', xAngleOffset)
                             end                        
 
                             local yAngleOffset = yOut - startY
@@ -248,7 +276,7 @@ function runDevice()
                             end
 
                             if angleYExceedCount >= angleAlarmExceed then
-                                sendData("alarm", string.format('{"t":%d , "y":%0.2f}' , os.time() , xAngleOffset) ,mqtt.QOS1)
+                                tAlarm = tAlarm..string.format('"y":%0.2f , ', yAngleOffset)
                             end  
 
                             if temperature > hTmpAlarm or temperature < lTmpAlarm then
@@ -258,10 +286,16 @@ function runDevice()
                             end
 
                             if tmpExceedCount >= tmpAlarmExceed then
-                                sendData("alarm", string.format('{"t":%d , "w":%0.2f}' , os.time() , temperature) ,mqtt.QOS1)
+                                tAlarm = tAlarm..string.format('"w":%0.2f , ', temperature)
                             end
 
-                            sendData("data", string.format('{"t":%d , "d":%0.2f, "x":%0.2f , "y":%0.2f , "w":%0.2f}' , os.time() , disOffset , xAngleOffset , yAngleOffset , temperature) ,mqtt.QOS0)
+                            if #tAlarm > 2 then
+                                sendData("alarm" , tAlarm..string.format('"t":%d}', os.time()) , mqtt.QOS1)
+                            end
+
+                            print(xAngleOffset.."   "..yAngleOffset)
+
+                            sendData("data", string.format('{"d":%0.2f, "x":%0.2f , "y":%0.2f , "w":%0.2f , "t":%d}' , disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time()) ,mqtt.QOS0)
 
                             pio.pin.sethigh(led_pin)
                             tmr.delayms(30)
@@ -270,15 +304,15 @@ function runDevice()
                         end,
 
                         function(where,line,error,message)
-                            print(message)
-                            mqttConnected = 0
+                            print("error "..message.." line:"..line)
+                            --mqttConnected = 0
+                            restart()
                         end
                     )
                 end
 
             else
                 print("mqtt disconnected...")
-                --client:disconnect()
                 tmr.delayms(1000)
                 startTask()
             end

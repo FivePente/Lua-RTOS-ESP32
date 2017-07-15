@@ -55,7 +55,7 @@ SOFTWARE.
 #define VL53L0X_LONG_RANGE_MODE         3   // Longe Range mode
 #define VL53L0X_HIGH_SPEED_MODE         4   // High Speed mode
 
-#define MAX_DEVICES                     16
+#define MAX_DEVICES                     10
 
 static int object_number = 0;
 static VL53L0X_Dev_t *pMyDevice[MAX_DEVICES];
@@ -71,11 +71,15 @@ typedef struct {
 
 typedef vl53l0x_user_data_t* VL53L0X_USER_DATA;
 
-static void print_pal_error(VL53L0X_Error Status)
+static void print_pal_error(VL53L0X_Error Status , VL53L0X_DEV Dev)
 {
     char buf[VL53L0X_MAX_STRING_LENGTH];
     VL53L0X_GetPalErrorString(Status, buf);
     printf("API Status: %i : %s\n", Status, buf);
+
+    if(Status != VL53L0X_ERROR_NONE){
+        VL53L0X_ResetDevice(Dev)
+    }
 }
 
 static VL53L0X_Error WaitMeasurementDataReady(VL53L0X_DEV Dev)
@@ -431,7 +435,7 @@ static void startRanging(VL53L0X_USER_DATA userData, int mode)
                 printf("Call of VL53L0X_SetAddress\n");
             }
 
-            print_pal_error(Status);
+            print_pal_error(Status , pMyDevice[objNumber]);
         }
         else
         {
@@ -524,7 +528,7 @@ static void stopRanging(VL53L0X_USER_DATA userData)
                     VL53L0X_REG_SYSTEM_INTERRUPT_GPIO_NEW_SAMPLE_READY);
             }
 
-            print_pal_error(Status);
+            print_pal_error(Status , pMyDevice[objNumber]);
 
             free(pMyDevice[objNumber]);
         }

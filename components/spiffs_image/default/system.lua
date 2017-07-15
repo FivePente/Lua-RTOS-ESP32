@@ -21,6 +21,7 @@ watchTime = 0
 mqttConnected = 0
 updateCode = 0
 sensorInited = 0
+dogTime = 60
 
 led_pin = pio.GPIO27
 pio.pin.setdir(pio.OUTPUT, led_pin)
@@ -44,7 +45,11 @@ function systemDog()
             tmr.delayms(2000)
         end
         
-        if os.clock() - watchTime > 60 then
+        if os.clock() - watchTime > dogTime then
+            if pppConnected == 1 and mqttConnected == 1 then
+                sendData("system" , '{"m":"system dog reboot"' , mqtt.QOS1)
+            end
+            tmr.delayms(500)
             print("system dog reboot...")
             os.exit(1)
         end
@@ -113,9 +118,6 @@ function startTask()
     client:setLostCallback(function(msg)
         print(msg)
         mqttConnected = 0
-        --client:disconnect()
-        --tmr.delayms(1000)
-        --startTask()
     end)
 
     try(
@@ -128,7 +130,6 @@ function startTask()
             if inited == 0 then
                 inited = 1
                 watchTime = os.clock()
-                --runDevice()
             end
         end,
         function(where,line,error,message)

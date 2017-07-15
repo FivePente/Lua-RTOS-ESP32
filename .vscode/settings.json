@@ -4,6 +4,12 @@
         "cstring": "cpp",
         "status.h": "c",
         "net.c": "cpp",
-        "status.c": "cpp"
+        "status.c": "cpp",
+        "spiffs.h": "c",
+        "cache.h": "c",
+        "vl53l0x_api_strings.h": "c",
+        "vl53l0x_def.h": "c",
+        "vl53l0x_api.c": "cpp",
+        "vl53l0x_platform.h": "c"
     }
 }
