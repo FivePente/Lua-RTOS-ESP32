@@ -78,7 +78,7 @@ static void print_pal_error(VL53L0X_Error Status , VL53L0X_DEV Dev)
     printf("API Status: %i : %s\n", Status, buf);
 
     if(Status != VL53L0X_ERROR_NONE){
-        VL53L0X_ResetDevice(Dev)
+        VL53L0X_ResetDevice(Dev);
     }
 }
 
