@@ -45,16 +45,18 @@ minTemp = -15
 
 function initI2C() 
 
-    s1 = sensor.attach("DS1820", pio.GPIO21, 0x28ff900f, 0xb316041a)
-    s1:set("resolution", 10)
+    ad = vl53l0x.init(i2c.I2C0 , i2c.MASTER , 100 , 0x29 , pio.GPIO18 , pio.GPIO19)
+    ad:startRanging(2)
+
+    tmr.delayms(100)
 
     cd = adxl345.init(i2c.I2C0 , i2c.MASTER , 100 , pio.GPIO18 , pio.GPIO19)
     cd:write(0x2D , 0x08)
     cd:write(0x31 , 0x28)
     cd:write(0x2C , 0x0C)
 
-    ad = vl53l0x.init(i2c.I2C0 , i2c.MASTER , 100 , 0x29 , pio.GPIO18 , pio.GPIO19)
-    ad:startRanging(2)
+    s1 = sensor.attach("DS1820", pio.GPIO21, 0x28ff900f, 0xb316041a)
+    s1:set("resolution", 10)
 
     sensorInited = 1
 end
@@ -234,7 +236,7 @@ function runDevice()
     watchTime = timer
     while true do
         if pppConnected == 1 then
-            if mqttConnected == 1 then
+            if mqttConnected == 1 and sensorInited == 1 then
                 checkAngle()
                 if os.clock() - timer >= 10 then
                     checkAll()
@@ -301,11 +303,10 @@ function runDevice()
                             tmr.delayms(30)
                             pio.pin.setlow(led_pin)
                             watchTime = os.clock()
-                        end,
-
+                       end,
+                    
                         function(where,line,error,message)
                             print("error "..message.." line:"..line)
-                            --mqttConnected = 0
                             restart()
                         end
                     )
@@ -323,4 +324,5 @@ function runDevice()
     end
 end
 
-thread.start(runDevice)
+--thread.start(runDevice)
+runDevice()

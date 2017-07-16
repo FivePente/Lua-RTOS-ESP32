@@ -10,6 +10,8 @@
         "vl53l0x_api_strings.h": "c",
         "vl53l0x_def.h": "c",
         "vl53l0x_api.c": "cpp",
-        "vl53l0x_platform.h": "c"
+        "vl53l0x_platform.h": "c",
+        "vl53l0x_api_strings.c": "cpp",
+        "driver.h": "c"
     }
 }
