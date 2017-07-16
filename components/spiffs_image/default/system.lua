@@ -171,7 +171,7 @@ function systemMain()
 
             if data ~= "" then
                 sendData("data" , data , mqtt.QOS0)
-                alarm = ""
+                data = ""
             end
         end
     end
