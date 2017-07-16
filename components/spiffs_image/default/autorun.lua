@@ -173,12 +173,11 @@ end
 
 function checkAll()
     temperature = s1:read("temperature")
-    if temperature > maxTemp or temperature < minTemp then
-        sendData("alarm", string.format('{"type":5 , "tmp":%0.2f}' , temperature) ,mqtt.QOS1)
-        return
-    else
+    if temperature < maxTemp or temperature > minTemp then
         checkAngleP()
         checkDistance()
+    else
+       print("temperature limitation")
     end
     
     print(string.format("dis %0.2f, x %0.3f , y %0.3f , tmp %0.2f" , disOut - startDis , xOut - startX , yOut - startY , temperature))
@@ -312,16 +311,15 @@ function runDevice()
                 end
 
             else
-                print("mqtt disconnected...")
+                --print("mqtt disconnected...")
                 --tmr.delayms(1000)
                 --startTask()
             end
         else
-            print("Network disconnected...")
+            --print("Network disconnected...")
             --tmr.delayms(3000)
         end
     end
 end
 
---thread.start(runDevice)
-runDevice()
+thread.start(runDevice)
