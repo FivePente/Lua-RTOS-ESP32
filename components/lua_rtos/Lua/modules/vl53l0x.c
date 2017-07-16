@@ -568,6 +568,7 @@ static int l_init(lua_State* L) {
     int scl = luaL_checkinteger(L, 6);
 
     if ((error = i2c_setup(id, mode, speed, sda, scl, 0, 0))) {
+        printf ("error 1\n");
     	return luaL_driver_error(L, error);
     }
 
@@ -584,25 +585,30 @@ static int l_init(lua_State* L) {
     object_number++;
 
     if ((error = i2c_start(user_data->unit, &user_data->transaction))) {
+        printf ("error 2\n");
     	return luaL_driver_error(L, error);
     }
 
 	if ((error = i2c_write_address(user_data->unit, &user_data->transaction, user_data->address, false))) {
-    	return luaL_driver_error(L, error);
+    	printf ("error 3\n");
+        return luaL_driver_error(L, error);
     }
 
     char readyReg = 0x000;
     char readyValue = 0x01;
 
     if ((error = i2c_write(user_data->unit, &user_data->transaction, &readyReg , sizeof(uint8_t)))) {
-    	return luaL_driver_error(L, error);
+    	printf ("error 4\n");
+        return luaL_driver_error(L, error);
     }
     if ((error = i2c_write(user_data->unit, &user_data->transaction, &readyValue , sizeof(uint8_t)))) {
-    	return luaL_driver_error(L, error);
+    	printf ("error 5\n");
+        return luaL_driver_error(L, error);
     }
 
     if ((error = i2c_stop(user_data->unit, &user_data->transaction))) {
-    	return luaL_driver_error(L, error);
+    	printf ("error 6\n");
+        return luaL_driver_error(L, error);
     }
 
     luaL_getmetatable(L, "vl53l0x.trans");
