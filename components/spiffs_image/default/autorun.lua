@@ -1,10 +1,8 @@
-local ver = 1.0
-
 nan = 0
 
+startDis = 0
 startX = 0
 startY = 0
-startDis = 0
 
 disOut = 0
 xOut = 0
@@ -42,6 +40,8 @@ lYAlarm = -0.03
 temperature = 0
 maxTemp = 50
 minTemp = -15
+
+local ver = 1.0
 
 function initI2C() 
 
@@ -154,10 +154,13 @@ function checkAngle()
 end
 
 function checkAngleP()
+
+    if indexCount == 0 then return end
+
     xOut = xOutCount / indexCount
     yOut = yOutCount / indexCount
 
-    print("angle count "..indexCount)
+    print("angle count "..indexCount.."  "..xOut)
 
     indexA = 0
     xOutCount = 0
@@ -165,6 +168,7 @@ function checkAngleP()
     indexCount = 0
 
     if startX == 0 or startX == nil then
+
         startX = xOut
         startY = yOut
         saveConfig()
@@ -179,7 +183,6 @@ function checkAll()
     else
        print("temperature limitation")
     end
-    
     print(string.format("dis %0.2f, x %0.3f , y %0.3f , tmp %0.2f" , disOut - startDis , xOut - startX , yOut - startY , temperature))
 end
 
@@ -221,10 +224,11 @@ function runDevice()
 
     if loadConfig then
         dofile("config.lua")
-        xOut = startX
-        yOut = startY
         print("load config.lua")
     end
+
+    startX = 0
+    startY = 0
 
     print("init data startDis:"..startDis.." startX:"..startX.." startY:"..startY)
     
@@ -322,4 +326,5 @@ function runDevice()
     end
 end
 
-thread.start(runDevice)
+--thread.start(runDevice)
+runDevice()
