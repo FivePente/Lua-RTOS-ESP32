@@ -163,15 +163,20 @@ function systemMain()
     end
 
     while true do 
-        if mqttConnected == 1 then
-            if alarm ~= "" then
-                sendData("alarm" , alarm , mqtt.QOS1)
-                alarm = ""
-            end
+        if pppConnected == 1 then
+            if mqttConnected == 1 then
+                if alarm ~= "" then
+                    sendData("alarm" , alarm , mqtt.QOS1)
+                    alarm = ""
+                end
 
-            if data ~= "" then
-                sendData("data" , data , mqtt.QOS0)
-                data = ""
+                if data ~= "" then
+                    sendData("data" , data , mqtt.QOS0)
+                    data = ""
+                end
+            else
+                tmr.delayms(1000)
+                startTask()
             end
         end
     end

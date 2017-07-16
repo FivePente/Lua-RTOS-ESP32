@@ -313,12 +313,12 @@ function runDevice()
 
             else
                 print("mqtt disconnected...")
-                tmr.delayms(1000)
-                startTask()
+                --tmr.delayms(1000)
+                --startTask()
             end
         else
             print("Network disconnected...")
-            tmr.delayms(3000)
+            --tmr.delayms(3000)
         end
     end
 end
