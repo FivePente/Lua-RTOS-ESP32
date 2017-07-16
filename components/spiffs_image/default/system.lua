@@ -56,6 +56,8 @@ function systemDog()
     end
 end
 
+thread.start(systemDog)
+
 if useWIFI == 1 then
     net.wf.scan()
     net.wf.setup(net.wf.mode.STA, "HiWiFi_3B0F16","Freedom0806")
@@ -146,20 +148,11 @@ function startTask()
     )
 end
 
-function systemMain()
-    while true do
-        if pppConnected == 1 then
-            net.service.sntp.start()
-            --net.service.sntp.stop()
-            startTask()
-            break
-        end
-    end
-
-    while true do
-        tmr.delayms(5)
+while true do
+    if pppConnected == 1 then
+        net.service.sntp.start()
+        --net.service.sntp.stop()
+        startTask()
+        break
     end
 end
-
-thread.start(systemDog)
-thread.start(systemMain)
