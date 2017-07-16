@@ -23,6 +23,9 @@ updateCode = 0
 sensorInited = 0
 dogTime = 60
 
+alarm = ""
+data = ""
+
 led_pin = pio.GPIO27
 pio.pin.setdir(pio.OUTPUT, led_pin)
 
@@ -148,11 +151,30 @@ function startTask()
     )
 end
 
-while true do
-    if pppConnected == 1 then
-        net.service.sntp.start()
-        --net.service.sntp.stop()
-        startTask()
-        break
+function systemMain()
+
+    while true do
+        if pppConnected == 1 then
+            net.service.sntp.start()
+            --net.service.sntp.stop()
+            startTask()
+            break
+        end
+    end
+
+    while true do 
+        if mqttConnected == 1 then
+            if alarm ~= "" then
+                sendData("alarm" , alarm , mqtt.QOS1)
+                alarm = ""
+            end
+
+            if data ~= "" then
+                sendData("data" , data , mqtt.QOS0)
+                alarm = ""
+            end
+        end
     end
 end
+
+thread.start(systemMain)

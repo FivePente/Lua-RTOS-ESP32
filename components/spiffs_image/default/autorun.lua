@@ -292,17 +292,16 @@ function runDevice()
                             end
 
                             if #tAlarm > 2 then
-                                sendData("alarm" , tAlarm..string.format('"t":%d}', os.time()) , mqtt.QOS1)
+                                --sendData("alarm" , tAlarm..string.format('"t":%d}', os.time()) , mqtt.QOS1)
+                                alarm = tAlarm..string.format('"t":%d}', os.time())
                             end
 
-                            print(xAngleOffset.."   "..yAngleOffset)
-
-                            sendData("data", string.format('{"d":%0.2f, "x":%0.2f , "y":%0.2f , "w":%0.2f , "t":%d}' , disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time()) ,mqtt.QOS0)
+                            --sendData("data", string.format('{"d":%0.2f, "x":%0.2f , "y":%0.2f , "w":%0.2f , "t":%d}' , disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time()) ,mqtt.QOS0)
+                            data = string.format('{"d":%0.2f, "x":%0.2f , "y":%0.2f , "w":%0.2f , "t":%d}' , disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time())
 
                             pio.pin.sethigh(led_pin)
                             tmr.delayms(30)
                             pio.pin.setlow(led_pin)
-                            watchTime = os.clock()
                        end,
                     
                         function(where,line,error,message)
