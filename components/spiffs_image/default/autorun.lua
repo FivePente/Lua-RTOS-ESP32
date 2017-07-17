@@ -10,7 +10,7 @@ yOut = 0
 
 xOutCount = 0
 yOutCount = 0
-indexA = 0
+indexA = 1
 
 disAlarmExceed = 3
 angleAlarmExceed = 3
@@ -41,14 +41,14 @@ temperature = 0
 maxTemp = 50
 minTemp = -15
 
+collectionMax = 20
+
 local ver = 1.0
 
 function initI2C() 
 
     ad = vl53l0x.init(i2c.I2C0 , i2c.MASTER , 100 , 0x29 , pio.GPIO18 , pio.GPIO19)
     ad:startRanging(2)
-
-    tmr.delayms(100)
 
     cd = adxl345.init(i2c.I2C0 , i2c.MASTER , 100 , pio.GPIO18 , pio.GPIO19)
     cd:write(0x2D , 0x08)
@@ -86,12 +86,12 @@ end
 function checkDistance()
 
     local ldis = {}
-    local index = 0
+    local index = 1
     while true do
         ldis[index] = ad:getDistance()
         index = index + 1
         
-        if index == 14 then
+        if index > 14 then
 
             local tdis = 0
             table.sort(ldis)
@@ -132,7 +132,7 @@ function checkAngle()
 
     indexA = indexA + 1
 
-    if indexA == 14 then
+    if indexA > collectionMax then
     
         table.sort(xList)
         table.sort(yList)
@@ -140,16 +140,16 @@ function checkAngle()
         tX = 0
         tY = 0
 
-        for i= 3, 12 do
+        for i= 3, collectionMax - 2 do
             tX = tX + xList[i]
             tY = tY + yList[i]
         end
 
-        xOutCount = xOutCount + tX / 10
-        yOutCount = yOutCount + tY / 10
+        xOutCount = xOutCount + tX / (collectionMax - 4)
+        yOutCount = yOutCount + tY / (collectionMax - 4)
 
-        indexCount = indexCount + 10
-        indexA = 0
+        indexCount = indexCount + (collectionMax - 4)
+        indexA = 1
     end
 end
 
@@ -183,7 +183,7 @@ function checkAll()
     else
        print("temperature limitation")
     end
-    print(string.format("dis %0.2f, x %0.3f , y %0.3f , tmp %0.2f" , disOut - startDis , xOut - startX , yOut - startY , temperature))
+    print(string.format("dis %0.2f, x %0.4f , y %0.4f , tmp %0.2f" , disOut - startDis , xOut - startX , yOut - startY , temperature))
 end
 
 function getXAngle(x , y , z)
@@ -199,7 +199,7 @@ function getYAngle(x , y , z)
 end
 
 function cutNumber(v)
-    local x,y = math.modf(v * 100)
+    local x,y = math.modf(v * 1000)
     print("y....."..math.abs(y))
     if math.abs(y) > 0.75 then
         if x >= 0 then
@@ -209,7 +209,7 @@ function cutNumber(v)
         end
     end
 
-    return x / 100
+    return x / 1000
 end
 
 function runDevice()
@@ -244,74 +244,65 @@ function runDevice()
                 if os.clock() - timer >= 10 then
                     checkAll()
                     timer = os.clock()
-                    try(
-                        function()
 
-                            local disOffset = disOut - startDis
-                            local tAlarm = '{'
+                    local disOffset = disOut - startDis
+                    local tAlarm = '{'
 
-                            if disOffset > hDisAlarm or disOffset < lDisAlarm then
-                                disExceedCount = disExceedCount + 1
-                            else
-                                disExceedCount = 0
-                            end
+                    if disOffset > hDisAlarm or disOffset < lDisAlarm then
+                        disExceedCount = disExceedCount + 1
+                    else
+                        disExceedCount = 0
+                    end
 
-                            if disExceedCount >= disAlarmExceed then
-                                tAlarm = tAlarm..string.format('"d":%0.2f , ', disOffset)
-                            end
+                    if disExceedCount >= disAlarmExceed then
+                        tAlarm = tAlarm..string.format('"d":%0.2f , ', disOffset)
+                    end
 
-                            local xAngleOffset = xOut - startX
+                    local xAngleOffset = xOut - startX
 
-                            if xAngleOffset > hXAlarm or xAngleOffset < lXAlarm then
-                                angleXExceedCount = angleXExceedCount + 1
-                            else
-                                angleXExceedCount = 0
-                            end
+                    if xAngleOffset > hXAlarm or xAngleOffset < lXAlarm then
+                        angleXExceedCount = angleXExceedCount + 1
+                    else
+                        angleXExceedCount = 0
+                    end
 
-                            if angleXExceedCount >= angleAlarmExceed then
-                                tAlarm = tAlarm..string.format('"x":%0.2f , ', xAngleOffset)
-                            end                        
+                    if angleXExceedCount >= angleAlarmExceed then
+                        tAlarm = tAlarm..string.format('"x":%0.2f , ', xAngleOffset)
+                    end                        
 
-                            local yAngleOffset = yOut - startY
+                    local yAngleOffset = yOut - startY
 
-                            if yAngleOffset > hYAlarm or yAngleOffset < lYAlarm then
-                                angleYExceedCount = angleYExceedCount + 1
-                            else
-                                angleYExceedCount = 0
-                            end
+                    if yAngleOffset > hYAlarm or yAngleOffset < lYAlarm then
+                        angleYExceedCount = angleYExceedCount + 1
+                    else
+                        angleYExceedCount = 0
+                    end
 
-                            if angleYExceedCount >= angleAlarmExceed then
-                                tAlarm = tAlarm..string.format('"y":%0.2f , ', yAngleOffset)
-                            end  
+                    if angleYExceedCount >= angleAlarmExceed then
+                        tAlarm = tAlarm..string.format('"y":%0.2f , ', yAngleOffset)
+                    end  
 
-                            if temperature > hTmpAlarm or temperature < lTmpAlarm then
-                                tmpExceedCount = tmpExceedCount + 1
-                            else
-                                tmpExceedCount = 0
-                            end
+                    if temperature > hTmpAlarm or temperature < lTmpAlarm then
+                        tmpExceedCount = tmpExceedCount + 1
+                    else
+                        tmpExceedCount = 0
+                    end
 
-                            if tmpExceedCount >= tmpAlarmExceed then
-                                tAlarm = tAlarm..string.format('"w":%0.2f , ', temperature)
-                            end
+                    if tmpExceedCount >= tmpAlarmExceed then
+                        tAlarm = tAlarm..string.format('"w":%0.2f , ', temperature)
+                    end
 
-                            if #tAlarm > 2 then
-                                --sendData("alarm" , tAlarm..string.format('"t":%d}', os.time()) , mqtt.QOS1)
-                                alarm = tAlarm..string.format('"t":%d}', os.time())
-                            end
+                    if #tAlarm > 2 then
+                        --sendData("alarm" , tAlarm..string.format('"t":%d}', os.time()) , mqtt.QOS1)
+                        alarm = tAlarm..string.format('"t":%d}', os.time())
+                    end
 
-                            --sendData("data", string.format('{"d":%0.2f, "x":%0.2f , "y":%0.2f , "w":%0.2f , "t":%d}' , disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time()) ,mqtt.QOS0)
-                            data = string.format('{"d":%0.2f, "x":%0.2f , "y":%0.2f , "w":%0.2f , "t":%d}' , disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time())
+                    --sendData("data", string.format('{"d":%0.2f, "x":%0.2f , "y":%0.2f , "w":%0.2f , "t":%d}' , disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time()) ,mqtt.QOS0)
+                    data = string.format('{"d":%0.2f, "x":%0.3f , "y":%0.3f , "w":%0.2f , "t":%d}' , disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time())
 
-                            pio.pin.sethigh(led_pin)
-                            tmr.delayms(30)
-                            pio.pin.setlow(led_pin)
-                       end,
-                    
-                        function(where,line,error,message)
-                            print("error "..message.." line:"..line)
-                            restart()
-                        end
-                    )
+                    pio.pin.sethigh(led_pin)
+                    tmr.delayms(30)
+                    pio.pin.setlow(led_pin)
                 end
 
             else
