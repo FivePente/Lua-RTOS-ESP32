@@ -16,6 +16,11 @@
         "i2c.h": "c",
         "vl53l0x_device.h": "c",
         "curl_printf.h": "c",
-        "curlx.h": "c"
+        "curlx.h": "c",
+        "thread.h": "c",
+        "lauxlib.h": "c",
+        "llex.h": "c",
+        "lzio.h": "c",
+        "adds.h": "c"
     }
 }

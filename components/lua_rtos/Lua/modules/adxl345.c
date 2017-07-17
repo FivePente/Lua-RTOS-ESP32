@@ -100,26 +100,32 @@ static int adxl345_read(lua_State* L) {
     char start_addr = 0x32;
 
     if ((error = i2c_start(user_data->unit, &user_data->transaction))) {
+        print("adxl345 read error 1")
     	return luaL_driver_error(L, error);
     }
 
 	if ((error = i2c_write_address(user_data->unit, &user_data->transaction, adxl345_i2c_addr, false))) {
+        print("adxl345 read error 2")
     	return luaL_driver_error(L, error);
     }
 
     if ((error = i2c_write(user_data->unit, &user_data->transaction, &start_addr , sizeof(uint8_t)))) {
-    	return luaL_driver_error(L, error);
+    	print("adxl345 read error 3")
+        return luaL_driver_error(L, error);
     }
 
     if ((error = i2c_start(user_data->unit, &user_data->transaction))) {
-    	return luaL_driver_error(L, error);
+    	print("adxl345 read error 3")
+        return luaL_driver_error(L, error);
     }
 
 	if ((error = i2c_write_address(user_data->unit, &user_data->transaction, adxl345_i2c_addr, true))) {
-    	return luaL_driver_error(L, error);
+    	print("adxl345 read error 4")
+        return luaL_driver_error(L, error);
     }
 
     if ((error = i2c_read(user_data->unit, &user_data->transaction, data, 6))) {
+        print("adxl345 read error5")
     	return luaL_driver_error(L, error);
     }
 
@@ -129,7 +135,8 @@ static int adxl345_read(lua_State* L) {
     //}
 
     if ((error = i2c_stop(user_data->unit, &user_data->transaction))) {
-    	return luaL_driver_error(L, error);
+    	print("adxl345 read error 6")
+        return luaL_driver_error(L, error);
     }
 
     x = (int16_t) ((data[1] << 8) | data[0]);
