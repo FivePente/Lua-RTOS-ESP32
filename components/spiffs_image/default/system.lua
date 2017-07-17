@@ -157,7 +157,6 @@ function startTask()
 end
 
 function systemMain()
-
     while true do
         if pppConnected == 1 then
             net.service.sntp.start()
