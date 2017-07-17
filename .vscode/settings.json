@@ -21,6 +21,26 @@
         "lauxlib.h": "c",
         "llex.h": "c",
         "lzio.h": "c",
-        "adds.h": "c"
+        "adds.h": "c",
+        "argexception.h": "c",
+        "codecvt.h": "c",
+        "parser.h": "c",
+        "valid.h": "c",
+        "xmlio.h": "c",
+        "xpath.h": "c",
+        "xsltinternals.h": "c",
+        "asn1.h": "c",
+        "err.h": "c",
+        "lhash.h": "c",
+        "ssl.h": "c",
+        "x509_vfy.h": "c",
+        "neopixel.h": "c",
+        "pwm.h": "c",
+        "sensor.h": "c",
+        "bme280.h": "c",
+        "llimits.h": "c",
+        "lobject.h": "c",
+        "lparser.h": "c",
+        "rsa.h": "c"
     }
 }
