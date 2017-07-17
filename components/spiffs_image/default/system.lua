@@ -30,6 +30,9 @@ led_pin = pio.GPIO27
 pio.pin.setdir(pio.OUTPUT, led_pin)
 
 function systemDog()
+
+    local currTime = 0
+
     while true do
         if pppConnected == 0 then
             pio.pin.sethigh(led_pin)
@@ -48,9 +51,9 @@ function systemDog()
             tmr.delayms(2000)
         end
 
-        local time = os.clock()
+        currTime = os.clock()
         
-        if (time - watchTime) > dogTime then
+        if (currTime - watchTime) > dogTime then
             if pppConnected == 1 and mqttConnected == 1 then
                 sendData("system" , '{"m":"system dog reboot"' , mqtt.QOS1)
             end

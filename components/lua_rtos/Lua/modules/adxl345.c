@@ -124,9 +124,9 @@ static int adxl345_read(lua_State* L) {
     }
 
     // We need to flush because we need to return reaad data now
-    if ((error = i2c_flush(user_data->unit, &user_data->transaction, 1))) {
-    	return luaL_driver_error(L, error);
-    }
+    //if ((error = i2c_flush(user_data->unit, &user_data->transaction, 1))) {
+    	//return luaL_driver_error(L, error);
+    //}
 
     if ((error = i2c_stop(user_data->unit, &user_data->transaction))) {
     	return luaL_driver_error(L, error);
