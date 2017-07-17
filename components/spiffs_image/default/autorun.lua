@@ -63,7 +63,7 @@ end
 
 function restart()
     if ad ~= nil then
-    
+
         ad:stopRanging()
     end
     os.exit(1)
@@ -235,7 +235,8 @@ function runDevice()
     
     initI2C()
     tmr.delayms(1000)
-
+    thread.start(systemMain)
+    
     local timer = os.clock()
     watchTime = timer
     while true do
