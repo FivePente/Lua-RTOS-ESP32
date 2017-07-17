@@ -130,7 +130,7 @@ function startTask()
 
     try(
         function()
-            client:connect("","" , 50 , 0 , 1)
+            client:connect("","" , 30 , 0 , 1)
 
             mqttConnected = 1
             initMainSubscribe(client)
@@ -186,4 +186,3 @@ function systemMain()
     end
 end
 
-thread.start(systemMain)
