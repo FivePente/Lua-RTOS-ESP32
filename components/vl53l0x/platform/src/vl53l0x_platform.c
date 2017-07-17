@@ -87,9 +87,9 @@ static int VL53L0X_i2c_read(VL53L0X_DEV Dev, int8_t cmd, uint8_t *data, int8_t l
         return VL53L0X_ERROR_CONTROL_INTERFACE;
     }
 
-    if(i2c_stop(Dev->unit, &Dev->tran) != NULL){
-        return VL53L0X_ERROR_CONTROL_INTERFACE;
-    }
+    //if(i2c_stop(Dev->unit, &Dev->tran) != NULL){
+        //return VL53L0X_ERROR_CONTROL_INTERFACE;
+    //}
     
     return result;
 }

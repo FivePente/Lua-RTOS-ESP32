@@ -47,10 +47,10 @@ local ver = 1.0
 
 function initI2C() 
 
-    ad = vl53l0x.init(i2c.I2C0 , i2c.MASTER , 400 , 0x29 , pio.GPIO18 , pio.GPIO19)
+    ad = vl53l0x.init(i2c.I2C0 , i2c.MASTER , 100 , 0x29 , pio.GPIO18 , pio.GPIO19)
     ad:startRanging(2)
 
-    cd = adxl345.init(i2c.I2C0 , i2c.MASTER , 400 , pio.GPIO18 , pio.GPIO19)
+    cd = adxl345.init(i2c.I2C0 , i2c.MASTER , 100 , pio.GPIO18 , pio.GPIO19)
     cd:write(0x2D , 0x08)
     cd:write(0x31 , 0x28)
     cd:write(0x2C , 0x0C)
@@ -63,6 +63,7 @@ end
 
 function restart()
     if ad ~= nil then
+    
         ad:stopRanging()
     end
     os.exit(1)
