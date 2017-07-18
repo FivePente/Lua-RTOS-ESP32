@@ -133,10 +133,10 @@ static int adxl345_read(lua_State* L) {
     	return luaL_driver_error(L, error);
     }
 
-    if ((error = i2c_stop(user_data->unit, &user_data->transaction))) {
-    	printf("adxl345 read error 7\n");
-        return luaL_driver_error(L, error);
-    }
+    //if ((error = i2c_stop(user_data->unit, &user_data->transaction))) {
+    	//printf("adxl345 read error 7\n");
+        //return luaL_driver_error(L, error);
+    //}
 
     x = (int16_t) ((user_data->data[1] << 8) | user_data->data[0]);
     y = (int16_t) ((user_data->data[3] << 8) | user_data->data[2]);
