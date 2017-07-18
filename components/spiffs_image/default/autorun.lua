@@ -130,7 +130,6 @@ function checkAngle()
     local err = ""
 
     x, y , z ,err = cd:read()
-    tmr.delayms(10)
 
     if err ~= nil then
         print("adxl345 read "..err)
@@ -153,15 +152,15 @@ function checkAngle()
         tX = 0
         tY = 0
 
-        for i= 11, collectionMax - 10 do
+        for i= 3, collectionMax - 18 do
             tX = tX + xList[i]
             tY = tY + yList[i]
         end
 
-        xOutCount = xOutCount + tX / (collectionMax - 20)
-        yOutCount = yOutCount + tY / (collectionMax - 20)
+        xOutCount = xOutCount + tX / (collectionMax - 4)
+        yOutCount = yOutCount + tY / (collectionMax - 4)
 
-        indexCount = indexCount + (collectionMax - 20)
+        indexCount = indexCount + (collectionMax - 4)
         indexA = 1
     end
 end
@@ -252,9 +251,8 @@ function runDevice()
         if pppConnected == 1 then
             if mqttConnected == 1 then
                 checkAngle()
-                if indexCount >= 100 then --os.clock() - timer >= 10 then
+                if indexCount >= 100 then
                     checkAll()
-                    --timer = os.clock()
 
                     local disOffset = disOut - startDis
                     local tAlarm = '{'
@@ -333,4 +331,4 @@ pppConnected = 1
 mqttConnected = 1
 
 --thread.start(runDevice)
---runDevice()
+runDevice()
