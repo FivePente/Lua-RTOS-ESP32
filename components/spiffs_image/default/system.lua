@@ -65,7 +65,7 @@ function systemDog()
     end
 end
 
-thread.start(systemDog)
+--thread.start(systemDog)
 
 if useWIFI == 1 then
     net.wf.scan()
@@ -189,4 +189,4 @@ function systemMain()
     end
 end
 
-thread.start(systemMain)
+--thread.start(systemMain)
