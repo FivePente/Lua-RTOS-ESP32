@@ -140,7 +140,6 @@ static int adxl345_read(lua_State* L) {
     int x,y,z;
     char start_addr = 0x32;
 
-    /*
     if ((error = i2c_start(user_data->unit, &user_data->transaction))) {
         printf("adxl345 read error 1\n");
     	return luaL_driver_error(L, error);
@@ -155,12 +154,6 @@ static int adxl345_read(lua_State* L) {
     	printf("adxl345 read error 3\n");
         return luaL_driver_error(L, error);
     }
-
-    if ((error = i2c_start(user_data->unit, &user_data->transaction))) {
-    	printf("adxl345 read error 4\n");
-        return luaL_driver_error(L, error);
-    }
-    */
 
     if ((error = i2c_start(user_data->unit, &user_data->transaction))) {
     	printf("adxl345 read error 4\n");
