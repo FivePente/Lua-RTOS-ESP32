@@ -54,15 +54,10 @@ function initI2C()
     --tmr.delayms(1000)
 
     cd = adxl345.init(i2c.I2C0 , i2c.MASTER , 100 , pio.GPIO18 , pio.GPIO19)
-    print('sssss_____1')
     cd:startWrite()
-    print('sssss_____2')
     cd:write(0x2D , 0x08)
-    print('sssss_____3')
     cd:write(0x31 , 0x28)
-    print('sssss_____4')
     cd:write(0x2C , 0x0C)
-    print('sssss_____5')
     cd:stop()
 
     print('sssss')
@@ -186,7 +181,6 @@ function checkAngleP()
     indexCount = 0
 
     if startX == 0 or startX == nil then
-
         startX = xOut
         startY = yOut
         saveConfig()
@@ -259,7 +253,7 @@ function runDevice()
         if pppConnected == 1 then
             if mqttConnected == 1 then
                 checkAngle()
-                if indexCount >= 1000 then --os.clock() - timer >= 10 then
+                if indexCount >= 100 then --os.clock() - timer >= 10 then
                     checkAll()
                     --timer = os.clock()
 
