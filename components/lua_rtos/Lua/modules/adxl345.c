@@ -21,6 +21,7 @@ static const uint8_t adxl345_i2c_addr = 0x53;
 typedef struct {
 	int unit;
 	int transaction;
+    char *data;
 } adxl345_user_data_t;
 
 static int adxl345_init(lua_State* L) {
@@ -45,6 +46,7 @@ static int adxl345_init(lua_State* L) {
 
     user_data->unit = id;
     user_data->transaction = I2C_TRANSACTION_INITIALIZER;
+    user_data->data = (char*)malloc(6);
 
     luaL_getmetatable(L, "adxl345.trans");
     lua_setmetatable(L, -2);
@@ -146,7 +148,6 @@ static int adxl345_read(lua_State* L) {
 	user_data = (adxl345_user_data_t *)luaL_checkudata(L, 1, "adxl345.trans");
     luaL_argcheck(L, user_data, 1, "adxl345 transaction expected");
 
-    char *data = (char*)malloc(6);
     int x,y,z;
     char start_addr = 0x32;
 
@@ -195,7 +196,7 @@ static int adxl345_read(lua_State* L) {
         return 4;
     }
 
-    if ((error = i2c_read(user_data->unit, &user_data->transaction, data, 6))) {
+    if ((error = i2c_read(user_data->unit, &user_data->transaction, user_data->data, 6))) {
         printf("adxl345 read error6\n");
         lua_pushinteger(L, 0);
         lua_pushinteger(L, 0);
@@ -219,16 +220,15 @@ static int adxl345_read(lua_State* L) {
         return 4;
     }
 
-    x = (int16_t) ((data[1] << 8) | data[0]);
-    y = (int16_t) ((data[3] << 8) | data[2]);
-    z = (int16_t) ((data[5] << 8) | data[4]);
+    x = (int16_t) ((user_data->data[1] << 8) | user_data->data[0]);
+    y = (int16_t) ((user_data->data[3] << 8) | user_data->data[2]);
+    z = (int16_t) ((user_data->data[5] << 8) | user_data->data[4]);
 
     lua_pushinteger(L, x);
     lua_pushinteger(L, y);
     lua_pushinteger(L, z);
     lua_pushnil(L);
 
-    free(data);
     return 4;
 }
 

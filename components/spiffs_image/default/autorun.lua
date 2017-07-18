@@ -173,8 +173,6 @@ function checkAngle()
 end
 
 function checkAngleP()
-    cd:stop()
-    angleStarted = 0
     if indexCount == 0 then return end
 
     xOut = xOutCount / indexCount
@@ -193,8 +191,6 @@ function checkAngleP()
         startY = yOut
         saveConfig()
     end
-    
-    
 end
 
 function checkAll()
