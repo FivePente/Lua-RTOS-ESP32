@@ -159,7 +159,7 @@ static int adxl345_trans_gc (lua_State *L) {
 
     user_data = (adxl345_user_data_t *)luaL_testudata(L, 1, "adxl345.trans");
     if (user_data) {
-        free(user_data->data)
+        free(user_data->data);
     }
     return 0;
 }
