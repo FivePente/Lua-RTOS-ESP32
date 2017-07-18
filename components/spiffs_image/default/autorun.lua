@@ -42,7 +42,9 @@ maxTemp = 50
 minTemp = -15
 
 collectionMax = 30
+collectionTotal = 4000
 angleStarted = 0
+
 
 local ver = 1.0
 
@@ -198,13 +200,13 @@ end
 function getXAngle(x , y , z)
     local tmp = x / math.sqrt(y*y + z*z)
     local res = math.atan(tmp)
-    return math.deg(res) --res * 180 / 3.1415926
+    return math.deg(res)
 end
 
 function getYAngle(x , y , z)
     local tmp = y / math.sqrt(x*x + z*z)
     local res = math.atan(tmp)
-    return math.deg(res) --res * 180 / 3.1415926
+    return math.deg(res)
 end
 
 function cutNumber(v)
@@ -250,7 +252,7 @@ function runDevice()
         if pppConnected == 1 then
             if mqttConnected == 1 then
                 checkAngle()
-                if indexCount >= 4000 then
+                if indexCount >= collectionTotal then
                     checkAll()
 
                     local disOffset = disOut - startDis
@@ -302,16 +304,15 @@ function runDevice()
 
                     if #tAlarm > 2 then
                         --sendData("alarm" , tAlarm..string.format('"t":%d}', os.time()) , mqtt.QOS1)
-                        --alarm = tAlarm..string.format('"t":%d}', os.time())
+                        alarm = tAlarm..string.format('"t":%d}', os.time())
                     end
 
                     --sendData("data", string.format('{"d":%0.2f, "x":%0.2f , "y":%0.2f , "w":%0.2f , "t":%d}' , disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time()) ,mqtt.QOS0)
-                    --data = string.format('{"d":%0.2f, "x":%0.3f , "y":%0.3f , "w":%0.2f , "t":%d}' , disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time())
+                    data = string.format('{"d":%0.2f, "x":%0.3f , "y":%0.3f , "w":%0.2f , "t":%d}' , disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time())
 
                     pio.pin.sethigh(led_pin)
                     tmr.delayms(30)
                     pio.pin.setlow(led_pin)
-                    watchTime = os.clock()
                 end
 
             else
