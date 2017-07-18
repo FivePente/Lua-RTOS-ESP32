@@ -330,4 +330,4 @@ pppConnected = 1
 mqttConnected = 1
 
 --thread.start(runDevice)
-runDevice()
+--runDevice()
