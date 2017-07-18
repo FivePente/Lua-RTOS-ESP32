@@ -197,7 +197,7 @@ function checkAll()
     temperature = s1:read("temperature")
     if temperature < maxTemp or temperature > minTemp then
         checkAngleP()
-        checkDistance()
+        --checkDistance()
     else
        print("temperature limitation")
     end
