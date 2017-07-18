@@ -54,7 +54,6 @@ function initI2C()
     --tmr.delayms(1000)
 
     cd = adxl345.init(i2c.I2C0 , i2c.MASTER , 100 , pio.GPIO18 , pio.GPIO19)
-    cd:startWrite()
     cd:write(0x2D , 0x08)
     cd:write(0x31 , 0x28)
     cd:write(0x2C , 0x0C)
