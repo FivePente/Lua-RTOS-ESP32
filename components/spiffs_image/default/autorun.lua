@@ -135,10 +135,8 @@ function checkAngle()
     local tX = 0
     local tY = 0
 
-    print("aaa")
     x, y , z = cd:read()
-    tmr.delayms(3)
-    print("bbbb"..x)
+    cd:stop()
 
     tX = getXAngle(x , y , z)
     tY = getYAngle(x , y , z)
@@ -260,7 +258,7 @@ function runDevice()
         if pppConnected == 1 then
             if mqttConnected == 1 then
                 checkAngle()
-                if indexCount >= 10000 then --os.clock() - timer >= 10 then
+                if indexCount >= 1000 then --os.clock() - timer >= 10 then
                     checkAll()
                     --timer = os.clock()
 
@@ -313,15 +311,16 @@ function runDevice()
 
                     if #tAlarm > 2 then
                         --sendData("alarm" , tAlarm..string.format('"t":%d}', os.time()) , mqtt.QOS1)
-                        alarm = tAlarm..string.format('"t":%d}', os.time())
+                        --alarm = tAlarm..string.format('"t":%d}', os.time())
                     end
 
                     --sendData("data", string.format('{"d":%0.2f, "x":%0.2f , "y":%0.2f , "w":%0.2f , "t":%d}' , disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time()) ,mqtt.QOS0)
-                    data = string.format('{"d":%0.2f, "x":%0.3f , "y":%0.3f , "w":%0.2f , "t":%d}' , disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time())
+                    --data = string.format('{"d":%0.2f, "x":%0.3f , "y":%0.3f , "w":%0.2f , "t":%d}' , disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time())
 
                     pio.pin.sethigh(led_pin)
                     tmr.delayms(30)
                     pio.pin.setlow(led_pin)
+                    watchTime = os.clock()
                 end
 
             else

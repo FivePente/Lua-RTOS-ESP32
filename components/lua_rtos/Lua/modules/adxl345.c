@@ -152,44 +152,72 @@ static int adxl345_read(lua_State* L) {
 
     if ((error = i2c_start(user_data->unit, &user_data->transaction))) {
         printf("adxl345 read error 1\n");
-    	return luaL_driver_error(L, error);
+        lua_pushinteger(L, 0);
+        lua_pushinteger(L, 0);
+        lua_pushinteger(L, 0);
+        lua_pushstring(error->msg);
+        return 4;
     }
 
 	if ((error = i2c_write_address(user_data->unit, &user_data->transaction, adxl345_i2c_addr, false))) {
         printf("adxl345 read error 2\n");
-    	return luaL_driver_error(L, error);
+        lua_pushinteger(L, 0);
+        lua_pushinteger(L, 0);
+        lua_pushinteger(L, 0);
+        lua_pushstring(error->msg);
+        return 4;
     }
 
     if ((error = i2c_write(user_data->unit, &user_data->transaction, &start_addr , sizeof(uint8_t)))) {
     	printf("adxl345 read error 3\n");
-        return luaL_driver_error(L, error);
+        lua_pushinteger(L, 0);
+        lua_pushinteger(L, 0);
+        lua_pushinteger(L, 0);
+        lua_pushstring(error->msg);
+        return 4;
     }
 
     if ((error = i2c_start(user_data->unit, &user_data->transaction))) {
     	printf("adxl345 read error 4\n");
-        return luaL_driver_error(L, error);
+        lua_pushinteger(L, 0);
+        lua_pushinteger(L, 0);
+        lua_pushinteger(L, 0);
+        lua_pushstring(error->msg);
+        return 4;
     }
 
 	if ((error = i2c_write_address(user_data->unit, &user_data->transaction, adxl345_i2c_addr, true))) {
     	printf("adxl345 read error 5\n");
-        return luaL_driver_error(L, error);
+        lua_pushinteger(L, 0);
+        lua_pushinteger(L, 0);
+        lua_pushinteger(L, 0);
+        lua_pushstring(error->msg);
+        return 4;
     }
 
     if ((error = i2c_read(user_data->unit, &user_data->transaction, data, 6))) {
         printf("adxl345 read error6\n");
-    	return luaL_driver_error(L, error);
+        lua_pushinteger(L, 0);
+        lua_pushinteger(L, 0);
+        lua_pushinteger(L, 0);
+        lua_pushstring(error->msg);
+        return 4;
     }
 
     //We need to flush because we need to return reaad data now
+     /*
     if ((error = i2c_flush(user_data->unit, &user_data->transaction, 1))) {
     	return luaL_driver_error(L, error);
-    }
+    }*/
 
-    /*
     if ((error = i2c_stop(user_data->unit, &user_data->transaction))) {
     	printf("adxl345 read error 7\n");
-        return luaL_driver_error(L, error);
-    }*/
+        lua_pushinteger(L, 0);
+        lua_pushinteger(L, 0);
+        lua_pushinteger(L, 0);
+        lua_pushstring(error->msg);
+        return 4;
+    }
 
     x = (int16_t) ((data[1] << 8) | data[0]);
     y = (int16_t) ((data[3] << 8) | data[2]);
@@ -198,9 +226,10 @@ static int adxl345_read(lua_State* L) {
     lua_pushinteger(L, x);
     lua_pushinteger(L, y);
     lua_pushinteger(L, z);
+    lua_pushnil(L);
 
     free(data);
-    return 3;
+    return 4;
 }
 
 static int adxl345_stop(lua_State* L) {
