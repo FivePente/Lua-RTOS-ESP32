@@ -201,13 +201,13 @@ end
 function getXAngle(x , y , z)
     local tmp = x / math.sqrt(y*y + z*z)
     local res = math.atan(tmp)
-    return res * 180 / 3.1415926
+    return math.deg(res) --res * 180 / 3.1415926
 end
 
 function getYAngle(x , y , z)
     local tmp = y / math.sqrt(x*x + z*z)
     local res = math.atan(tmp)
-    return res * 180 / 3.1415926
+    return math.deg(res) --res * 180 / 3.1415926
 end
 
 function cutNumber(v)
@@ -329,6 +329,9 @@ function runDevice()
         end
     end
 end
+
+pppConnected = 1
+mqttConnected = 1
 
 --thread.start(runDevice)
 runDevice()

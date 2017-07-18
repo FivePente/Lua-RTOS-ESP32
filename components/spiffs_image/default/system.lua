@@ -186,4 +186,4 @@ function systemMain()
     end
 end
 
-thread.start(systemMain)
+--thread.start(systemMain)
