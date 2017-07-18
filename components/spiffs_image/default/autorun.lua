@@ -56,11 +56,13 @@ function initI2C()
     cd = adxl345.init(i2c.I2C0 , i2c.MASTER , 100 , pio.GPIO18 , pio.GPIO19)
     print('sssss_____1')
     cd:startWrite()
-    print('sssss_____1')
+    print('sssss_____2')
     cd:write(0x2D , 0x08)
     print('sssss_____3')
     cd:write(0x31 , 0x28)
+    print('sssss_____4')
     cd:write(0x2C , 0x0C)
+    print('sssss_____5')
     cd:stop()
 
     print('sssss')
@@ -133,7 +135,9 @@ function checkAngle()
     local tX = 0
     local tY = 0
 
+    print("aaa")
     x, y , z = cd:read()
+    print("bbbb")
 
     tX = getXAngle(x , y , z)
     tY = getYAngle(x , y , z)
