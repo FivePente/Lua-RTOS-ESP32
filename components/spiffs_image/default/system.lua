@@ -11,7 +11,7 @@ os.logcons(true)           -- Enable/disable sys log messages to console
 os.shell(true)             -- Enable/disable shell
 os.history(false)          -- Enable/disable history
 
-local useGSM = 1
+local useGSM = 0
 local useWIFI = 0
 
 mqttConnectTry = 0
