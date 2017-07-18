@@ -41,7 +41,7 @@ temperature = 0
 maxTemp = 50
 minTemp = -15
 
-collectionMax = 20
+collectionMax = 30
 angleStarted = 0
 
 local ver = 1.0
@@ -50,7 +50,6 @@ function initI2C()
 
     --ad = vl53l0x.init(i2c.I2C0 , i2c.MASTER , 100 , 0x29 , pio.GPIO18 , pio.GPIO19)
     --ad:startRanging(2)
-
     --tmr.delayms(1000)
 
     cd = adxl345.init(i2c.I2C0 , i2c.MASTER , 400 , pio.GPIO18 , pio.GPIO19)
@@ -327,8 +326,4 @@ function runDevice()
     end
 end
 
-pppConnected = 1
-mqttConnected = 1
-
---thread.start(runDevice)
-runDevice()
+thread.start(runDevice)

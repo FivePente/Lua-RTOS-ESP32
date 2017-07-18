@@ -28,7 +28,7 @@ data = ""
 
 led_pin = pio.GPIO27
 pio.pin.setdir(pio.OUTPUT, led_pin)
---[[
+
 function systemDog()
 
     local currTime = 0
@@ -36,36 +36,35 @@ function systemDog()
     while true do
         if pppConnected == 0 then
             pio.pin.sethigh(led_pin)
-            tmr.delayms(30)
+            thread.sleepms(30)
             pio.pin.setlow(led_pin)
-            tmr.delayms(500)
+            thread.sleepms(500)
         elseif mqttConnected == 0 then
             pio.pin.sethigh(led_pin)
-            tmr.delayms(30)
+            thread.sleepms(30)
             pio.pin.setlow(led_pin)
-            tmr.delayms(1000)
+            thread.sleepms(1000)
         elseif sensorInited == 0 then
             pio.pin.sethigh(led_pin)
-            tmr.delayms(30)
+            thread.sleepms(30)
             pio.pin.setlow(led_pin)
-            tmr.delayms(2000)
+            thread.sleepms(2000)
         end
 
         currTime = os.clock()
-        
+
         if (currTime - watchTime) > dogTime then
             if pppConnected == 1 and mqttConnected == 1 then
                 sendData("system" , '{"m":"system dog reboot"' , mqtt.QOS1)
             end
-            tmr.delayms(500)
+            thread.sleepms(500)
             print("system dog reboot...")
             os.exit(1)
         end
     end
 end
 
-thread.start(systemDog)
-
+--[[
 if useWIFI == 1 then
     net.wf.scan()
     net.wf.setup(net.wf.mode.STA, "HiWiFi_3B0F16","Freedom0806")
@@ -83,6 +82,18 @@ if useGSM == 1 then
     end)
     ppp.setupXTask()
 end
+]]
+function pppMain()
+    ppp.setCallback(function (err_code , message)
+        print("ppp state: " , message)
+        if err_code == 0 then
+            pppConnected = 1
+        else
+            pppConnected = 0
+        end
+    end)
+    ppp.setup()
+end
 
 function runDevice()
     print("empty autorun.lua")
@@ -99,7 +110,7 @@ function initMainSubscribe(mqttClient)
 
     mqttClient:subscribe("code", mqtt.QOS0, function(len, message)
         updateCode = 1
-        tmr.delayms(10)
+        thread.sleepms(10)
         local file2 = io.open("autorun.lua","w+")
         file2:write(message)
         file2:close()
@@ -145,11 +156,11 @@ function startTask()
             mqttConnectTry = mqttConnectTry + 1
             if mqttConnectTry < 2 then
                 print("connect fail , trying again...")
-                tmr.delayms(3000)
+                thread.sleepms(3000)
                 startTask()
             else
                 print("connect fail , reboot...")
-                tmr.delayms(1000)
+                thread.sleepms(1000)
                 os.exit(1)
             end
         end
@@ -179,12 +190,14 @@ function systemMain()
                     data = ""
                 end
             else
-                tmr.delayms(1000)
+                thread.sleepms(1000)
                 startTask()
             end
         end
     end
 end
 
---thread.start(systemMain)
-]]
+
+thread.start(systemDog , 2048 , 10 , 1)
+thread.start(systemMain , 2048 , 11 , 1)
+thread.start(pppMain , 2048 , 12 , 1)
