@@ -50,6 +50,8 @@ function initI2C()
     --ad = vl53l0x.init(i2c.I2C0 , i2c.MASTER , 100 , 0x29 , pio.GPIO18 , pio.GPIO19)
     --ad:startRanging(2)
 
+    --tmr.delayms(1000)
+
     cd = adxl345.init(i2c.I2C0 , i2c.MASTER , 100 , pio.GPIO18 , pio.GPIO19)
     cd:write(0x2D , 0x08)
     cd:write(0x31 , 0x28)
@@ -234,8 +236,7 @@ function runDevice()
     print("init data startDis:"..startDis.." startX:"..startX.." startY:"..startY)
     
     initI2C()
-    tmr.delayms(1000)
-    thread.start(systemMain)
+    tmr.delayms(100)
 
     local timer = os.clock()
     watchTime = timer
@@ -243,9 +244,9 @@ function runDevice()
         if pppConnected == 1 then
             if mqttConnected == 1 then
                 checkAngle()
-                if os.clock() - timer >= 10 then
+                if indexCount >= 10000 then --os.clock() - timer >= 10 then
                     checkAll()
-                    timer = os.clock()
+                    --timer = os.clock()
 
                     local disOffset = disOut - startDis
                     local tAlarm = '{'

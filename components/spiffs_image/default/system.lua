@@ -186,3 +186,4 @@ function systemMain()
     end
 end
 
+thread.start(systemMain)

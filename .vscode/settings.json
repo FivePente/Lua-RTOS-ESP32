@@ -41,6 +41,7 @@
         "llimits.h": "c",
         "lobject.h": "c",
         "lparser.h": "c",
-        "rsa.h": "c"
+        "rsa.h": "c",
+        "lrodefs.h": "c"
     }
 }
