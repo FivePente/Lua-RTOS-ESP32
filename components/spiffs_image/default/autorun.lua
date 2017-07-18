@@ -154,15 +154,15 @@ function checkAngle()
         tX = 0
         tY = 0
 
-        for i= 3, collectionMax - 2 do
+        for i= 11, collectionMax - 10 do
             tX = tX + xList[i]
             tY = tY + yList[i]
         end
 
-        xOutCount = xOutCount + tX / (collectionMax - 4)
-        yOutCount = yOutCount + tY / (collectionMax - 4)
+        xOutCount = xOutCount + tX / (collectionMax - 20)
+        yOutCount = yOutCount + tY / (collectionMax - 20)
 
-        indexCount = indexCount + (collectionMax - 4)
+        indexCount = indexCount + (collectionMax - 20)
         indexA = 1
     end
 end

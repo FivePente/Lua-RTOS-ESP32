@@ -99,45 +99,6 @@ static int adxl345_startWrite(lua_State* L) {
     return 1;
 }
 
-static int adxl345_startRead(lua_State* L) {
-    driver_error_t *error;
-	adxl345_user_data_t *user_data;
-
-	// Get user data
-	user_data = (adxl345_user_data_t *)luaL_checkudata(L, 1, "adxl345.trans");
-    luaL_argcheck(L, user_data, 1, "adxl345 transaction expected");
-
-    char start_addr = 0x32;
-
-    if ((error = i2c_start(user_data->unit, &user_data->transaction))) {
-        printf("adxl345 read error 1\n");
-    	return luaL_driver_error(L, error);
-    }
-
-	if ((error = i2c_write_address(user_data->unit, &user_data->transaction, adxl345_i2c_addr, false))) {
-        printf("adxl345 read error 2\n");
-    	return luaL_driver_error(L, error);
-    }
-
-    if ((error = i2c_write(user_data->unit, &user_data->transaction, &start_addr , sizeof(uint8_t)))) {
-    	printf("adxl345 read error 3\n");
-        return luaL_driver_error(L, error);
-    }
-
-    if ((error = i2c_start(user_data->unit, &user_data->transaction))) {
-    	printf("adxl345 read error 4\n");
-        return luaL_driver_error(L, error);
-    }
-
-	if ((error = i2c_write_address(user_data->unit, &user_data->transaction, adxl345_i2c_addr, true))) {
-    	printf("adxl345 read error 5\n");
-        return luaL_driver_error(L, error);
-    }
-
-    lua_pushnil(L);
-    return 1;
-}
-
 
 static int adxl345_read(lua_State* L) {
 
