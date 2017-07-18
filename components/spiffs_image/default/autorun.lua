@@ -42,6 +42,7 @@ maxTemp = 50
 minTemp = -15
 
 collectionMax = 20
+angleStarted = 0
 
 local ver = 1.0
 
@@ -53,9 +54,11 @@ function initI2C()
     --tmr.delayms(1000)
 
     cd = adxl345.init(i2c.I2C0 , i2c.MASTER , 100 , pio.GPIO18 , pio.GPIO19)
+    cd:startWrite()
     cd:write(0x2D , 0x08)
     cd:write(0x31 , 0x28)
     cd:write(0x2C , 0x0C)
+    cd:stop()
 
     s1 = sensor.attach("DS1820", pio.GPIO21, 0x28ff900f, 0xb316041a)
     s1:set("resolution", 10)
@@ -125,6 +128,11 @@ function checkAngle()
     local tX = 0
     local tY = 0
 
+    if angleStarted == 0 then
+        cd:startRead()
+        angleStarted = 1
+    end
+
     x, y , z = cd:read()
 
     tX = getXAngle(x , y , z)
@@ -157,7 +165,8 @@ function checkAngle()
 end
 
 function checkAngleP()
-
+    cd:stop()
+    angleStarted = 0
     if indexCount == 0 then return end
 
     xOut = xOutCount / indexCount
@@ -176,6 +185,8 @@ function checkAngleP()
         startY = yOut
         saveConfig()
     end
+    
+    
 end
 
 function checkAll()
