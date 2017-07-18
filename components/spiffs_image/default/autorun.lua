@@ -58,9 +58,6 @@ function initI2C()
     cd:write(0x2D , 0x08)
     cd:write(0x31 , 0x28)
     cd:write(0x2C , 0x0C)
-    cd:stop()
-
-    print('sssss')
 
     s1 = sensor.attach("DS1820", pio.GPIO21, 0x28ff900f, 0xb316041a)
     s1:set("resolution", 10)
