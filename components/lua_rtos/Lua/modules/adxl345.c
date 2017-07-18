@@ -155,7 +155,7 @@ static int adxl345_read(lua_State* L) {
         lua_pushinteger(L, 0);
         lua_pushinteger(L, 0);
         lua_pushinteger(L, 0);
-        lua_pushstring(error->msg);
+        lua_pushstring(L , error->msg);
         return 4;
     }
 
@@ -164,7 +164,7 @@ static int adxl345_read(lua_State* L) {
         lua_pushinteger(L, 0);
         lua_pushinteger(L, 0);
         lua_pushinteger(L, 0);
-        lua_pushstring(error->msg);
+        lua_pushstring(L , error->msg);
         return 4;
     }
 
@@ -173,7 +173,7 @@ static int adxl345_read(lua_State* L) {
         lua_pushinteger(L, 0);
         lua_pushinteger(L, 0);
         lua_pushinteger(L, 0);
-        lua_pushstring(error->msg);
+        lua_pushstring(L , error->msg);
         return 4;
     }
 
@@ -182,7 +182,7 @@ static int adxl345_read(lua_State* L) {
         lua_pushinteger(L, 0);
         lua_pushinteger(L, 0);
         lua_pushinteger(L, 0);
-        lua_pushstring(error->msg);
+        lua_pushstring(L , error->msg);
         return 4;
     }
 
@@ -191,7 +191,7 @@ static int adxl345_read(lua_State* L) {
         lua_pushinteger(L, 0);
         lua_pushinteger(L, 0);
         lua_pushinteger(L, 0);
-        lua_pushstring(error->msg);
+        lua_pushstring(L, error->msg);
         return 4;
     }
 
@@ -200,7 +200,7 @@ static int adxl345_read(lua_State* L) {
         lua_pushinteger(L, 0);
         lua_pushinteger(L, 0);
         lua_pushinteger(L, 0);
-        lua_pushstring(error->msg);
+        lua_pushstring(L , error->msg);
         return 4;
     }
 
@@ -215,7 +215,7 @@ static int adxl345_read(lua_State* L) {
         lua_pushinteger(L, 0);
         lua_pushinteger(L, 0);
         lua_pushinteger(L, 0);
-        lua_pushstring(error->msg);
+        lua_pushstring(L , error->msg);
         return 4;
     }
 
