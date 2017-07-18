@@ -25,7 +25,7 @@ dogTime = 60
 
 alarm = ""
 data = ""
-
+--[[
 led_pin = pio.GPIO27
 pio.pin.setdir(pio.OUTPUT, led_pin)
 
@@ -187,3 +187,4 @@ function systemMain()
 end
 
 --thread.start(systemMain)
+]]
