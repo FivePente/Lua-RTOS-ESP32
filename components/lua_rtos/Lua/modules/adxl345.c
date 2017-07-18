@@ -232,7 +232,6 @@ static const LUA_REG_TYPE adxl345_map[] = {
 
 //inst map
 static const LUA_REG_TYPE adxl345_trans_map[] = {
-    { LSTRKEY( "startRead" ),       LFUNCVAL( adxl345_startRead )},
     { LSTRKEY( "startWrite" ),      LFUNCVAL( adxl345_startWrite )},
     { LSTRKEY( "stop" ),            LFUNCVAL( adxl345_stop )},
     { LSTRKEY( "read" ),            LFUNCVAL( adxl345_read )},
