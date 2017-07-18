@@ -152,7 +152,7 @@ function checkAngle()
         tX = 0
         tY = 0
 
-        for i= 3, collectionMax - 18 do
+        for i= 3, collectionMax - 2 do
             tX = tX + xList[i]
             tY = tY + yList[i]
         end
@@ -251,7 +251,7 @@ function runDevice()
         if pppConnected == 1 then
             if mqttConnected == 1 then
                 checkAngle()
-                if indexCount >= 100 then
+                if indexCount >= 4000 then
                     checkAll()
 
                     local disOffset = disOut - startDis
