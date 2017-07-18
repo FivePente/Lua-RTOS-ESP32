@@ -138,7 +138,7 @@ function checkAngle()
     print("aaa")
     x, y , z = cd:read()
     tmr.delayms(3)
-    print("bbbb")
+    print("bbbb"..x)
 
     tX = getXAngle(x , y , z)
     tY = getYAngle(x , y , z)

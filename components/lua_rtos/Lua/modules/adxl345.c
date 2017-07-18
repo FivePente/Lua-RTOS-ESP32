@@ -122,6 +122,16 @@ static int adxl345_startRead(lua_State* L) {
         return luaL_driver_error(L, error);
     }
 
+    if ((error = i2c_start(user_data->unit, &user_data->transaction))) {
+    	printf("adxl345 read error 4\n");
+        return luaL_driver_error(L, error);
+    }
+
+	if ((error = i2c_write_address(user_data->unit, &user_data->transaction, adxl345_i2c_addr, true))) {
+    	printf("adxl345 read error 5\n");
+        return luaL_driver_error(L, error);
+    }
+
     lua_pushnil(L);
     return 1;
 }
@@ -170,12 +180,12 @@ static int adxl345_read(lua_State* L) {
     	return luaL_driver_error(L, error);
     }
 
-    /*
-    // We need to flush because we need to return reaad data now
+    //We need to flush because we need to return reaad data now
     if ((error = i2c_flush(user_data->unit, &user_data->transaction, 1))) {
     	return luaL_driver_error(L, error);
     }
 
+    /*
     if ((error = i2c_stop(user_data->unit, &user_data->transaction))) {
     	printf("adxl345 read error 7\n");
         return luaL_driver_error(L, error);
