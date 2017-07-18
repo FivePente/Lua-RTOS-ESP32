@@ -134,9 +134,14 @@ function checkAngle()
     local z = 0
     local tX = 0
     local tY = 0
+    local err = ""
 
-    x, y , z = cd:read()
-    cd:stop()
+    x, y , z ,err = cd:read()
+
+    if err ~= nil then
+        print("adxl345 read "..err)
+        return
+    end
 
     tX = getXAngle(x , y , z)
     tY = getYAngle(x , y , z)
