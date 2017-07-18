@@ -128,9 +128,18 @@ function checkAngle()
     local z = 0
     local tX = 0
     local tY = 0
-    local err = ""
 
-    x, y , z ,err = cd:read()
+    try(
+        function()
+            x, y , z  = cd:read()
+        end,
+        function(where, line, error, message)
+            print(message)
+            print("read error init I2C")
+            sensorInited = 0
+            initI2C()
+        end
+    )
 
     if err ~= nil then
         print("adxl345 read "..err)
@@ -250,7 +259,7 @@ function runDevice()
     watchTime = timer
     while true do
         if pppConnected == 1 then
-            if mqttConnected == 1 then
+            if mqttConnected == 1 and sensorInited == 1 then
                 checkAngle()
                 if indexCount >= collectionTotal then
                     checkAll()
