@@ -84,6 +84,8 @@ if useGSM == 1 then
 end
 ]]
 function pppMain()
+    cpu = os.cpu()
+    print("CPU: ppp "..cpu)
     ppp.setCallback(function (err_code , message)
         print("ppp state: " , message)
         if err_code == 0 then
@@ -168,6 +170,8 @@ function startTask()
 end
 
 function systemMain()
+    cpu = os.cpu()
+    print("CPU: emqtt "..cpu)
     while true do
         if pppConnected == 1 then
             net.service.sntp.start()
