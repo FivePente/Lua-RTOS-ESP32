@@ -326,4 +326,4 @@ function runDevice()
     end
 end
 
-thread.start(runDevice)
+runDevice()
