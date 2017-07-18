@@ -64,7 +64,8 @@ function systemDog()
     end
 end
 
---[[
+thread.start(systemDog , 2048 , 10 , 1)
+
 if useWIFI == 1 then
     net.wf.scan()
     net.wf.setup(net.wf.mode.STA, "HiWiFi_3B0F16","Freedom0806")
@@ -81,20 +82,6 @@ if useGSM == 1 then
         end
     end)
     ppp.setupXTask()
-end
-]]
-function pppMain()
-    cpu = os.cpu()
-    print("CPU: ppp "..cpu)
-    ppp.setCallback(function (err_code , message)
-        print("ppp state: " , message)
-        if err_code == 0 then
-            pppConnected = 1
-        else
-            pppConnected = 0
-        end
-    end)
-    ppp.setup()
 end
 
 function runDevice()
@@ -201,7 +188,4 @@ function systemMain()
     end
 end
 
-
-thread.start(systemDog , 2048 , 10 , 1)
 thread.start(systemMain , 2048 , 11 , 1)
-thread.start(pppMain , 2048 , 12 , 1)
