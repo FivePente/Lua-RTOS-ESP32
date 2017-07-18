@@ -31,8 +31,7 @@ pio.pin.setdir(pio.OUTPUT, led_pin)
 
 function systemDog()
 
-    local currTime = 0
-
+    local tTime = 0
     while true do
         if pppConnected == 0 then
             pio.pin.sethigh(led_pin)
@@ -49,14 +48,16 @@ function systemDog()
             thread.sleepms(30)
             pio.pin.setlow(led_pin)
             thread.sleepms(2000)
+        else
+            pio.pin.sethigh(led_pin)
+            thread.sleepms(30)
+            pio.pin.setlow(led_pin)
+            thread.sleepms(5000)
         end
 
-        currTime = os.clock()
+        tTime = os.clock() - watchTime
 
-        if (currTime - watchTime) > dogTime then
-            if pppConnected == 1 and mqttConnected == 1 then
-                sendData("system" , '{"m":"system dog reboot"' , mqtt.QOS1)
-            end
+        if tTime > dogTime then
             thread.sleepms(500)
             print("system dog reboot...")
             os.exit(1)
