@@ -131,6 +131,7 @@ function checkAngle()
     if angleStarted == 0 then
         cd:startRead()
         angleStarted = 1
+        print("ttttt")
     end
 
     x, y , z = cd:read()

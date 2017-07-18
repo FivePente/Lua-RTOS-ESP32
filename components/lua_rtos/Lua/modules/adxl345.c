@@ -84,8 +84,6 @@ static int adxl345_startWrite(lua_State* L) {
 	user_data = (adxl345_user_data_t *)luaL_checkudata(L, 1, "adxl345.trans");
     luaL_argcheck(L, user_data, 1, "adxl345 transaction expected");
 
-    char reg_addr = luaL_checkinteger(L, 2);
-
     // Enable sensor
     if ((error = i2c_start(user_data->unit, &user_data->transaction))) {
     	return luaL_driver_error(L, error);
