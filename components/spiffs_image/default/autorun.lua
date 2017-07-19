@@ -59,8 +59,8 @@ function initI2C()
     ad = vl53l0x.init(i2c.I2C0 , i2c.MASTER , 400 , 0x29 , pio.GPIO18 , pio.GPIO19)
     ad:startRanging(2)
 
-    local tC = collectgarbage("count")
-    print("mem1: "..tC)
+    --local tC = collectgarbage("count")
+    --print("mem1: "..tC)
     --collectgarbage()
 
     sensorInited = 1
@@ -219,8 +219,8 @@ function checkAll()
     else
        print("temperature limitation")
     end
-    local tC = collectgarbage("count")
-    print("mem1: "..tC)
+    --local tC = collectgarbage("count")
+    --print("mem1: "..tC)
     print(string.format("dis %0.2f, x %0.4f , y %0.4f , tmp %0.2f" , disOut - startDis , xOut - startX , yOut - startY , temperature))
 end
 
