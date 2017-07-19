@@ -567,9 +567,13 @@ static int l_init(lua_State* L) {
     int sda = luaL_checkinteger(L, 5);
     int scl = luaL_checkinteger(L, 6);
 
-    if ((error = i2c_setup(id, mode, speed, sda, scl, 0, 0))) {
-        printf ("error 1\n");
-    	return luaL_driver_error(L, error);
+    error = i2c_check(id);
+
+    if (error != NULL){
+        if ((error = i2c_setup(id, mode, speed, sda, scl, 0, 0))) {
+            printf ("error 1\n");
+            return luaL_driver_error(L, error);
+        }
     }
 
     // Allocate userdata

@@ -34,10 +34,14 @@ static int adxl345_init(lua_State* L) {
     int sda = luaL_checkinteger(L, 4);
     int scl = luaL_checkinteger(L, 5);
 
-    if ((error = i2c_setup(id, mode, speed, sda, scl, 0, 0))) {
-    	return luaL_driver_error(L, error);
-    }
+    error = i2c_check(id);
 
+    if (error != NULL){
+        if ((error = i2c_setup(id, mode, speed, sda, scl, 0, 0))) {
+            printf ("error 1\n");
+            return luaL_driver_error(L, error);
+        }
+    }
     // Allocate userdata
     adxl345_user_data_t *user_data = (adxl345_user_data_t *)lua_newuserdata(L, sizeof(adxl345_user_data_t));
     if (!user_data) {

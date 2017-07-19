@@ -76,6 +76,7 @@
         "tls1.h": "c",
         "os_defines.h": "c",
         "_null.h": "c",
-        "vl53l0x_platform.c": "cpp"
+        "vl53l0x_platform.c": "cpp",
+        "i2c.c": "cpp"
     }
 }
