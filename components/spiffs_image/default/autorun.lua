@@ -219,6 +219,8 @@ function checkAll()
     else
        print("temperature limitation")
     end
+    local tC = collectgarbage("count")
+    print("mem1: "..tC)
     print(string.format("dis %0.2f, x %0.4f , y %0.4f , tmp %0.2f" , disOut - startDis , xOut - startX , yOut - startY , temperature))
 end
 
