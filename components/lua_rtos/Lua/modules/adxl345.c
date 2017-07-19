@@ -9,12 +9,14 @@
 
 #include "modules.h"
 #include "lua.h"
+#include "driver/i2c.h"
 #include "error.h"
 #include "lauxlib.h"
 #include "i2c.h"
 #include "platform.h"
 #include <stdlib.h>
 #include <string.h>
+
 
 static const uint8_t adxl345_i2c_addr = 0x53;
 

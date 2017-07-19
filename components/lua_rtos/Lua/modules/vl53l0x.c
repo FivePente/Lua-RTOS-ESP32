@@ -30,6 +30,7 @@ SOFTWARE.
 #include "error.h"
 #include "lauxlib.h"
 #include "i2c.h"
+#include "driver/i2c.h"
 #include "platform.h"
 #include "modules.h"
 #include <string.h>

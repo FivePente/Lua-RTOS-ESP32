@@ -79,6 +79,5 @@ driver_error_t *i2c_write(int unit, int *transaction, char *data, int len);
 driver_error_t *i2c_read(int unit, int *transaction, char *data, int len);
 driver_error_t *i2c_flush(int unit, int *transaction, int new_transaction);
 driver_error_t *i2c_close(int unit);
-driver_error_t *i2c_check(int unit);
 
 #endif /* I2C_H */
