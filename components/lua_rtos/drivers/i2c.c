@@ -90,7 +90,8 @@ static driver_error_t *i2c_lock_resources(int unit, i2c_resources_t *resources) 
 	return NULL;
 }
 
-static driver_error_t *i2c_check(int unit) {
+//static
+driver_error_t *i2c_check(int unit) {
     // Sanity checks
 	if (!((1 << unit) & CPU_I2C_ALL)) {
 		return driver_operation_error(I2C_DRIVER, I2C_ERR_INVALID_UNIT, NULL);
