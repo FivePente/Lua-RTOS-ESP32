@@ -58,13 +58,12 @@ function initI2C()
     s1 = sensor.attach("DS1820", pio.GPIO21, 0x28ff900f, 0xb316041a)
     s1:set("resolution", 10)
 
-    --[[
     local tC = collectgarbage("count")
     print("mem1: "..tC)
     collectgarbage()
     tC = collectgarbage("count")
     print("mem1: "..tC)
-    ]]
+
     sensorInited = 1
 end
 
@@ -146,6 +145,7 @@ function checkAngle()
 
     try(
         function()
+
             x, y , z  = cd:read()
         end,
         function(where, line, error, message)
@@ -159,7 +159,9 @@ function checkAngle()
     )
 
     --error return
-    if b then return end
+    if b == 1 then 
+        return 
+    end
 
     tX = getXAngle(x , y , z)
     tY = getYAngle(x , y , z)
@@ -218,8 +220,8 @@ function checkAll()
     else
        print("temperature limitation")
     end
-    --local tC = collectgarbage("count")
-    --print("mem1: "..tC)
+    local tC = collectgarbage("count")
+    print("mem: "..tC)
     print(string.format("dis %0.2f, x %0.4f , y %0.4f , tmp %0.2f" , disOut - startDis , xOut - startX , yOut - startY , temperature))
 end
 
@@ -269,7 +271,6 @@ function runDevice()
 
     print("init data startDis:"..startDis.." startX:"..startX.." startY:"..startY)
     
-
     initI2C()
     tmr.delayms(100)
 
