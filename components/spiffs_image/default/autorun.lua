@@ -137,6 +137,7 @@ function checkAngle()
     local z = 0
     local tX = 0
     local tY = 0
+    local b = 0
 
     try(
         function()
@@ -148,8 +149,12 @@ function checkAngle()
             sensorInited = 0
             cd:close()
             initI2C()
+            b = 1
         end
     )
+
+    --error return
+    if b then return end
 
     tX = getXAngle(x , y , z)
     tY = getYAngle(x , y , z)

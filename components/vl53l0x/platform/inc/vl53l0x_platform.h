@@ -32,6 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vl53l0x_def.h"
 #include "vl53l0x_platform_log.h"
+#include "lua.h"
+#include "lauxlib.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -64,6 +66,7 @@ typedef struct {
     uint8_t I2cDevAddr;                /*!< i2c device address user specific field */
     int unit;
     int tran;
+    lua_State* luaState;
 } VL53L0X_Dev_t;
 
 

@@ -79,6 +79,9 @@
         "vl53l0x_platform.c": "cpp",
         "i2c.c": "cpp",
         "gzguts.h": "c",
-        "locale_facets.h": "c"
+        "locale_facets.h": "c",
+        "lstate.h": "c",
+        "lua.h": "c",
+        "pthread.h": "c"
     }
 }

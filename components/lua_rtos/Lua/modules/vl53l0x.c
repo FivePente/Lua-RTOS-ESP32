@@ -69,6 +69,7 @@ typedef struct {
 	int transaction;
     int object_number;
     char address;
+    lua_State* luaState;
 } vl53l0x_user_data_t;
 
 typedef vl53l0x_user_data_t* VL53L0X_USER_DATA;
@@ -197,6 +198,7 @@ static void startRanging(VL53L0X_USER_DATA userData, int mode)
             pMyDevice[objNumber]->I2cDevAddr = userData->address;
             pMyDevice[objNumber]->tran = userData->transaction;
             pMyDevice[objNumber]->unit = userData->unit;
+            pMyDevice[objNumber]->luaState = userData->luaState;
 
             VL53L0X_init(pMyDevice[objNumber]);
             /*
@@ -527,7 +529,6 @@ static void stopRanging(VL53L0X_USER_DATA userData)
             }
 
             print_pal_error(Status);
-
             free(pMyDevice[objNumber]);
         }
         else
