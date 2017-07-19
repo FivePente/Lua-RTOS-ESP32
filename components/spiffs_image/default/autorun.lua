@@ -46,7 +46,7 @@ angleStarted = 0
 
 local ver = 1.0
 
-function initI2CADXL345() 
+function initI2C() 
     cd = adxl345.init(i2c.I2C0 , i2c.MASTER , 400 , pio.GPIO18 , pio.GPIO19)
     cd:write(0x2D , 0x08)
     cd:write(0x31 , 0x28)
@@ -99,6 +99,7 @@ function checkDistance()
             sensorInited = 0
             ad:stopRanging()
             ad:close()
+            tmr.delayms(10)
             initI2C()
             return
         else
@@ -149,11 +150,6 @@ function checkAngle()
             initI2C()
         end
     )
-
-    if err ~= nil then
-        print("adxl345 read "..err)
-        return
-    end
 
     tX = getXAngle(x , y , z)
     tY = getYAngle(x , y , z)
@@ -208,7 +204,7 @@ function checkAll()
     temperature = s1:read("temperature")
     if temperature < maxTemp or temperature > minTemp then
         checkAngleP()
-        --checkDistance()
+        checkDistance()
     else
        print("temperature limitation")
     end
@@ -329,9 +325,9 @@ function runDevice()
 
                     --sendData("data", string.format('{"d":%0.2f, "x":%0.2f , "y":%0.2f , "w":%0.2f , "t":%d}' , disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time()) ,mqtt.QOS0)
                     --data = string.format('{"d":%0.2f, "x":%0.3f , "y":%0.3f , "w":%0.2f , "t":%d}' , disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time())
-                    --pio.pin.sethigh(led_pin)
-                    --tmr.delayms(30)
-                    --pio.pin.setlow(led_pin)
+                    pio.pin.sethigh(led_pin)
+                    tmr.delayms(30)
+                    pio.pin.setlow(led_pin)
                 end
 
             else
@@ -345,9 +341,5 @@ function runDevice()
         end
     end
 end
-
-pppConnected = 1 
-mqttConnected = 1 
-sensorInited = 1
 
 runDevice()

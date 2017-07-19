@@ -588,7 +588,7 @@ static int l_init(lua_State* L) {
     user_data->transaction = I2C_TRANSACTION_INITIALIZER;
     user_data->object_number = object_number;
     user_data->address = addr;
-    object_number++;
+    //object_number++;
 
     if ((error = i2c_start(user_data->unit, &user_data->transaction))) {
         printf ("error 2\n");
