@@ -203,8 +203,6 @@ driver_error_t *i2c_flush(int unit, int *transaction, int new_transaction) {
 }
 
 driver_error_t *i2c_close(int unit) {
-	driver_error_t *error;
-
     // Sanity checks
 	if (!((1 << unit) & CPU_I2C_ALL)) {
 		return driver_operation_error(I2C_DRIVER, I2C_ERR_INVALID_UNIT, NULL);
