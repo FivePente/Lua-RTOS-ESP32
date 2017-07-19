@@ -141,7 +141,7 @@ static int adxl345_read(lua_State* L) {
     	return luaL_driver_error(L, error);
     }
 
-    char *tData = &user_data->dataBuf
+    char tData = user_data->dataBuf
 
     x = (int16_t) ((tData[1] << 8) | tData[0]);
     y = (int16_t) ((tData[3] << 8) | tData[2]);
