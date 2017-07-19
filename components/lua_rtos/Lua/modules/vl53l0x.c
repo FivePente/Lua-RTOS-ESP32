@@ -683,6 +683,21 @@ static int get_timing(lua_State* L) {
     return 1;
 } 
 
+static int vl53l0x_close(lua_State* L) {
+    driver_error_t *error;
+	vl53l0x_user_data_t *user_data;
+
+	// Get user data
+	user_data = (vl53l0x_user_data_t *)luaL_checkudata(L, 1, "vl53l0x.trans");
+    luaL_argcheck(L, user_data, 1, "adxl345 transaction expected");
+
+    if ((error = i2c_close(user_data->unit))) {
+    	return luaL_driver_error(L, error);
+    }
+
+    return 0;
+}
+
 // Destructor
 static int vl53l0x_trans_gc (lua_State *L) {
 	vl53l0x_user_data_t *user_data = NULL;
@@ -703,6 +718,7 @@ static const LUA_REG_TYPE vl53l0x_trans_map[] = {
     { LSTRKEY( "stopRanging" ),  LFUNCVAL( stop_ranging )},
     { LSTRKEY( "getDistance" ),  LFUNCVAL( get_distance )},
     { LSTRKEY( "getTiming" ),    LFUNCVAL( get_timing )},
+    { LSTRKEY( "close" ),            LFUNCVAL( vl53l0x_close )},
     { LSTRKEY( "__metatable" ),  	LROVAL  ( vl53l0x_trans_map ) },
 	{ LSTRKEY( "__index"     ),   	LROVAL  ( vl53l0x_trans_map ) },
 	{ LSTRKEY( "__gc"        ),   	LFUNCVAL  ( vl53l0x_trans_gc ) },

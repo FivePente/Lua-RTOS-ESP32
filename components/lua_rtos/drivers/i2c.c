@@ -202,6 +202,35 @@ driver_error_t *i2c_flush(int unit, int *transaction, int new_transaction) {
 	return NULL;
 }
 
+driver_error_t *i2c_close(int unit) {
+	driver_error_t *error;
+
+    // Sanity checks
+	if (!((1 << unit) & CPU_I2C_ALL)) {
+		return driver_operation_error(I2C_DRIVER, I2C_ERR_INVALID_UNIT, NULL);
+	}
+
+	mtx_lock(&i2c[unit].mtx);
+
+	if (i2c[unit].setup) {
+		i2c_driver_delete(unit);
+
+		if (unit == 0) {
+			periph_module_disable(PERIPH_I2C0_MODULE);
+		} else {
+			periph_module_disable(PERIPH_I2C1_MODULE);
+		}
+
+		i2c[unit].setup = 0;
+	}
+
+    mtx_unlock(&i2c[unit].mtx);
+
+	return NULL;
+}
+
+
+
 driver_error_t *i2c_setup(int unit, int mode, int speed, int sda, int scl, int addr10_en, int addr) {
 	driver_error_t *error;
 

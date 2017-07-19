@@ -46,21 +46,17 @@ angleStarted = 0
 
 local ver = 1.0
 
-function initI2C() 
-
-    --ad = vl53l0x.init(i2c.I2C0 , i2c.MASTER , 400 , 0x29 , pio.GPIO18 , pio.GPIO19)
-    --ad:startRanging(2)
-    --tmr.delayms(10)
-
+function initI2CADXL345() 
     cd = adxl345.init(i2c.I2C0 , i2c.MASTER , 400 , pio.GPIO18 , pio.GPIO19)
     cd:write(0x2D , 0x08)
     cd:write(0x31 , 0x28)
     cd:write(0x2C , 0x0C)
 
+    ad = vl53l0x.init(i2c.I2C0 , i2c.MASTER , 400 , 0x29 , pio.GPIO18 , pio.GPIO19)
+    ad:startRanging(2)
+
     s1 = sensor.attach("DS1820", pio.GPIO21, 0x28ff900f, 0xb316041a)
     s1:set("resolution", 10)
-
-    tmr.delayms(10)
 
     sensorInited = 1
 end
@@ -94,32 +90,37 @@ function checkDistance()
     local index = 1
     local tDis = 0
     while true do
+        
         tDis = ad:getDistance()
 
         if tDis == -1 then
-            print("distance error")
+            print("vl5310x get distance error init I2C")
+            sensorInited = 0
+            ad:stopRanging()
+            ad:close()
+            initI2C()
             return
-        end
+        else
+            ldis[index] = tDis
+            index = index + 1
+            
+            if index > 14 then
 
-        ldis[index] = tDis
-        index = index + 1
-        
-        if index > 14 then
+                local tdis = 0
+                table.sort(ldis)
+                print(table.concat(ldis, ", "))
 
-            local tdis = 0
-            table.sort(ldis)
-            print(table.concat(ldis, ", "))
+                for i= 2, 13 do
+                    tdis = tdis + ldis[i]
+                end
 
-            for i= 2, 13 do
-                tdis = tdis + ldis[i]
+                disOut = tdis / 12
+                if startDis == 0 then
+                    startDis = disOut
+                    saveConfig()
+                end
+                break
             end
-
-            disOut = tdis / 12
-            if startDis == 0 then
-                startDis = disOut
-                saveConfig()
-            end
-            break
         end
     end
 end
@@ -140,9 +141,10 @@ function checkAngle()
             x, y , z  = cd:read()
         end,
         function(where, line, error, message)
-            print(message)
+            print("error:"..message)
             print("read error init I2C")
             sensorInited = 0
+            cd:close()
             initI2C()
         end
     )

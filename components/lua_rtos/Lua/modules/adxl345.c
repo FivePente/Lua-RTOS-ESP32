@@ -157,6 +157,21 @@ static int adxl345_read(lua_State* L) {
     return 3;
 }
 
+static int adxl345_close(lua_State* L) {
+    driver_error_t *error;
+	adxl345_user_data_t *user_data;
+
+	// Get user data
+	user_data = (adxl345_user_data_t *)luaL_checkudata(L, 1, "adxl345.trans");
+    luaL_argcheck(L, user_data, 1, "adxl345 transaction expected");
+
+    if ((error = i2c_close(user_data->unit))) {
+    	return luaL_driver_error(L, error);
+    }
+
+    return 0;
+}
+
 // Destructor
 static int adxl345_trans_gc (lua_State *L) {
 	adxl345_user_data_t *user_data = NULL;
@@ -179,6 +194,7 @@ static const LUA_REG_TYPE adxl345_map[] = {
 static const LUA_REG_TYPE adxl345_trans_map[] = {
     { LSTRKEY( "read" ),            LFUNCVAL( adxl345_read )},
     { LSTRKEY( "write" ),            LFUNCVAL( adxl345_writeReg )},
+    { LSTRKEY( "close" ),            LFUNCVAL( adxl345_close )},
     { LSTRKEY( "__metatable" ),  	LROVAL  ( adxl345_trans_map ) },
 	{ LSTRKEY( "__index"     ),   	LROVAL  ( adxl345_trans_map ) },
 	{ LSTRKEY( "__gc"        ),   	LFUNCVAL  ( adxl345_trans_gc ) },
