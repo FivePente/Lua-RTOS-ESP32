@@ -141,11 +141,9 @@ static int adxl345_read(lua_State* L) {
     	return luaL_driver_error(L, error);
     }
 
-    char tData = user_data->dataBuf
-
-    x = (int16_t) ((tData[1] << 8) | tData[0]);
-    y = (int16_t) ((tData[3] << 8) | tData[2]);
-    z = (int16_t) ((tData[5] << 8) | tData[4]);
+    x = (int16_t) ((user_data->dataBuf[1] << 8) | user_data->dataBuf[0]);
+    y = (int16_t) ((user_data->dataBuf[3] << 8) | user_data->dataBuf[2]);
+    z = (int16_t) ((user_data->dataBuf[5] << 8) | user_data->dataBuf[4]);
 
     lua_pushinteger(L, x);
     lua_pushinteger(L, y);
@@ -160,7 +158,7 @@ static int adxl345_trans_gc (lua_State *L) {
 
     user_data = (adxl345_user_data_t *)luaL_testudata(L, 1, "adxl345.trans");
     if (user_data) {
-        free(user_data->data);
+        free(user_data->dataBuf);
     }
     return 0;
 }
