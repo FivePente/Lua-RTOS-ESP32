@@ -57,7 +57,7 @@ SOFTWARE.
 #define VL53L0X_LONG_RANGE_MODE         3   // Longe Range mode
 #define VL53L0X_HIGH_SPEED_MODE         4   // High Speed mode
 
-#define MAX_DEVICES                     10
+#define MAX_DEVICES                     2
 
 static int object_number = 0;
 static VL53L0X_Dev_t *pMyDevice[MAX_DEVICES];
