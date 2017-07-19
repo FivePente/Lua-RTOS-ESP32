@@ -59,11 +59,11 @@ function initI2C()
     ad = vl53l0x.init(i2c.I2C0 , i2c.MASTER , 400 , 0x29 , pio.GPIO18 , pio.GPIO19)
     ad:startRanging(2)
 
-    local tC = collectgarbage("count")
-    print("mem1: "..tC)
+    --local tC = collectgarbage("count")
+    --print("mem1: "..tC)
     collectgarbage()
-    tC = collectgarbage("count")
-    print("mem2: "..tC)
+    --tC = collectgarbage("count")
+    --print("mem2: "..tC)
 
     sensorInited = 1
 end
