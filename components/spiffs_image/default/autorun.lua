@@ -43,10 +43,6 @@ collectionMax = 30
 collectionTotal = 100
 angleStarted = 0
 
-s1 = nil 
-cd = nil
-ad = nil
-
 local ver = 1.0
 
 function initI2C() 
@@ -59,9 +55,14 @@ function initI2C()
     ad = vl53l0x.init(i2c.I2C0 , i2c.MASTER , 400 , 0x29 , pio.GPIO18 , pio.GPIO19)
     ad:startRanging(2)
 
-    --local tC = collectgarbage("count")
-    --print("mem1: "..tC)
-    --collectgarbage()
+    s1 = sensor.attach("DS1820", pio.GPIO21, 0x28ff900f, 0xb316041a)
+    s1:set("resolution", 10)
+
+    local tC = collectgarbage("count")
+    print("mem1: "..tC)
+    collectgarbage()
+    tC = collectgarbage("count")
+    print("mem1: "..tC)
 
     sensorInited = 1
 end
@@ -270,8 +271,7 @@ function runDevice()
 
     print("init data startDis:"..startDis.." startX:"..startX.." startY:"..startY)
     
-    s1 = sensor.attach("DS1820", pio.GPIO21, 0x28ff900f, 0xb316041a)
-    s1:set("resolution", 10)
+
     initI2C()
     tmr.delayms(100)
 
