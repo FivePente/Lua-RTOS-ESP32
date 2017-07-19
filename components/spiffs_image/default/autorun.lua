@@ -342,4 +342,7 @@ function runDevice()
     end
 end
 
+pppConnected = 1
+mqttConnected = 1
+
 runDevice()

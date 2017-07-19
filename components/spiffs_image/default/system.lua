@@ -54,14 +54,14 @@ function systemDog()
             pio.pin.setlow(led_pin)
             thread.sleepms(5000)
         end
-
+        --[[
         tTime = os.clock() - watchTime
 
         if tTime > dogTime then
             thread.sleepms(500)
             print("system dog reboot...")
             os.exit(1)
-        end
+        end]]
     end
 end
 
@@ -189,4 +189,4 @@ function systemMain()
     end
 end
 
-thread.start(systemMain)
+--thread.start(systemMain)
