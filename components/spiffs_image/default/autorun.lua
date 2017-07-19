@@ -48,9 +48,9 @@ local ver = 1.0
 
 function initI2C() 
 
-    ad = vl53l0x.init(i2c.I2C0 , i2c.MASTER , 400 , 0x29 , pio.GPIO18 , pio.GPIO19)
-    ad:startRanging(2)
-    tmr.delayms(10)
+    --ad = vl53l0x.init(i2c.I2C0 , i2c.MASTER , 400 , 0x29 , pio.GPIO18 , pio.GPIO19)
+    --ad:startRanging(2)
+    --tmr.delayms(10)
 
     cd = adxl345.init(i2c.I2C0 , i2c.MASTER , 400 , pio.GPIO18 , pio.GPIO19)
     cd:write(0x2D , 0x08)
