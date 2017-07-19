@@ -48,12 +48,8 @@ function systemDog()
             thread.sleepms(30)
             pio.pin.setlow(led_pin)
             thread.sleepms(2000)
-        else
-            pio.pin.sethigh(led_pin)
-            thread.sleepms(30)
-            pio.pin.setlow(led_pin)
-            thread.sleepms(5000)
         end
+        
         --[[
         tTime = os.clock() - watchTime
 

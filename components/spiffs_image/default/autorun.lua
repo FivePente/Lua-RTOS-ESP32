@@ -97,9 +97,9 @@ function checkDistance()
         if tDis == -1 then
             print("vl5310x get distance error init I2C")
             sensorInited = 0
-            ad:stopRanging()
-            ad:close()
-            tmr.delayms(10)
+            --ad:stopRanging()
+            --ad:close()
+            --tmr.delayms(10)
             initI2C()
             return
         else
@@ -146,7 +146,7 @@ function checkAngle()
             print("error:"..message)
             print("read error init I2C")
             sensorInited = 0
-            cd:close()
+            --cd:close()
             initI2C()
         end
     )
