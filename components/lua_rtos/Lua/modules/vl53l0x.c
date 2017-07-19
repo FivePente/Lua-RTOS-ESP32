@@ -480,7 +480,7 @@ static int32_t getDistance(VL53L0X_USER_DATA userData)
                 // Clear the interrupt
                 VL53L0X_ClearInterruptMask(pMyDevice[objNumber],
                                     VL53L0X_REG_SYSTEM_INTERRUPT_GPIO_NEW_SAMPLE_READY);
-                // VL53L0X_PollingDelay(pMyDevice[objNumber]);
+                VL53L0X_PollingDelay(pMyDevice[objNumber]);
             }
         }
         else

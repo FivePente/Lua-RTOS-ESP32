@@ -73,6 +73,9 @@
         "sha.h": "c",
         "ssl3.h": "c",
         "stack.h": "c",
-        "tls1.h": "c"
+        "tls1.h": "c",
+        "os_defines.h": "c",
+        "_null.h": "c",
+        "vl53l0x_platform.c": "cpp"
     }
 }

@@ -92,8 +92,16 @@ function checkDistance()
 
     local ldis = {}
     local index = 1
+    local tDis = 0
     while true do
-        ldis[index] = ad:getDistance()
+        tDis = ad:getDistance()
+
+        if tDis == -1 then
+            print("distance error")
+            return
+        end
+
+        ldis[index] = tDis
         index = index + 1
         
         if index > 14 then
