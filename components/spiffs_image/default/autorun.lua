@@ -97,9 +97,9 @@ function checkDistance()
         if tDis == -1 then
             print("vl5310x get distance error init I2C")
             sensorInited = 0
-            --ad:stopRanging()
-            --ad:close()
-            --tmr.delayms(10)
+            ad:stopRanging()
+            ad:close()
+            tmr.delayms(500)
             initI2C()
             return
         else
@@ -146,7 +146,7 @@ function checkAngle()
             print("error:"..message)
             print("read error init I2C")
             sensorInited = 0
-            --cd:close()
+            cd:close()
             initI2C()
         end
     )
@@ -325,6 +325,10 @@ function runDevice()
 
                     --sendData("data", string.format('{"d":%0.2f, "x":%0.2f , "y":%0.2f , "w":%0.2f , "t":%d}' , disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time()) ,mqtt.QOS0)
                     --data = string.format('{"d":%0.2f, "x":%0.3f , "y":%0.3f , "w":%0.2f , "t":%d}' , disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time())
+                    pio.pin.sethigh(led_pin)
+                    tmr.delayms(30)
+                    pio.pin.setlow(led_pin)
+                    tmr.delayms(10)
                     pio.pin.sethigh(led_pin)
                     tmr.delayms(30)
                     pio.pin.setlow(led_pin)
