@@ -259,9 +259,6 @@ function runDevice()
         print("load config.lua")
     end
 
-    startX = 0
-    startY = 0
-
     print("init data startDis:"..startDis.." startX:"..startX.." startY:"..startY)
     
     initI2C()
