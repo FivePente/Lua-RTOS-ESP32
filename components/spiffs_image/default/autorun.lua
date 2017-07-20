@@ -40,7 +40,7 @@ maxTemp = 50
 minTemp = -15
 
 collectionMax = 30
-collectionTotal = 100
+collectionTotal = 4000
 angleStarted = 0
 
 local ver = 1.0
