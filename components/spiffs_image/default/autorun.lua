@@ -58,12 +58,11 @@ function initI2C()
     s1 = sensor.attach("DS1820", pio.GPIO21, 0x28ff900f, 0xb316041a)
     s1:set("resolution", 10)
 
-    --[[
     local tC = collectgarbage("count")
     print("mem1: "..tC)
     collectgarbage()
     tC = collectgarbage("count")
-    print("mem1: "..tC)]]
+    print("mem1: "..tC)
 
     sensorInited = 1
 end
@@ -266,89 +265,88 @@ function runDevice()
     print("init data startDis:"..startDis.." startX:"..startX.." startY:"..startY)
     
     initI2C()
+    startTask()
     tmr.delayms(100)
 
     local timer = os.clock()
     watchTime = timer
     while true do
         if pppConnected == 1 then
-            if mqttConnected == 1 and sensorInited == 1 then
-                checkAngle()
-                if indexCount >= collectionTotal then
-                    checkAll()
+            if mqttConnected == 1 then
+                if sensorInited == 1 then
+                    checkAngle()
+                    if indexCount >= collectionTotal then
+                        checkAll()
 
-                    local disOffset = disOut - startDis
-                    local tAlarm = '{'
+                        local disOffset = disOut - startDis
+                        local tAlarm = '{'
 
-                    if disOffset > hDisAlarm or disOffset < lDisAlarm then
-                        disExceedCount = disExceedCount + 1
-                    else
-                        disExceedCount = 0
+                        if disOffset > hDisAlarm or disOffset < lDisAlarm then
+                            disExceedCount = disExceedCount + 1
+                        else
+                            disExceedCount = 0
+                        end
+
+                        if disExceedCount >= disAlarmExceed then
+                            tAlarm = tAlarm..string.format('"d":%0.2f , ', disOffset)
+                        end
+
+                        local xAngleOffset = xOut - startX
+
+                        if xAngleOffset > hXAlarm or xAngleOffset < lXAlarm then
+                            angleXExceedCount = angleXExceedCount + 1
+                        else
+                            angleXExceedCount = 0
+                        end
+
+                        if angleXExceedCount >= angleAlarmExceed then
+                            tAlarm = tAlarm..string.format('"x":%0.2f , ', xAngleOffset)
+                        end                        
+
+                        local yAngleOffset = yOut - startY
+
+                        if yAngleOffset > hYAlarm or yAngleOffset < lYAlarm then
+                            angleYExceedCount = angleYExceedCount + 1
+                        else
+                            angleYExceedCount = 0
+                        end
+
+                        if angleYExceedCount >= angleAlarmExceed then
+                            tAlarm = tAlarm..string.format('"y":%0.2f , ', yAngleOffset)
+                        end  
+
+                        if temperature > hTmpAlarm or temperature < lTmpAlarm then
+                            tmpExceedCount = tmpExceedCount + 1
+                        else
+                            tmpExceedCount = 0
+                        end
+
+                        if tmpExceedCount >= tmpAlarmExceed then
+                            tAlarm = tAlarm..string.format('"w":%0.2f , ', temperature)
+                        end
+
+                        if #tAlarm > 2 then
+                            sendData("alarm" , tAlarm..string.format('"t":%d}', os.time()) , mqtt.QOS1)
+                        end
+
+                        sendData("data", string.format('{"d":%0.2f, "x":%0.2f , "y":%0.2f , "w":%0.2f , "t":%d}' , disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time()) ,mqtt.QOS0)
+                        pio.pin.sethigh(led_pin)
+                        tmr.delayms(30)
+                        pio.pin.setlow(led_pin)
+                        tmr.delayms(10)
+                        pio.pin.sethigh(led_pin)
+                        tmr.delayms(30)
+                        pio.pin.setlow(led_pin)
                     end
-
-                    if disExceedCount >= disAlarmExceed then
-                        tAlarm = tAlarm..string.format('"d":%0.2f , ', disOffset)
-                    end
-
-                    local xAngleOffset = xOut - startX
-
-                    if xAngleOffset > hXAlarm or xAngleOffset < lXAlarm then
-                        angleXExceedCount = angleXExceedCount + 1
-                    else
-                        angleXExceedCount = 0
-                    end
-
-                    if angleXExceedCount >= angleAlarmExceed then
-                        tAlarm = tAlarm..string.format('"x":%0.2f , ', xAngleOffset)
-                    end                        
-
-                    local yAngleOffset = yOut - startY
-
-                    if yAngleOffset > hYAlarm or yAngleOffset < lYAlarm then
-                        angleYExceedCount = angleYExceedCount + 1
-                    else
-                        angleYExceedCount = 0
-                    end
-
-                    if angleYExceedCount >= angleAlarmExceed then
-                        tAlarm = tAlarm..string.format('"y":%0.2f , ', yAngleOffset)
-                    end  
-
-                    if temperature > hTmpAlarm or temperature < lTmpAlarm then
-                        tmpExceedCount = tmpExceedCount + 1
-                    else
-                        tmpExceedCount = 0
-                    end
-
-                    if tmpExceedCount >= tmpAlarmExceed then
-                        tAlarm = tAlarm..string.format('"w":%0.2f , ', temperature)
-                    end
-
-                    if #tAlarm > 2 then
-                        --sendData("alarm" , tAlarm..string.format('"t":%d}', os.time()) , mqtt.QOS1)
-                        alarm = tAlarm..string.format('"t":%d}', os.time())
-                    end
-
-                    --sendData("data", string.format('{"d":%0.2f, "x":%0.2f , "y":%0.2f , "w":%0.2f , "t":%d}' , disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time()) ,mqtt.QOS0)
-                    data = string.format('{"d":%0.2f, "x":%0.3f , "y":%0.3f , "w":%0.2f , "t":%d}' , disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time())
-
-                    pio.pin.sethigh(led_pin)
-                    tmr.delayms(30)
-                    pio.pin.setlow(led_pin)
-                    tmr.delayms(10)
-                    pio.pin.sethigh(led_pin)
-                    tmr.delayms(30)
-                    pio.pin.setlow(led_pin)
                 end
-
             else
-                --print("mqtt disconnected...")
-                --tmr.delayms(1000)
-                --startTask()
+                print("mqtt disconnected...")
+                tmr.delayms(1000)
+                startTask()
             end
         else
-            --print("Network disconnected...")
-            --tmr.delayms(3000)
+            print("Network disconnected...")
+            tmr.delayms(3000)
         end
     end
 end

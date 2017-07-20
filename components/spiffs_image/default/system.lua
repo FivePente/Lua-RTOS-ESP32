@@ -153,37 +153,11 @@ function startTask()
     )
 end
 
-function systemMain()
-    cpu = os.cpu()
-    print("CPU: emqtt "..cpu)
-    while true do
-        if pppConnected == 1 then
-            net.service.sntp.start()
-            --net.service.sntp.stop()
-            startTask()
-            break
-        end
+while true do
+    if pppConnected == 1 then
+        net.service.sntp.start()
+        --net.service.sntp.stop()
+        startTask()
+        break
     end
-
-    --[[
-    while true do 
-        if pppConnected == 1 then
-            if mqttConnected == 1 then
-                if alarm ~= "" then
-                    sendData("alarm" , alarm , mqtt.QOS1)
-                    alarm = ""
-                end
-
-                if data ~= "" then
-                    sendData("data" , data , mqtt.QOS0)
-                    data = ""
-                end
-            else
-                thread.sleepms(1000)
-                startTask()
-            end
-        end
-    end]]
 end
-
-thread.start(systemMain)
