@@ -300,7 +300,7 @@ function runDevice()
                         end
 
                         if angleXExceedCount >= angleAlarmExceed then
-                            tAlarm = tAlarm..string.format('"x":%0.2f , ', xAngleOffset)
+                            tAlarm = tAlarm..string.format('"x":%0.3f , ', cutNumber(xAngleOffset))
                         end                        
 
                         local yAngleOffset = yOut - startY
@@ -312,7 +312,7 @@ function runDevice()
                         end
 
                         if angleYExceedCount >= angleAlarmExceed then
-                            tAlarm = tAlarm..string.format('"y":%0.2f , ', yAngleOffset)
+                            tAlarm = tAlarm..string.format('"y":%0.3f , ', cutNumber(yAngleOffset))
                         end  
 
                         if temperature > hTmpAlarm or temperature < lTmpAlarm then
@@ -329,7 +329,7 @@ function runDevice()
                             sendData("alarm" , tAlarm..string.format('"t":%d}', os.time()) , mqtt.QOS1)
                         end
 
-                        sendData("data", string.format('{"d":%0.2f, "x":%0.2f , "y":%0.2f , "w":%0.2f , "t":%d}' , disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time()) ,mqtt.QOS0)
+                        sendData("data", string.format('{"d":%0.2f, "x":%0.3f , "y":%0.3f , "w":%0.2f , "t":%d}' , disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time()) ,mqtt.QOS0)
                         pio.pin.sethigh(led_pin)
                         tmr.delayms(30)
                         pio.pin.setlow(led_pin)
