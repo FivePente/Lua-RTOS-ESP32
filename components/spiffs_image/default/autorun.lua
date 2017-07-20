@@ -265,7 +265,6 @@ function runDevice()
     print("init data startDis:"..startDis.." startX:"..startX.." startY:"..startY)
     
     initI2C()
-    startTask()
     tmr.delayms(100)
 
     local timer = os.clock()
