@@ -58,11 +58,12 @@ function initI2C()
     s1 = sensor.attach("DS1820", pio.GPIO21, 0x28ff900f, 0xb316041a)
     s1:set("resolution", 10)
 
+    --[[
     local tC = collectgarbage("count")
     print("mem1: "..tC)
     collectgarbage()
     tC = collectgarbage("count")
-    print("mem1: "..tC)
+    print("mem1: "..tC)]]
 
     sensorInited = 1
 end
