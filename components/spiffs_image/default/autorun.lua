@@ -39,9 +39,14 @@ temperature = 0
 maxTemp = 50
 minTemp = -15
 
-collectionMax = 30
+collectionMax = 15
 collectionTotal = 4000
 angleStarted = 0
+
+maxX = 0
+maxY = 0
+minX = 0
+minY = 0
 
 local ver = 1.0
 
@@ -144,7 +149,6 @@ function checkAngle()
 
     try(
         function()
-
             x, y , z  = cd:read()
         end,
         function(where, line, error, message)
@@ -172,15 +176,15 @@ function checkAngle()
         tX = 0
         tY = 0
 
-        for i= 3, collectionMax - 2 do
+        for i= 2, collectionMax - 1 do
             tX = tX + xList[i]
             tY = tY + yList[i]
         end
 
-        xOutCount = xOutCount + tX / (collectionMax - 4)
-        yOutCount = yOutCount + tY / (collectionMax - 4)
+        xOutCount = xOutCount + tX / (collectionMax - 2)
+        yOutCount = yOutCount + tY / (collectionMax - 2)
 
-        indexCount = indexCount + (collectionMax - 4)
+        indexCount = indexCount + (collectionMax - 2)
         indexA = 1
     end
 end
