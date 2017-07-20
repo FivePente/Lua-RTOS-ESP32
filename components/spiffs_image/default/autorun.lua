@@ -333,10 +333,6 @@ function runDevice()
                         pio.pin.sethigh(led_pin)
                         tmr.delayms(30)
                         pio.pin.setlow(led_pin)
-                        tmr.delayms(10)
-                        pio.pin.sethigh(led_pin)
-                        tmr.delayms(30)
-                        pio.pin.setlow(led_pin)
                     end
                 end
             else
