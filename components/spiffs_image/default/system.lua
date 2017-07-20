@@ -49,7 +49,7 @@ function systemDog()
             pio.pin.setlow(led_pin)
             thread.sleepms(2000)
         end
-        
+
         --[[
         tTime = os.clock() - watchTime
 
@@ -185,4 +185,4 @@ function systemMain()
     end
 end
 
---thread.start(systemMain)
+thread.start(systemMain)
