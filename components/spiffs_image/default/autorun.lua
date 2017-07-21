@@ -48,7 +48,7 @@ local ver = 1.0
 function initI2C() 
     cd = adxl345.init(i2c.I2C0 , i2c.MASTER , 400 , pio.GPIO18 , pio.GPIO19)
     cd:write(0x2D , 0x08)
-    cd:write(0x31 , 0x2F)
+    cd:write(0x31 , 0x28)
     cd:write(0x2C , 0x0C)
     cd:write(0x38 , 0xA0)
 
@@ -176,10 +176,10 @@ function checkAngle()
             tY = tY + yList[i]
         end
 
-        xOutCount = xOutCount + tX / (collectionMax - 4)
-        yOutCount = yOutCount + tY / (collectionMax - 4)
+        xOutCount = xOutCount + tX
+        yOutCount = yOutCount + tY
 
-        indexCount = indexCount + 1
+        indexCount = indexCount + (collectionMax - 4)
         indexA = 1
     end
 end
