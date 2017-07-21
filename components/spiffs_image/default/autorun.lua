@@ -364,5 +364,6 @@ while true do
     if pppConnected == 1 and mqttConnected == 1 then
         print("run device..........")
         runDevice()
+        break
     end
 end

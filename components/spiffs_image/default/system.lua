@@ -62,26 +62,6 @@ function systemDog()
     end
 end
 
-thread.start(systemDog)
-
-if useWIFI == 1 then
-    net.wf.scan()
-    net.wf.setup(net.wf.mode.STA, "HiWiFi_3B0F16","Freedom0806")
-    net.wf.start();
-end
-
-if useGSM == 1 then
-    ppp.setCallback(function (err_code , message)
-        print("ppp state: " , message)
-        if err_code == 0 then
-            pppConnected = 1
-        else
-            pppConnected = 0
-        end
-    end)
-    ppp.setupXTask()
-end
-
 function runDevice()
     print("empty autorun.lua")
 end
@@ -157,6 +137,26 @@ function startTask()
     )
 end
 
+function initNet()
+    if useWIFI == 1 then
+        net.wf.scan()
+        net.wf.setup(net.wf.mode.STA, "HiWiFi_3B0F16","Freedom0806")
+        net.wf.start();
+    end
+
+    if useGSM == 1 then
+        ppp.setCallback(function (err_code , message)
+            print("ppp state: " , message)
+            if err_code == 0 then
+                pppConnected = 1
+            else
+                pppConnected = 0
+            end
+        end)
+        ppp.setupXTask()
+    end
+end
+
 function mainTask()
     while true do
         if pppConnected == 1 then
@@ -175,4 +175,6 @@ function mainTask()
     end
 end
 
+thread.start(systemDog)
+initNet()
 thread.start(mainTask)
