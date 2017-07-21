@@ -40,7 +40,7 @@ maxTemp = 50
 minTemp = -15
 
 collectionMax = 20
-collectionTotal = 4000
+collectionTotal = 500
 angleStarted = 0
 
 local ver = 1.0
@@ -48,7 +48,7 @@ local ver = 1.0
 function initI2C() 
     cd = adxl345.init(i2c.I2C0 , i2c.MASTER , 400 , pio.GPIO18 , pio.GPIO19)
     cd:write(0x2D , 0x08)
-    cd:write(0x31 , 0x28)
+    cd:write(0x31 , 0x2C)
     cd:write(0x2C , 0x0C)
     cd:write(0x38 , 0xA0)
 
@@ -230,7 +230,7 @@ function getYAngle(x , y , z)
 end
 
 function cutNumber(v)
-    local x,y = math.modf(v * 1000)
+    local x,y = math.modf(v * 100)
     print("y....."..math.abs(y))
     if math.abs(y) > 0.75 then
         if x >= 0 then
@@ -240,7 +240,7 @@ function cutNumber(v)
         end
     end
 
-    return x / 1000
+    return x / 100
 end
 
 function runDevice()
@@ -313,7 +313,7 @@ function runDevice()
                         end
 
                         if angleXExceedCount >= angleAlarmExceed then
-                            tAlarm = tAlarm..string.format('"x":%0.3f , ', cutNumber(xAngleOffset))
+                            tAlarm = tAlarm..string.format('"x":%0.2f , ', cutNumber(xAngleOffset))
                         end                        
 
                         local yAngleOffset = yOut - startY
@@ -325,7 +325,7 @@ function runDevice()
                         end
 
                         if angleYExceedCount >= angleAlarmExceed then
-                            tAlarm = tAlarm..string.format('"y":%0.3f , ', cutNumber(yAngleOffset))
+                            tAlarm = tAlarm..string.format('"y":%0.2f , ', cutNumber(yAngleOffset))
                         end  
 
                         if temperature > hTmpAlarm or temperature < lTmpAlarm then
@@ -342,7 +342,7 @@ function runDevice()
                             sendData("alarm" , tAlarm..string.format('"t":%d}', os.time()) , mqtt.QOS1)
                         end
 
-                        sendData("data", string.format('{"d":%0.2f, "x":%0.3f , "y":%0.3f , "w":%0.2f , "t":%d}' , disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time()) ,mqtt.QOS0)
+                        sendData("data", string.format('{"d":%0.2f, "x":%0.2f , "y":%0.2f , "w":%0.2f , "t":%d}' , disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time()) ,mqtt.QOS0)
                         pio.pin.sethigh(led_pin)
                         tmr.delayms(30)
                         pio.pin.setlow(led_pin)
