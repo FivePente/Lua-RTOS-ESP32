@@ -157,11 +157,22 @@ function startTask()
     )
 end
 
-while true do
-    if pppConnected == 1 then
-        net.service.sntp.start()
-        --net.service.sntp.stop()
-        startTask()
-        break
+function mainTask()
+    while true do
+        if pppConnected == 1 then
+            net.service.sntp.start()
+            --net.service.sntp.stop()
+            startTask()
+            break
+        end
+    end
+
+    while true do
+        if mqttConnected == 0 then
+            thread.sleepms(3000)
+            startTask()
+        end
     end
 end
+
+thread.start(mainTask)
