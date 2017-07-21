@@ -43,11 +43,6 @@ collectionMax = 15
 collectionTotal = 4000
 angleStarted = 0
 
-maxX = 0
-maxY = 0
-minX = 0
-minY = 0
-
 local ver = 1.0
 
 function initI2C() 

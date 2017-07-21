@@ -82,6 +82,7 @@
         "locale_facets.h": "c",
         "lstate.h": "c",
         "lua.h": "c",
-        "pthread.h": "c"
+        "pthread.h": "c",
+        "error.h": "c"
     }
 }

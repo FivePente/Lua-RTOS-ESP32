@@ -50,14 +50,13 @@ function systemDog()
             thread.sleepms(2000)
         end
 
-        --[[
         tTime = os.clock() - watchTime
 
         if tTime > dogTime then
             thread.sleepms(500)
             print("system dog reboot...")
             os.exit(1)
-        end]]
+        end
     end
 end
 
@@ -112,8 +111,10 @@ function initMainSubscribe(mqttClient)
 end
 
 function sendData(topic , message , qos)
-    client:publish(topic, message , qos)
-    watchTime = os.clock()
+    if mqttConnected then
+        client:publish(topic, message , qos)
+        watchTime = os.clock()
+    end
 end
 
 function startTask()
