@@ -360,4 +360,9 @@ function runDevice()
     end
 end
 
-runDevice()
+while true do
+    if pppConnected == 1 and mqttConnected == 1 then
+        print("run device..........")
+        runDevice()
+    end
+end
