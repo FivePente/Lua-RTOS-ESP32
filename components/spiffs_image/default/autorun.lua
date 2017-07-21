@@ -179,7 +179,7 @@ function checkAngle()
         xOutCount = xOutCount + tX / (collectionMax - 4)
         yOutCount = yOutCount + tY / (collectionMax - 4)
 
-        indexCount = indexCount + (collectionMax - 4)
+        indexCount = indexCount + 1
         indexA = 1
     end
 end
