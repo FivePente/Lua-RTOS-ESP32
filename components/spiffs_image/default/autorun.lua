@@ -50,7 +50,7 @@ function initI2C()
     cd:write(0x2D , 0x08) 
     cd:write(0x31 , 0x28) --0xA8
     cd:write(0x2C , 0x0C) --0x0C
-    --cd:write(0x38 , 0xA0)
+    cd:write(0x38 , 0xA0)
 
     ad = vl53l0x.init(i2c.I2C0 , i2c.MASTER , 400 , 0x29 , pio.GPIO18 , pio.GPIO19)
     ad:startRanging(2)
