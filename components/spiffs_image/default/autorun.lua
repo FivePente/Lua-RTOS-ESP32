@@ -266,6 +266,24 @@ function runDevice()
     local timer = os.clock()
     watchTime = timer
     while true do
+
+        if updateCode == 1 then
+            if command == "code" then
+                local file2 = io.open("autorun.lua","w+")
+                file2:write(code)
+                file2:close()
+                os.exit(0)
+            elseif command == "initConfig" then
+                initConfig()
+                if code ~= nil and code ~= "" then
+                    assert(load(code))()
+                end
+            end
+
+            code = ""
+            updateCode = 0
+        end
+
         if pppConnected == 1 then
             if mqttConnected == 1 then
                 if sensorInited == 1 then

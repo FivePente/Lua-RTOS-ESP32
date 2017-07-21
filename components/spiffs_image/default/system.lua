@@ -25,6 +25,8 @@ dogTime = 60
 
 alarm = ""
 data = ""
+code = ""
+command = ""
 
 led_pin = pio.GPIO27
 pio.pin.setdir(pio.OUTPUT, led_pin)
@@ -89,24 +91,25 @@ function initConfig()
 end
 
 function initMainSubscribe(mqttClient)
-    mqttClient:subscribe("message", mqtt.QOS0, function(len, message)
-        print(message)
-    end)
-
-    mqttClient:subscribe("code", mqtt.QOS0, function(len, message)
+    mqttClient:subscribe("code", mqtt.QOS2, function(len, message)
         updateCode = 1
-        thread.sleepms(10)
+        command = "code"
+        code = message
+        --[[
         local file2 = io.open("autorun.lua","w+")
         file2:write(message)
         file2:close()
-        os.exit(0)
+        os.exit(0)]]
     end)
-    mqttClient:subscribe("initConfig", mqtt.QOS0, function(len, message)
+    mqttClient:subscribe("initConfig", mqtt.QOS2, function(len, message)
         updateCode = 1
+        command = "initConfig"
+        code = message
+        --[[
         initConfig()
         if message ~= nil and message ~= "" then
             assert(load(message))()
-        end
+        end]]
     end)  
 end
 
