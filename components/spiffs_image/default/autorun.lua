@@ -39,7 +39,7 @@ temperature = 0
 maxTemp = 50
 minTemp = -15
 
-collectionMax = 15
+collectionMax = 20
 collectionTotal = 4000
 angleStarted = 0
 
@@ -171,15 +171,15 @@ function checkAngle()
         tX = 0
         tY = 0
 
-        for i= 2, collectionMax - 1 do
+        for i= 3, collectionMax - 2 do
             tX = tX + xList[i]
             tY = tY + yList[i]
         end
 
-        xOutCount = xOutCount + tX / (collectionMax - 2)
-        yOutCount = yOutCount + tY / (collectionMax - 2)
+        xOutCount = xOutCount + tX / (collectionMax - 4)
+        yOutCount = yOutCount + tY / (collectionMax - 4)
 
-        indexCount = indexCount + (collectionMax - 2)
+        indexCount = indexCount + (collectionMax - 4)
         indexA = 1
     end
 end
