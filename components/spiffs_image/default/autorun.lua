@@ -100,7 +100,7 @@ function initConfig()
     for i= 1, 11 do
         x, y , z  = cd:read()
         offx = offx + x
-        offy = offy + t
+        offy = offy + y
         offz = offz + z
     end
 
