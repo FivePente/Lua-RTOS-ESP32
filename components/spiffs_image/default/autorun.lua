@@ -87,9 +87,9 @@ function initConfig()
     --startX = xOut
     --startY = yOut
 
-    cd:write(0X1E , 0x00)
-    cd:write(0X1F , 0x00)
-    cd:write(0X20 , 0x05)
+    cd:write(0x1E , 0x00)
+    cd:write(0x1F , 0x00)
+    cd:write(0x20 , 0x05)
 
     tmr.delayms(15)
 
@@ -108,9 +108,9 @@ function initConfig()
     offy = -(offy / 10) / 4
     offz = -((offz-256) / 10) / 4
 
-    cd:write(0X1E , offx)
-    cd:write(0X1F , offy)
-    cd:write(0X20 , offz)
+    cd:write(0x1E , math.floor(offx))
+    cd:write(0x1F , math.floor(offy))
+    cd:write(0x20 , math.floor(offz))
 
     saveConfig(disOut , offx , offy ,offz ,temperature)
 end
