@@ -40,29 +40,29 @@ maxTemp = 50
 minTemp = -15
 
 collectionMax = 20
-collectionTotal = 500
+collectionTotal = 200
 angleStarted = 0
 
 local ver = 1.0
 
 function initI2C() 
     cd = adxl345.init(i2c.I2C0 , i2c.MASTER , 400 , pio.GPIO18 , pio.GPIO19)
+    tmr.delayms(10)
     cd:write(0x2D , 0x08)
-    cd:write(0x31 , 0x2C) --28
-    cd:write(0x2C , 0x0C)
+    cd:write(0x31 , 0x2B) --28
+    cd:write(0x2C , 0x0B)
     cd:write(0x38 , 0xA0)
+    cd:write(0x2E , 0x00)
+
+    cd:write(0x1E , 0x00)
+    cd:write(0x1F , 0x00)
+    cd:write(0x20 , 0x00)
 
     ad = vl53l0x.init(i2c.I2C0 , i2c.MASTER , 400 , 0x29 , pio.GPIO18 , pio.GPIO19)
     ad:startRanging(2)
 
     s1 = sensor.attach("DS1820", pio.GPIO21, 0x28ff900f, 0xb316041a)
     s1:set("resolution", 10)
-
-    local tC = collectgarbage("count")
-    print("mem1: "..tC)
-    collectgarbage()
-    tC = collectgarbage("count")
-    print("mem1: "..tC)
 
     sensorInited = 1
 end
@@ -74,45 +74,20 @@ function restart()
     os.exit(1)
 end
 
-function saveConfig(sd , sx , sy , sz , tmp)
+function saveConfig()
     local file2 = io.open("config.lua","w+")
-    file2:write( "startDis="..sd.." startX="..sx.." startY="..xy.." startZ="..sz.." tmp="..tmp )
+    file2:write( "startDis="..startDis.." startX="..startX.." startY="..startY)
     file2:close()
     print("save config...")
 end
 
 function initConfig()
     --checkAll()
-    --startDis = disOut
-    --startX = xOut
-    --startY = yOut
+    startDis = disOut
+    startX = xOut
+    startY = yOut
 
-    cd:write(0x1E , 0x00)
-    cd:write(0x1F , 0x00)
-    cd:write(0x20 , 0x05)
-
-    tmr.delayms(15)
-
-    local offx = 0
-    local offy = 0
-    local offz = 0
-
-    for i= 1, 11 do
-        x, y , z  = cd:read()
-        offx = offx + x
-        offy = offy + y
-        offz = offz + z
-    end
-
-    offx = -(offx / 10) / 4
-    offy = -(offy / 10) / 4
-    offz = -((offz-256) / 10) / 4
-
-    cd:write(0x1E , math.floor(offx))
-    cd:write(0x1F , math.floor(offy))
-    cd:write(0x20 , math.floor(offz))
-
-    saveConfig(disOut , offx , offy ,offz ,temperature)
+    saveConfig()
 end
 
 function checkDistance()
@@ -197,13 +172,13 @@ function checkAngle()
         tX = 0
         tY = 0
 
-        for i= 2, collectionMax - 1 do
+        for i= 3, collectionMax - 2 do
             tX = tX + xList[i]
             tY = tY + yList[i]
         end
 
-        xOutCount = xOutCount + tX / (collectionMax - 2)
-        yOutCount = yOutCount + tY / (collectionMax - 2)
+        xOutCount = xOutCount + tX / (collectionMax - 4)
+        yOutCount = yOutCount + tY / (collectionMax - 4)
 
         indexCount = indexCount + 1
         indexA = 1
@@ -213,10 +188,10 @@ end
 function checkAngleP()
     if indexCount == 0 then return end
 
-    xOut = xOutCount / indexCount
-    yOut = yOutCount / indexCount
+    xOut = xOutCount / indexCount / 90
+    yOut = yOutCount / indexCount / 90
 
-    print("angle count "..indexCount.."  "..xOut)
+    print("angle count "..indexCount.."  "..xOut.."  "..yOut)
 
     indexA = 0
     xOutCount = 0
@@ -226,21 +201,21 @@ function checkAngleP()
     if startX == 0 or startX == nan then
         startX = xOut
         startY = yOut
-        --saveConfig()
+        saveConfig()
     end
 end
 
 function checkAll()
     temperature = s1:read("temperature")
     if temperature < maxTemp or temperature > minTemp then
+        --checkDistance()
         checkAngleP()
-        checkDistance()
     else
        print("temperature limitation")
     end
     local tC = collectgarbage("count")
     print("mem: "..tC)
-    print(string.format("dis %0.2f, x %0.4f , y %0.4f , tmp %0.2f" , disOut - startDis , xOut - startX , yOut - startY , temperature))
+    print(string.format("dis %0.2f, x %0.3f , y %0.3f , tmp %0.2f" , disOut - startDis , cutNumber(xOut - startX) , cutNumber(yOut - startY) , temperature))
 end
 
 function getXAngle(x , y , z)
@@ -256,7 +231,8 @@ function getYAngle(x , y , z)
 end
 
 function cutNumber(v)
-    local x,y = math.modf(v * 100)
+--[[
+    local x,y = math.modf(v * 1000)
     if math.abs(y) > 0.9 then
         if x >= 0 then
             x = x + 1
@@ -265,7 +241,8 @@ function cutNumber(v)
         end
     end
 
-    return x / 100
+    return (x / 1000) * 90]]
+    return v * 90
 end
 
 function runDevice()
@@ -291,9 +268,10 @@ function runDevice()
     local timer = os.clock()
     watchTime = timer
     while true do
+
         if initConfigFlag == 1 then
-            initConfigFlag = 0
             initConfig()
+            initConfigFlag = 0
         end
 
         if pppConnected == 1 then
@@ -351,10 +329,10 @@ function runDevice()
                         end
 
                         if #tAlarm > 2 then
-                            sendData("alarm" , tAlarm..string.format('"t":%d}', os.time()) , mqtt.QOS1)
+                            --sendData("alarm" , tAlarm..string.format('"t":%d}', os.time()) , mqtt.QOS1)
                         end
-
-                        sendData("data", string.format('{"d":%0.2f, "x":%0.2f , "y":%0.2f , "w":%0.2f , "t":%d}' , disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time()) ,mqtt.QOS0)
+                        watchTime = os.clock()
+                        --sendData("data", string.format('{"d":%0.2f, "x":%0.2f , "y":%0.2f , "w":%0.2f , "t":%d}' , disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time()) ,mqtt.QOS0)
                         pio.pin.sethigh(led_pin)
                         tmr.delayms(30)
                         pio.pin.setlow(led_pin)
@@ -374,10 +352,8 @@ end
 
 while true do
     if pppConnected == 1 and mqttConnected == 1 then
-        if startup == 1 then
-            print("run device..........")
-            runDevice()
-            break
-        end
+        print("run device..........")
+        runDevice()
+        break
     end
 end
