@@ -24,6 +24,7 @@ sensorInited = 0
 dogTime = 120
 startup = 0
 initConfigFlag = 0
+useNet = 0
 
 led_pin = pio.GPIO27
 pio.pin.setdir(pio.OUTPUT, led_pin)
@@ -167,6 +168,9 @@ function mainTask()
     end
 end
 
---thread.start(systemDog)
---initNet()
---thread.start(mainTask)
+thread.start(systemDog)
+
+if useNet == 1 then
+    initNet()
+    thread.start(mainTask)
+end

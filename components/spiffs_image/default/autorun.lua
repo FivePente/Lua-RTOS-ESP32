@@ -353,8 +353,10 @@ function runDevice()
     end
 end
 
-pppConnected = 1
-mqttConnected = 1
+if useNet == 0 then
+    pppConnected = 1
+    mqttConnected = 1
+end
 
 while true do
     if pppConnected == 1 and mqttConnected == 1 then
