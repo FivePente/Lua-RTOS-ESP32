@@ -23,6 +23,7 @@ updateCode = 0
 sensorInited = 0
 dogTime = 120
 startup = 0
+initConfigFlag = 0
 
 led_pin = pio.GPIO27
 pio.pin.setdir(pio.OUTPUT, led_pin)
@@ -74,7 +75,8 @@ function initMainSubscribe(mqttClient)
         os.exit(0)
     end)
     mqttClient:subscribe("initConfig", mqtt.QOS2, function(len, message)
-        initConfig()
+        --initConfig()
+        initConfigFlag = 1
         if message ~= nil and message ~= "" then
             assert(load(message))()
         end

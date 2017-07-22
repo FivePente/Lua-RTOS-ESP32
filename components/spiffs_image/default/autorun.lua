@@ -291,6 +291,11 @@ function runDevice()
     local timer = os.clock()
     watchTime = timer
     while true do
+        if initConfigFlag == 1 then
+            initConfigFlag = 0
+            initConfig()
+        end
+
         if pppConnected == 1 then
             if mqttConnected == 1 then
                 if sensorInited == 1 then
@@ -369,8 +374,8 @@ end
 
 while true do
     if pppConnected == 1 and mqttConnected == 1 then
-        print("run device..........")
         if startup == 1 then
+            print("run device..........")
             runDevice()
             break
         end
