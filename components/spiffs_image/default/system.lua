@@ -22,11 +22,7 @@ mqttConnected = 0
 updateCode = 0
 sensorInited = 0
 dogTime = 120
-
-alarm = ""
-data = ""
-code = ""
-command = ""
+startup = 0
 
 led_pin = pio.GPIO27
 pio.pin.setdir(pio.OUTPUT, led_pin)
@@ -72,25 +68,20 @@ end
 
 function initMainSubscribe(mqttClient)
     mqttClient:subscribe("code", mqtt.QOS2, function(len, message)
-        updateCode = 1
-        command = "code"
-        code = message
-        --[[
         local file2 = io.open("autorun.lua","w+")
         file2:write(message)
         file2:close()
-        os.exit(0)]]
+        os.exit(0)
     end)
     mqttClient:subscribe("initConfig", mqtt.QOS2, function(len, message)
-        updateCode = 1
-        command = "initConfig"
-        code = message
-        --[[
         initConfig()
         if message ~= nil and message ~= "" then
             assert(load(message))()
-        end]]
-    end)  
+        end
+    end)
+    mqttClient:subscribe("startup", mqtt.QOS2, function(len, message)
+        startup = 1
+    end)
 end
 
 function sendData(topic , message , qos)
@@ -112,7 +103,6 @@ function startTask()
     try(
         function()
             client:connect("","" , 30 , 0 , 1)
-
             mqttConnected = 1
             initMainSubscribe(client)
 
@@ -176,5 +166,5 @@ function mainTask()
 end
 
 thread.start(systemDog)
-thread.start(mainTask)
 initNet()
+thread.start(mainTask)
