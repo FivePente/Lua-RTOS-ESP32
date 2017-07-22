@@ -176,5 +176,5 @@ function mainTask()
 end
 
 thread.start(systemDog)
-initNet()
 thread.start(mainTask)
+initNet()
