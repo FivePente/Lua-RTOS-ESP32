@@ -149,7 +149,7 @@ function checkDistance()
                 disOut = tdis / 12
                 if startDis == 0 then
                     startDis = disOut
-                    saveConfig()
+                    --saveConfig()
                 end
                 break
             end
@@ -226,7 +226,7 @@ function checkAngleP()
     if startX == 0 or startX == nan then
         startX = xOut
         startY = yOut
-        saveConfig()
+        --saveConfig()
     end
 end
 
