@@ -21,7 +21,7 @@ watchTime = 0
 mqttConnected = 0
 updateCode = 0
 sensorInited = 0
-dogTime = 60
+dogTime = 120
 
 alarm = ""
 data = ""

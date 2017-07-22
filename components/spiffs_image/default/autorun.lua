@@ -48,7 +48,7 @@ local ver = 1.0
 function initI2C() 
     cd = adxl345.init(i2c.I2C0 , i2c.MASTER , 400 , pio.GPIO18 , pio.GPIO19)
     cd:write(0x2D , 0x08)
-    cd:write(0x31 , 0x2F) --28
+    cd:write(0x31 , 0x2C) --28
     cd:write(0x2C , 0x0C)
     cd:write(0x38 , 0xA0)
 
@@ -74,19 +74,45 @@ function restart()
     os.exit(1)
 end
 
-function saveConfig()
+function saveConfig(sd , sx , sy , sz , tmp)
     local file2 = io.open("config.lua","w+")
-    file2:write( "startDis="..startDis.." startX="..startX.." startY="..startY.." tmp="..temperature )
+    file2:write( "startDis="..sd.." startX="..sx.." startY="..xy.." startZ="..sz.." tmp="..tmp )
     file2:close()
     print("save config...")
 end
 
 function initConfig()
     --checkAll()
-    startDis = disOut
-    startX = xOut
-    startY = yOut
-    saveConfig()
+    --startDis = disOut
+    --startX = xOut
+    --startY = yOut
+
+    cd:write(0X1E , 0x00)
+    cd:write(0X1F , 0x00)
+    cd:write(0X20 , 0x05)
+
+    tmr.delayms(15)
+
+    local offx = 0
+    local offy = 0
+    local offz = 0
+
+    for i= 1, 11 do
+        x, y , z  = cd:read()
+        offx = offx + x
+        offy = offy + t
+        offz = offz + z
+    end
+
+    offx = -(offx / 10) / 4
+    offy = -(offy / 10) / 4
+    offz = -((offz-256) / 10) / 4
+
+    cd:write(0X1E , offx)
+    cd:write(0X1F , offy)
+    cd:write(0X20 , offz)
+
+    saveConfig(disOut , offx , offy ,offz ,temperature)
 end
 
 function checkDistance()
@@ -171,13 +197,13 @@ function checkAngle()
         tX = 0
         tY = 0
 
-        for i= 3, collectionMax - 2 do
+        for i= 2, collectionMax - 1 do
             tX = tX + xList[i]
             tY = tY + yList[i]
         end
 
-        xOutCount = xOutCount + tX / (collectionMax - 4)
-        yOutCount = yOutCount + tY / (collectionMax - 4)
+        xOutCount = xOutCount + tX / (collectionMax - 2)
+        yOutCount = yOutCount + tY / (collectionMax - 2)
 
         indexCount = indexCount + 1
         indexA = 1
@@ -231,8 +257,7 @@ end
 
 function cutNumber(v)
     local x,y = math.modf(v * 100)
-    print("y....."..math.abs(y))
-    if math.abs(y) > 0.75 then
+    if math.abs(y) > 0.9 then
         if x >= 0 then
             x = x + 1
         elseif x < 0 then
