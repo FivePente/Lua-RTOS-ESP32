@@ -58,7 +58,10 @@ function initI2C()
     cd:write(0x1F , 0x00)
     cd:write(0x20 , 0x00)
 
+    tmr.delayms(10)
+
     ad = vl53l0x.init(i2c.I2C0 , i2c.MASTER , 400 , 0x29 , pio.GPIO18 , pio.GPIO19)
+    tmr.delayms(10)
     ad:startRanging(2)
 
     s1 = sensor.attach("DS1820", pio.GPIO21, 0x28ff900f, 0xb316041a)
@@ -340,7 +343,7 @@ function runDevice()
                 end
             else
                 print("mqtt disconnected...")
-                tmr.delayms(1000)
+                tmr.delayms(3000)
                 --startTask()
             end
         else
@@ -350,10 +353,15 @@ function runDevice()
     end
 end
 
+pppConnected = 1
+mqttConnected = 1
+
 while true do
     if pppConnected == 1 and mqttConnected == 1 then
-        print("run device..........")
-        runDevice()
-        break
+        if startup == 1 then
+            print("run device..........")
+            runDevice()
+            break
+        end
     end
 end
