@@ -210,7 +210,6 @@ function checkAngle()
         yOutCount = yOutCount + tY
 
         indexCount = indexCount + 1
-
         indexA = 1
     end
 end
@@ -218,8 +217,8 @@ end
 function checkAngleP()
     if indexCount == 0 then return end
 
-    --xOut = xOutCount / indexCount
-    --yOut = yOutCount / indexCount
+    xOut = xOutCount / indexCount
+    yOut = yOutCount / indexCount
 
     print("angle count "..indexCount.."  "..xOut.."  "..yOut)
 
