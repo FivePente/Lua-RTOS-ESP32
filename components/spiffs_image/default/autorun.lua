@@ -40,7 +40,7 @@ temperature = 0
 maxTemp = 50
 minTemp = -15
 
-collectionMax = 20
+collectionMax = 19
 collectionTotal = 10
 angleStarted = 0
 
@@ -179,7 +179,7 @@ function checkAngle()
 
     --print(xOut.."    "..yOut)
 
-    tmr.delayms(25)
+    --tmr.delayms(25)
     
     xList[indexA] = tX
     yList[indexA] = tY
@@ -191,6 +191,12 @@ function checkAngle()
         table.sort(xList)
         table.sort(yList)
 
+        xOut = xList[10]
+        yOut = yList[10]
+
+        print(xOut.."   "..yOut)
+
+        --[[
         tX = 0
         tY = 0
 
@@ -202,7 +208,7 @@ function checkAngle()
         xOutCount = xOutCount + tX / (collectionMax - 2)
         yOutCount = yOutCount + tY / (collectionMax - 2)
 
-        indexCount = indexCount + 1
+        indexCount = indexCount + 1]]
         indexA = 1
     end
 end
@@ -210,8 +216,8 @@ end
 function checkAngleP()
     if indexCount == 0 then return end
 
-    xOut = xOutCount / indexCount
-    yOut = yOutCount / indexCount
+    --xOut = xOutCount / indexCount
+    --yOut = yOutCount / indexCount
 
     print("angle count "..indexCount.."  "..xOut.."  "..yOut)
 
