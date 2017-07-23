@@ -177,9 +177,7 @@ function checkAngle()
     tX = getXAngle(lastX , lastY , lastZ)
     tY = getYAngle(lastX , lastY , lastZ)
 
-    --print(xOut.."    "..yOut)
-
-    --tmr.delayms(25)
+    tmr.delayms(5)
     
     xList[indexA] = tX
     yList[indexA] = tY
@@ -194,25 +192,12 @@ function checkAngle()
         tX = xList[10]
         tY = yList[10]
 
-        --[[
-        tX = 0
-        tY = 0
-
-        for i= 2, collectionMax - 1 do
-            tX = tX + xList[i]
-            tY = tY + yList[i]
-        end
-
-        xOutCount = xOutCount + tX / (collectionMax - 2)
-        yOutCount = yOutCount + tY / (collectionMax - 2)]]
-
         xOutCount = xOutCount + tX
         yOutCount = yOutCount + tY
 
         indexCount = indexCount + 1
         indexA = 1
     end
-    tmr.delayms(30)
 end
 
 function checkAngleP()
@@ -287,8 +272,6 @@ function runDevice()
         dofile("config.lua")
         print("load config.lua")
     end
-
-    --print("init data startDis:"..startDis.." startX:"..startX.." startY:"..startY)
     
     initI2C()
     tmr.delayms(100)
