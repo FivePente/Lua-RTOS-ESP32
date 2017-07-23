@@ -41,7 +41,7 @@ maxTemp = 50
 minTemp = -15
 
 collectionMax = 19
-collectionTotal = 10
+collectionTotal = 100
 angleStarted = 0
 
 local ver = 1.0
@@ -191,10 +191,8 @@ function checkAngle()
         table.sort(xList)
         table.sort(yList)
 
-        xOut = xList[10]
-        yOut = yList[10]
-
-        print(xOut.."   "..yOut)
+        tX = xList[10]
+        tY = yList[10]
 
         --[[
         tX = 0
@@ -206,9 +204,13 @@ function checkAngle()
         end
 
         xOutCount = xOutCount + tX / (collectionMax - 2)
-        yOutCount = yOutCount + tY / (collectionMax - 2)
+        yOutCount = yOutCount + tY / (collectionMax - 2)]]
 
-        indexCount = indexCount + 1]]
+        xOutCount = xOutCount + tX
+        yOutCount = yOutCount + tY
+
+        indexCount = indexCount + 1
+
         indexA = 1
     end
 end
