@@ -212,6 +212,7 @@ function checkAngle()
         indexCount = indexCount + 1
         indexA = 1
     end
+    tmr.delayms(30)
 end
 
 function checkAngleP()
