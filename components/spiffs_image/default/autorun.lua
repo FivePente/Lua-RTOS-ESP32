@@ -5,6 +5,7 @@ startY = 0
 disOut = 0
 xOut = 0
 yOut = 0
+zOut = 0
 
 xOutCount = 0
 yOutCount = 0
@@ -40,7 +41,7 @@ maxTemp = 50
 minTemp = -15
 
 collectionMax = 20
-collectionTotal = 200
+collectionTotal = 10
 angleStarted = 0
 
 local ver = 1.0
@@ -49,8 +50,8 @@ function initI2C()
     cd = adxl345.init(i2c.I2C0 , i2c.MASTER , 400 , pio.GPIO18 , pio.GPIO19)
     tmr.delayms(10)
     cd:write(0x2D , 0x08)
-    cd:write(0x31 , 0x2B) --28
-    cd:write(0x2C , 0x0B)
+    cd:write(0x31 , 0x28) --28
+    cd:write(0x2C , 0x0C)
     cd:write(0x38 , 0xA0)
     cd:write(0x2E , 0x00)
 
@@ -60,9 +61,9 @@ function initI2C()
 
     tmr.delayms(10)
 
-    ad = vl53l0x.init(i2c.I2C0 , i2c.MASTER , 400 , 0x29 , pio.GPIO18 , pio.GPIO19)
-    tmr.delayms(10)
-    ad:startRanging(2)
+    --ad = vl53l0x.init(i2c.I2C0 , i2c.MASTER , 400 , 0x29 , pio.GPIO18 , pio.GPIO19)
+    --tmr.delayms(10)
+    --ad:startRanging(2)
 
     s1 = sensor.attach("DS1820", pio.GPIO21, 0x28ff900f, 0xb316041a)
     s1:set("resolution", 10)
@@ -138,6 +139,10 @@ end
 xList = {}
 yList = {}
 indexCount = 0
+FILTER_A = 0.01
+lastX = 0
+lastY = 0
+lastZ = 0
 
 function checkAngle()
     local x = 0
@@ -148,9 +153,13 @@ function checkAngle()
 
     try(
         function()
-            x, y , z  = cd:read()
+            x, y , z = cd:read()
+            lastX = x * FILTER_A + (1.0 - FILTER_A) * lastX
+            lastY = y * FILTER_A + (1.0 - FILTER_A) * lastY
+            lastZ = z * FILTER_A + (1.0 - FILTER_A) * lastZ
         end,
         function(where, line, error, message)
+            print(x.."  "..y.."  "..z)
             print("error:"..message)
             print("read error init I2C")
             sensorInited = 0
@@ -159,8 +168,18 @@ function checkAngle()
         end
     )
 
-    tX = getXAngle(x , y , z)
-    tY = getYAngle(x , y , z)
+    if x == nan then
+        x = 0
+        y = 0
+        z = 0
+    end
+
+    tX = getXAngle(lastX , lastY , lastZ)
+    tY = getYAngle(lastX , lastY , lastZ)
+
+    --print(xOut.."    "..yOut)
+
+    tmr.delayms(25)
     
     xList[indexA] = tX
     yList[indexA] = tY
@@ -175,13 +194,13 @@ function checkAngle()
         tX = 0
         tY = 0
 
-        for i= 3, collectionMax - 2 do
+        for i= 2, collectionMax - 1 do
             tX = tX + xList[i]
             tY = tY + yList[i]
         end
 
-        xOutCount = xOutCount + tX / (collectionMax - 4)
-        yOutCount = yOutCount + tY / (collectionMax - 4)
+        xOutCount = xOutCount + tX / (collectionMax - 2)
+        yOutCount = yOutCount + tY / (collectionMax - 2)
 
         indexCount = indexCount + 1
         indexA = 1
@@ -191,8 +210,8 @@ end
 function checkAngleP()
     if indexCount == 0 then return end
 
-    xOut = xOutCount / indexCount / 90
-    yOut = yOutCount / indexCount / 90
+    xOut = xOutCount / indexCount
+    yOut = yOutCount / indexCount
 
     print("angle count "..indexCount.."  "..xOut.."  "..yOut)
 
@@ -218,7 +237,7 @@ function checkAll()
     end
     local tC = collectgarbage("count")
     print("mem: "..tC)
-    print(string.format("dis %0.2f, x %0.3f , y %0.3f , tmp %0.2f" , disOut - startDis , cutNumber(xOut - startX) , cutNumber(yOut - startY) , temperature))
+    print(string.format("dis %0.2f, x %0.2f , y %0.2f , tmp %0.2f" , disOut - startDis , cutNumber(xOut - startX) , cutNumber(yOut - startY) , temperature))
 end
 
 function getXAngle(x , y , z)
@@ -234,9 +253,8 @@ function getYAngle(x , y , z)
 end
 
 function cutNumber(v)
---[[
-    local x,y = math.modf(v * 1000)
-    if math.abs(y) > 0.9 then
+    local x,y = math.modf(v * 100)
+    if math.abs(y) > 0.75 then
         if x >= 0 then
             x = x + 1
         elseif x < 0 then
@@ -244,8 +262,7 @@ function cutNumber(v)
         end
     end
 
-    return (x / 1000) * 90]]
-    return v * 90
+    return x / 100
 end
 
 function runDevice()
@@ -356,6 +373,7 @@ end
 if useNet == 0 then
     pppConnected = 1
     mqttConnected = 1
+    startup = 1
 end
 
 while true do
