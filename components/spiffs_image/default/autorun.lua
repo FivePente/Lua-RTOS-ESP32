@@ -168,12 +168,6 @@ function checkAngle()
         end
     )
 
-    if x == nan then
-        x = 0
-        y = 0
-        z = 0
-    end
-
     tX = getXAngle(lastX , lastY , lastZ)
     tY = getYAngle(lastX , lastY , lastZ)
 
@@ -189,8 +183,16 @@ function checkAngle()
         table.sort(xList)
         table.sort(yList)
 
-        tX = xList[10]
-        tY = yList[10]
+        for i= 2, collectionMax - 1 do
+            tX = tX + xList[i] * xList[i]
+            tY = tY + yList[i] * yList[i]
+        end
+
+        --tX = xList[10]
+        --tY = yList[10]
+
+        tX = math.sqrt(tX / (collectionMax - 2))
+        tY = math.sqrt(tY / (collectionMax - 2))
 
         xOutCount = xOutCount + tX
         yOutCount = yOutCount + tY
