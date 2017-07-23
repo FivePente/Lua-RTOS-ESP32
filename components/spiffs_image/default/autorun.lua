@@ -40,8 +40,8 @@ temperature = 0
 maxTemp = 50
 minTemp = -15
 
-collectionMax = 19
-collectionTotal = 100
+collectionMax = 9
+collectionTotal = 10
 angleStarted = 0
 
 local ver = 1.0
