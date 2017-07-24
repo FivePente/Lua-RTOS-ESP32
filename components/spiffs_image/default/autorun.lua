@@ -253,15 +253,16 @@ function checkAll()
 end
 
 function getXAngle(x , y , z)
-    local tmp = x / math.sqrt(y*y + z*z)
-    local res = math.atan(tmp)
+    --local tmp = x / math.sqrt(y*y + z*z)
+    --local res = math.atan(tmp)
+    res = math.atan(x , y)
     return math.deg(res)
 end
 
 function getYAngle(x , y , z)
-    local tmp = y / math.sqrt(x*x + z*z)
-    local tmp = y / x
-    local res = math.atan(tmp)
+    --local tmp = y / math.sqrt(x*x + z*z)
+    --local res = math.atan(tmp)
+    local res = math.atan(y , x)
     return math.deg(res)
 end
 
