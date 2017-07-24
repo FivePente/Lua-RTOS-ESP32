@@ -185,7 +185,7 @@ function checkAngle()
     tX = getXAngle(lastX , lastY , lastZ)
     tY = getYAngle(lastX , lastY , lastZ)
 
-    if tX >= 0 
+    print(tX.."  "..tY)
     
     xList[indexA] = tX
     yList[indexA] = tY
