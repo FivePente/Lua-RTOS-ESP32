@@ -40,30 +40,27 @@ temperature = 0
 maxTemp = 50
 minTemp = -15
 
-collectionMax = 9
-collectionTotal = 10
+collectionMax = 20
+collectionTotal = 200
 angleStarted = 0
 
 local ver = 1.0
 
 function initI2C() 
-    cd = adxl345.init(i2c.I2C0 , i2c.MASTER , 400 , pio.GPIO18 , pio.GPIO19)
+    cd = adxl345.init(i2c.I2C0 , i2c.SLAVE , 400 , pio.GPIO18 , pio.GPIO19)
     tmr.delayms(10)
-    cd:write(0x2D , 0x08)
+    cd:write(0x2D , 0x00)
     cd:write(0x31 , 0x28) --28
-    cd:write(0x2C , 0x0C)
-    cd:write(0x38 , 0xA0)
+    cd:write(0x2C , 0x0D)
+    --cd:write(0x38 , 0xA0)
     cd:write(0x2E , 0x00)
-
-    cd:write(0x1E , 0x00)
-    cd:write(0x1F , 0x00)
-    cd:write(0x20 , 0x00)
+    cd:write(0x2D , 0x28)
 
     tmr.delayms(10)
 
-    --ad = vl53l0x.init(i2c.I2C0 , i2c.MASTER , 400 , 0x29 , pio.GPIO18 , pio.GPIO19)
-    --tmr.delayms(10)
-    --ad:startRanging(2)
+    ad = vl53l0x.init(i2c.I2C0 , i2c.SLAVE , 400 , 0x29 , pio.GPIO18 , pio.GPIO19)
+    tmr.delayms(10)
+    ad:startRanging(2)
 
     s1 = sensor.attach("DS1820", pio.GPIO21, 0x28ff900f, 0xb316041a)
     s1:set("resolution", 10)
@@ -139,10 +136,14 @@ end
 xList = {}
 yList = {}
 indexCount = 0
-FILTER_A = 0.01
+FILTER_A = 0.001
 lastX = 0
 lastY = 0
 lastZ = 0
+maxX = 0
+minX = 0
+maxY = 0
+minY = 0
 
 function checkAngle()
     local x = 0
@@ -154,24 +155,34 @@ function checkAngle()
     try(
         function()
             x, y , z = cd:read()
+
+            if x > maxX then
+                maxX = x
+            elseif x < minX then
+                minX = x
+            end
+
+            if y > maxY then
+                maxY = y
+            elseif y < minY then
+                minY = y
+            end
+
             lastX = x * FILTER_A + (1.0 - FILTER_A) * lastX
             lastY = y * FILTER_A + (1.0 - FILTER_A) * lastY
             lastZ = z * FILTER_A + (1.0 - FILTER_A) * lastZ
         end,
         function(where, line, error, message)
-            print(x.."  "..y.."  "..z)
-            print("error:"..message)
-            print("read error init I2C")
+            print("read error init I2C:"..message)
             sensorInited = 0
             cd:close()
+            tmr.delayms(10)
             initI2C()
         end
     )
 
     tX = getXAngle(lastX , lastY , lastZ)
     tY = getYAngle(lastX , lastY , lastZ)
-
-    tmr.delayms(5)
     
     xList[indexA] = tX
     yList[indexA] = tY
@@ -183,16 +194,13 @@ function checkAngle()
         table.sort(xList)
         table.sort(yList)
 
-        for i= 2, collectionMax - 1 do
-            tX = tX + xList[i] * xList[i]
-            tY = tY + yList[i] * yList[i]
+        for i= 4, collectionMax - 3 do
+            tX = tX + xList[i]
+            tY = tY + yList[i]
         end
 
-        --tX = xList[10]
-        --tY = yList[10]
-
-        tX = math.sqrt(tX / (collectionMax - 2))
-        tY = math.sqrt(tY / (collectionMax - 2))
+        tX = tX / (collectionMax - 6)
+        tY = tY / (collectionMax - 6)
 
         xOutCount = xOutCount + tX
         yOutCount = yOutCount + tY
@@ -208,12 +216,17 @@ function checkAngleP()
     xOut = xOutCount / indexCount
     yOut = yOutCount / indexCount
 
-    print("angle count "..indexCount.."  "..xOut.."  "..yOut)
+    print("angle count "..indexCount.."  "..xOut.."  "..yOut.."  "..(maxX - minX).."  "..(maxY - minY))
 
     indexA = 0
     xOutCount = 0
     yOutCount = 0
     indexCount = 0
+
+    maxX = 0
+    minX = 0
+    maxY = 0
+    minY = 0
 
     if startX == 0 or startX == nan then
         startX = xOut
@@ -225,7 +238,8 @@ end
 function checkAll()
     temperature = s1:read("temperature")
     if temperature < maxTemp or temperature > minTemp then
-        --checkDistance()
+        tmr.delayms(10)
+        checkDistance()
         checkAngleP()
     else
        print("temperature limitation")

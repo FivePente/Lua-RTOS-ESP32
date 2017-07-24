@@ -83,6 +83,24 @@
         "lstate.h": "c",
         "lua.h": "c",
         "pthread.h": "c",
-        "error.h": "c"
+        "error.h": "c",
+        "cookie.h": "c",
+        "libssh2_publickey.h": "c",
+        "lrotable.h": "c",
+        "lfunc.h": "c",
+        "servo.h": "c",
+        "fdlibm.h": "c",
+        "mqttclient.h": "c",
+        "stl_function.h": "c",
+        "gssapi.h": "c",
+        "tree.h": "c",
+        "numbersinternals.h": "c",
+        "task.h": "c",
+        "conf.h": "c",
+        "ocsp.h": "c",
+        "pkcs12.h": "c",
+        "x509.h": "c",
+        "x509v3.h": "c",
+        "list.c": "cpp"
     }
 }

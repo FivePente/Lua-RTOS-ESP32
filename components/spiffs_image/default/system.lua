@@ -31,7 +31,6 @@ pio.pin.setdir(pio.OUTPUT, led_pin)
 
 function systemDog()
 
-    local tTime = 0
     while true do
         if pppConnected == 0 then
             pio.pin.sethigh(led_pin)
@@ -50,9 +49,7 @@ function systemDog()
             thread.sleepms(2000)
         end
 
-        tTime = os.clock() - watchTime
-
-        if tTime > dogTime then
+        if os.clock() > dogTime then
             thread.sleepms(500)
             print("system dog reboot...")
             os.exit(1)
