@@ -168,10 +168,6 @@ function checkAngle()
             elseif y < minY then
                 minY = y
             end
-
-            lastX = x * FILTER_A + (1.0 - FILTER_A) * lastX
-            lastY = y * FILTER_A + (1.0 - FILTER_A) * lastY
-            lastZ = z * FILTER_A + (1.0 - FILTER_A) * lastZ
         end,
         function(where, line, error, message)
             print("read error init I2C:"..message)
@@ -182,13 +178,13 @@ function checkAngle()
         end
     )
 
-    tX = getXAngle(lastX , lastY , lastZ)
-    tY = getYAngle(lastX , lastY , lastZ)
+    tX = getXAngle(x , y , z)
+    tY = getYAngle(x , y , z)
 
-    print(tX.."  "..tY)
+    --print(tX.."  "..tY)
     
-    xList[indexA] = tX
-    yList[indexA] = tY
+    xList[indexA] = tX - startX                                     
+    yList[indexA] = tY - startY
 
     indexA = indexA + 1
 
@@ -245,7 +241,7 @@ end
 function checkAll()
     temperature = s1:read("temperature")
     if temperature < maxTemp or temperature > minTemp then
-        tmr.delayms(10)
+        tmr.delayms(2)
         checkDistance()
         checkAngleP()
     else
@@ -253,7 +249,7 @@ function checkAll()
     end
     local tC = collectgarbage("count")
     print("mem: "..tC)
-    print(string.format("dis %0.2f, x %0.2f , y %0.2f , tmp %0.2f" , disOut - startDis , cutNumber(xOut - startX) , cutNumber(yOut - startY) , temperature))
+    print(string.format("dis %0.2f, x %0.2f , y %0.2f , tmp %0.2f" , disOut - startDis , cutNumber(xOut) , cutNumber(yOut) , temperature))
 end
 
 function getXAngle(x , y , z)
@@ -365,10 +361,10 @@ function runDevice()
                         end
 
                         if #tAlarm > 2 then
-                            --sendData("alarm" , tAlarm..string.format('"t":%d}', os.time()) , mqtt.QOS1)
+                            sendData("alarm" , tAlarm..string.format('"t":%d}', os.time()) , mqtt.QOS1)
                         end
-                        watchTime = os.clock()
-                        --sendData("data", string.format('{"d":%0.2f, "x":%0.2f , "y":%0.2f , "w":%0.2f , "t":%d}' , disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time()) ,mqtt.QOS0)
+                        --watchTime = os.clock()
+                        sendData("data", string.format('{"d":%0.2f, "x":%0.2f , "y":%0.2f , "w":%0.2f , "t":%d}' , disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time()) ,mqtt.QOS0)
                         pio.pin.sethigh(led_pin)
                         tmr.delayms(30)
                         pio.pin.setlow(led_pin)
