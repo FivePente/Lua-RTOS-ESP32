@@ -255,14 +255,14 @@ end
 function getXAngle(x , y , z)
     --local tmp = x / math.sqrt(y*y + z*z)
     --local res = math.atan(tmp)
-    res = math.atan(x , y)
+    res = math.atan(x , math.sqrt(y*y + z*z))
     return math.deg(res)
 end
 
 function getYAngle(x , y , z)
     --local tmp = y / math.sqrt(x*x + z*z)
     --local res = math.atan(tmp)
-    local res = math.atan(y , x)
+    local res = math.atan(y , math.sqrt(x*x + z*z))
     return math.deg(res)
 end
 
