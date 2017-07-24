@@ -47,9 +47,10 @@ angleStarted = 0
 local ver = 1.0
 
 function initI2C() 
-    cd = adxl345.init(i2c.I2C0 , i2c.SLAVE , 400 , pio.GPIO18 , pio.GPIO19)
-    tmr.delayms(10)
+    cd = adxl345.init(i2c.I2C0 , i2c.MASTER , 400 , pio.GPIO18 , pio.GPIO19)
+    tmr.delayms(2)
     cd:write(0x2D , 0x00)
+    tmr.delayms(2)
     cd:write(0x31 , 0x28) --28
     cd:write(0x2C , 0x0D)
     --cd:write(0x38 , 0xA0)
@@ -58,7 +59,7 @@ function initI2C()
 
     tmr.delayms(10)
 
-    ad = vl53l0x.init(i2c.I2C0 , i2c.SLAVE , 400 , 0x29 , pio.GPIO18 , pio.GPIO19)
+    ad = vl53l0x.init(i2c.I2C0 , i2c.MASTER , 400 , 0x29 , pio.GPIO18 , pio.GPIO19)
     tmr.delayms(10)
     ad:startRanging(2)
 
@@ -183,6 +184,8 @@ function checkAngle()
 
     tX = getXAngle(lastX , lastY , lastZ)
     tY = getYAngle(lastX , lastY , lastZ)
+
+    if tX >= 0 
     
     xList[indexA] = tX
     yList[indexA] = tY
@@ -250,14 +253,16 @@ function checkAll()
 end
 
 function getXAngle(x , y , z)
-    local tmp = x / math.sqrt(y*y + z*z)
-    local res = math.atan(tmp)
+    --local tmp = x / math.sqrt(y*y + z*z)
+    local tmp = x / y
+    local res = math.tan(tmp)
     return math.deg(res)
 end
 
 function getYAngle(x , y , z)
-    local tmp = y / math.sqrt(x*x + z*z)
-    local res = math.atan(tmp)
+    --local tmp = y / math.sqrt(x*x + z*z)
+    local tmp = y / x
+    local res = math.tan(tmp)
     return math.deg(res)
 end
 
