@@ -119,10 +119,10 @@ function checkDistance()
                 print(table.concat(ldis, ", "))
 
                 for i= 2, 13 do
-                    tdis = tdis + ldis[i]
+                    tdis = tdis + ldis[i] * ldis[i]
                 end
 
-                disOut = tdis / 12
+                disOut = math.sqrt(tdis / 12)
                 if startDis == 0 then
                     startDis = disOut
                     --saveConfig()
