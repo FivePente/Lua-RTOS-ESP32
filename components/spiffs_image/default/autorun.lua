@@ -231,6 +231,10 @@ function checkAngleP()
     maxY = 0
     minY = 0
 
+    lastX = 0
+    lastY = 0
+    lastZ = 0
+
     if startX == 0 or startX == nan then
         startX = xOut
         startY = yOut
