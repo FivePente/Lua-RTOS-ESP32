@@ -380,4 +380,4 @@ function runDevice()
     end
 end
 
-runDevice()
+thread.start(runDevice)
