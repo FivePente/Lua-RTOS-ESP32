@@ -1,36 +1,22 @@
--- system.lua
---
--- This script is executed after a system boot or a system reset and is intended
--- for setup the system.
-
----------------------------------------------------
--- Main setups
----------------------------------------------------
 os.loglevel(os.LOG_INFO)   -- Log level to info
 os.logcons(true)           -- Enable/disable sys log messages to console
 os.shell(true)             -- Enable/disable shell
 os.history(false)          -- Enable/disable history
 
-mqttConnectTry = 0
 pppConnected = 0
-watchTime = 0
-
 mqttConnected = 0
-updateCode = 0
 sensorInited = 0
-dogTime = 120
-startup = 0
-initConfigFlag = 0
 
 msgQueue = adxl345.initQueue()
 
-led_pin = pio.GPIO27
-pio.pin.setdir(pio.OUTPUT, led_pin)
+
 
 local useGSM = 1
 local useWIFI = 0
 
 function systemLed()
+    local led_pin = pio.GPIO27
+    pio.pin.setdir(pio.OUTPUT, led_pin)
     while true do
         if pppConnected == 0 then
             pio.pin.sethigh(led_pin)
@@ -47,12 +33,10 @@ function systemLed()
             thread.sleepms(30)
             pio.pin.setlow(led_pin)
             thread.sleepms(2000)
+        else
+            pio.pin.sethigh(led_pin)
         end
     end
-end
-
-function runDevice()
-    print("empty autorun.lua")
 end
 
 function initConfig()
@@ -67,8 +51,7 @@ function initMainSubscribe(mqttClient)
         os.exit(0)
     end)
     mqttClient:subscribe("initConfig", mqtt.QOS2, function(len , message)
-        --initConfig()
-        initConfigFlag = 1
+        initConfig()
         if message ~= nil and message ~= "" then
             assert(load(message))()
         end
@@ -126,7 +109,6 @@ if useWIFI == 1 then
     net.wf.scan()
     net.wf.setup(net.wf.mode.STA, "wifi","password")
     net.wf.start();
-
     net.service.sntp.start()
 end
 
