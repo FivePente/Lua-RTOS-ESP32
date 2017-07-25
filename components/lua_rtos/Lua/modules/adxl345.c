@@ -99,10 +99,10 @@ static int queue_receive(lua_State* L){
 	user_data = (x_queue_t *)luaL_checkudata(L, 1, "adxl345.queue");
     luaL_argcheck(L, user_data, 1, "adxl345 transaction expected");
 
-    const char *msg;
+    const char *luaMsg;
 
-    if (xQueueReceive( user_data->msgQueue, msg , 100/portTICK_RATE_MS ) == pdPASS){
-        lua_pushstring(L, msg);
+    if (xQueueReceive( user_data->msgQueue, luaMsg , 100/portTICK_RATE_MS ) == pdPASS){
+        lua_pushstring(L, luaMsg);
     }else{
         lua_pushnil(L);
     }
