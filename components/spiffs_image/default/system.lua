@@ -93,7 +93,6 @@ end
 
 function startupMqtt()
     print("start connection mqtt")
-    local err = 0
     client = mqtt.client("esp32", "60.205.82.208", 1883, false)
     client:setLostCallback(function(msg)
         print(msg)
@@ -108,46 +107,35 @@ function startupMqtt()
             mqttConnected = 1
             initMainSubscribe(client)
             runDevice()
-
-            if inited == 0 then
-                inited = 1
-                watchTime = os.clock()
-            end
         end,
         function(where,line,error,message)
             print("connect fail "..message.." reboot...")
             thread.sleepms(3000)
             os.exit(1)
-        end
-    )
-end
-
-function initNet()
-    
-    thread.start(systemLed)
-    thread.start(systemDog)
-
-    if useWIFI == 1 then
-        net.wf.scan()
-        net.wf.setup(net.wf.mode.STA, "wifi","password")
-        net.wf.start();
-
-        net.service.sntp.start()
-    end
-
-    if useGSM == 1 then
-        ppp.setCallback(function (err_code , message)
-            print("ppp state: " , message)
-            if err_code == 0 then
-                pppConnected = 1
-                net.service.sntp.start()
-                startupMqtt()
-            else
-                pppConnected = 0
-            end
         end)
-        ppp.setupXTask()
-    end
 end
 
-initNet()
+thread.start(systemLed)
+thread.start(systemDog)
+
+if useWIFI == 1 then
+    net.wf.scan()
+    net.wf.setup(net.wf.mode.STA, "wifi","password")
+    net.wf.start();
+
+    net.service.sntp.start()
+end
+
+if useGSM == 1 then
+    ppp.setCallback(function (err_code , message)
+        print("ppp state: " , message)
+        if err_code == 0 then
+            pppConnected = 1
+            net.service.sntp.start()
+            startupMqtt()
+        else
+            pppConnected = 0
+        end
+    end)
+    ppp.setupXTask()
+end
