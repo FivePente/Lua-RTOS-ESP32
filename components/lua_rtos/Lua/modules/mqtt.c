@@ -183,7 +183,7 @@ static int lmqtt_setConnectLostCallback(lua_State* L ){
     luaL_checktype(L, 2, LUA_TFUNCTION);
 
     // Copy argument (function) to the top of stack
-    lua_pushvalue(mqtt->callbackState, 2); 
+    lua_pushvalue(L , 2); 
     lua_xmove(L , mqtt->callbackState , 1);
 
     // Copy function reference
