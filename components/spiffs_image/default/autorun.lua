@@ -370,11 +370,11 @@ function runDevice()
                     end
                 end
             else
-                print("mqtt disconnected...")
+                --print("mqtt disconnected...")
                 --tmr.delayms(3000)
             end
         else
-            print("Network disconnected...")
+            --print("Network disconnected...")
             --tmr.delayms(3000)
         end
     end

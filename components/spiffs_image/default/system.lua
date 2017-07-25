@@ -103,8 +103,7 @@ function startupMqtt()
                     os.exit(1)
                 end
             )
-
-            while true do end
+            break
         end
     end
 end
