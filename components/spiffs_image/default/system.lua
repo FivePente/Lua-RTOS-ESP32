@@ -21,7 +21,6 @@ sensorInited = 0
 dogTime = 120
 startup = 0
 initConfigFlag = 0
-useNet = 1
 
 led_pin = pio.GPIO27
 pio.pin.setdir(pio.OUTPUT, led_pin)
@@ -85,8 +84,6 @@ function initMainSubscribe(mqttClient)
     end)
 end
 
-
-
 function sendData(topic , message , qos)
     if mqttConnected == 1 then
         client:publish(topic, message , qos)
@@ -110,6 +107,7 @@ function startupMqtt()
             client:connect("","" , 30 , 0 , 1)
             mqttConnected = 1
             initMainSubscribe(client)
+            runDevice()
 
             if inited == 0 then
                 inited = 1
@@ -117,17 +115,9 @@ function startupMqtt()
             end
         end,
         function(where,line,error,message)
-            print(message)
-            mqttConnectTry = mqttConnectTry + 1
-            if mqttConnectTry < 2 then
-                print("connect fail , trying again...")
-                thread.sleepms(3000)
-                startupMqtt()
-            else
-                print("connect fail , reboot...")
-                thread.sleepms(1000)
-                os.exit(1)
-            end
+            print("connect fail "..message.." reboot...")
+            thread.sleepms(3000)
+            os.exit(1)
         end
     )
 end

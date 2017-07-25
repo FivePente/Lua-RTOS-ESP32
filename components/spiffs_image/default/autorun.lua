@@ -380,11 +380,3 @@ function runDevice()
         end
     end
 end
-
-if useNet == 0 then
-    pppConnected = 1
-    mqttConnected = 1
-    startup = 1
-end
-
-runDevice()
