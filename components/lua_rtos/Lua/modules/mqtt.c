@@ -155,7 +155,7 @@ static int messageArrived(void *context, char * topicName, int topicLen, MQTTCli
                 lua_pushinteger(mqtt->callbackState, m->payloadlen);
                 printf("test 3\n");
                 lua_pushlstring(mqtt->callbackState, m->payload, m->payloadlen);
-                printf("test 4 %p\n" , mqtt->callbackState);
+                printf("test 4 %p\n");
                 lua_call(mqtt->callbackState, 2, 0);
                 printf("test 5\n");
             }
@@ -307,7 +307,7 @@ static int lmqtt_subscribe( lua_State* L ) {
     luaL_checktype(L, 4, LUA_TFUNCTION);
 
     // Copy argument (function) to the top of stack
-    lua_pushvalue(mqtt->callbackState, 4); 
+    lua_pushvalue(L, 4); 
 
     //Copy argument (function) to the callback statck
     lua_xmove(L , mqtt->callbackState , 1);
