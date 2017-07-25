@@ -101,10 +101,10 @@ static int queue_receive(lua_State* L){
 
     const char *msg;
 
-    if (xQueueReceive( MsgQueue, msg , 100/portTICK_RATE_MS ) == pdPASS){
+    if (xQueueReceive( user_data->msgQueue, msg , 100/portTICK_RATE_MS ) == pdPASS){
         lua_pushstring(L, msg);
     }else{
-        lua_pushnil(L)
+        lua_pushnil(L);
     }
     return 1;
 }
