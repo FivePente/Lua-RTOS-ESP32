@@ -87,7 +87,9 @@ static int queue_send(lua_State* L){
     luaL_argcheck(L, user_data, 1, "adxl345 transaction expected");
 
     char *msg = luaL_checkstring( L, 2 );
+    printf("send 1 \n");
     xQueueSend( user_data->msgQueue, msg, portMAX_DELAY );  
+    printf("send 2 \n");
     return 0;
 }
 
