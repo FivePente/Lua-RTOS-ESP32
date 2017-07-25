@@ -74,7 +74,7 @@ function initMainSubscribe(mqttClient)
 end
 
 function sendData(topic , message , qos)
-    if mqttConnected == 1 then
+    if client ~= nil and mqttConnected == 1 then
         client:publish(topic, message , qos)
         watchTime = os.clock()
     end

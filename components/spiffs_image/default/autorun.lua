@@ -52,7 +52,7 @@ function initI2C()
     cd:write(0x2D , 0x00)
     tmr.delayms(2)
     cd:write(0x31 , 0x28) --28
-    cd:write(0x2C , 0x0D)
+    cd:write(0x2C , 0x0C)
     --cd:write(0x38 , 0xA0)
     cd:write(0x2E , 0x00)
     cd:write(0x2D , 0x28)
@@ -380,4 +380,4 @@ function runDevice()
     end
 end
 
-thread.start(runDevice)
+runDevice()
