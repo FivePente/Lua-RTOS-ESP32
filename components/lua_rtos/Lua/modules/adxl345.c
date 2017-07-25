@@ -120,12 +120,20 @@ static int queue_receive(lua_State* L){
 
     if (xQueueReceive( user_data->msgQueue, &msg , 100/portTICK_RATE_MS ) == pdPASS){
         printf("receive 2 \n");
-        lua_pushstring(L, &msg);
+        lua_pushnumber(L, msg.d);
+        lua_pushnumber(L, msg.x);
+        lua_pushnumber(L, msg.y);
+        lua_pushnumber(L, msg.w);
+        lua_pushinteger(L, msg.t);
     }else{
-        lua_pushnil(L);
+        lua_pushinteger(L, 0);
+        lua_pushinteger(L, 0);
+        lua_pushinteger(L, 0);
+        lua_pushinteger(L, 0);
+        lua_pushinteger(L, 0);
     }
     printf("receive 3 \n");
-    return 1;
+    return 5;
 }
 
 static int adxl345_writeReg(lua_State* L) {

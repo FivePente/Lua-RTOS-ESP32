@@ -78,12 +78,13 @@ end
 --function sendData(topic , message , qos)
 function sendData()
     if client ~= nil and mqttConnected == 1 then
-        local msg = msgQueue:receive()
-        print(msg)
-        if msg ~= nil and msg ~= "" then
+        local d , x , y , w , t = msgQueue:receive()
+        print(t)
+        if t ~= 0 then
             print("send....")
-            print(msg)
-            client:publish("data", msg , 0)
+            print(x)
+            local str = string.format('{"d":%0.2f, "x":%0.2f , "y":%0.2f , "w":%0.2f , "t":%d}' , d , x , y , w ,t)
+            client:publish("data", str , 0)
             watchTime = os.clock()
         end
     end
