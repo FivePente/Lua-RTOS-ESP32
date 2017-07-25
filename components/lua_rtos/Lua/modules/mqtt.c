@@ -210,11 +210,14 @@ static int lmqtt_client( lua_State* L ){
 
     luaL_checktype(L, 4, LUA_TBOOLEAN);
     secure = lua_toboolean( L, 4 );
+
+    lua_State *luaS = lua_newthread(L);
+    lua_pop(L , 1);
     
     // Allocate mqtt structure and initialize
     mqtt = (mqtt_userdata *)lua_newuserdata(L, sizeof(mqtt_userdata));
     mqtt->L = L;
-    mqtt->callbackState = lua_newthread(L);
+    mqtt->callbackState = luaS;
     mqtt->callbacks = NULL;
     mqtt->connectionLost = -1;
     mqtt->secure = secure;
