@@ -78,7 +78,7 @@ static int adxl345_init(lua_State* L) {
 
 static int adxl345_init_xQueue(lua_State* L){
     x_queue_t *user_data = (x_queue_t *)lua_newuserdata(L, sizeof(x_queue_t));
-    user_data->msgQueue = xQueueCreate(3 , sizeof(char) * 50);  
+    user_data->msgQueue = xQueueCreate(3 , sizeof(x_queue_msg_t));  
 
     luaL_getmetatable(L, "adxl345.queue");
     lua_setmetatable(L, -2);
