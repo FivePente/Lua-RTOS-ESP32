@@ -22,6 +22,8 @@ dogTime = 120
 startup = 0
 initConfigFlag = 0
 
+msgQueue = adxl345.initQueue()
+
 led_pin = pio.GPIO27
 pio.pin.setdir(pio.OUTPUT, led_pin)
 
