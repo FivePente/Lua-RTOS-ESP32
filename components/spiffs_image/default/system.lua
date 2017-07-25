@@ -79,7 +79,9 @@ end
 function sendData()
     if client ~= nil and mqttConnected == 1 then
         local msg = msgQueue:receive()
+        print(msg)
         if msg ~= nil and msg ~= "" then
+            print("send....")
             print(msg)
             client:publish("data", msg , 0)
             watchTime = os.clock()
