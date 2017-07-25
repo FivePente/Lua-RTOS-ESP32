@@ -49,17 +49,6 @@ function systemLed()
     end
 end
 
-function systemDog()
-    while true do
-        if os ~= nil and watchTime ~= nil then 
-            if os.clock() - watchTime > dogTime then
-                print("system dog reboot...")
-                os.exit(1)
-            end
-        end
-    end
-end
-
 function runDevice()
     print("empty autorun.lua")
 end
@@ -108,7 +97,6 @@ function startupMqtt()
                     client:connect("","" , 30 , 0 , 1)
                     mqttConnected = 1
                     initMainSubscribe(client)
-                    runDevice()
                 end,
                 function(where,line,error,message)
                     print("connect fail reboot...")
@@ -122,7 +110,6 @@ function startupMqtt()
 end
 
 thread.start(systemLed)
-thread.start(systemDog)
 
 if useWIFI == 1 then
     net.wf.scan()
