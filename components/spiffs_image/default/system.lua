@@ -129,7 +129,7 @@ end
 function initNet()
     if useWIFI == 1 then
         net.wf.scan()
-        net.wf.setup(net.wf.mode.STA, "HiWiFi_3B0F16","Freedom0806")
+        net.wf.setup(net.wf.mode.STA, "wifi","password")
         net.wf.start();
     end
 
