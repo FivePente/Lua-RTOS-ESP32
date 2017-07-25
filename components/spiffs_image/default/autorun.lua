@@ -59,9 +59,9 @@ function initI2C()
 
     tmr.delayms(10)
 
-    ad = vl53l0x.init(i2c.I2C0 , i2c.MASTER , 400 , 0x29 , pio.GPIO18 , pio.GPIO19)
-    tmr.delayms(10)
-    ad:startRanging(2)
+    --ad = vl53l0x.init(i2c.I2C0 , i2c.MASTER , 400 , 0x29 , pio.GPIO18 , pio.GPIO19)
+    --tmr.delayms(10)
+    --ad:startRanging(2)
 
     s1 = sensor.attach("DS1820", pio.GPIO21, 0x28ff900f, 0xb316041a)
     s1:set("resolution", 10)
@@ -241,15 +241,11 @@ end
 function checkAll()
     temperature = s1:read("temperature")
     if temperature < maxTemp or temperature > minTemp then
-        tmr.delayms(2)
-        checkDistance()
+        --checkDistance()
         checkAngleP()
     else
        print("temperature limitation")
     end
-    local tC = collectgarbage("count")
-    print("mem: "..tC)
-    print(string.format("dis %0.2f, x %0.2f , y %0.2f , tmp %0.2f" , disOut - startDis , cutNumber(xOut) , cutNumber(yOut) , temperature))
 end
 
 function getXAngle(x , y , z)
