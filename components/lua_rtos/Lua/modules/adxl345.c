@@ -34,6 +34,14 @@ typedef struct {
 	xQueueHandle msgQueue;
 } x_queue_t;
 
+typedef struct {
+	float d;
+    float x;
+    float y;
+    float w;
+    uint t;
+} x_queue_msg_t;
+
 static int adxl345_init(lua_State* L) {
 
     driver_error_t *error;
@@ -81,14 +89,20 @@ static int adxl345_init_xQueue(lua_State* L){
 static int queue_send(lua_State* L){
 
 	x_queue_t *user_data;
+    x_queue_msg_t msg;
 
 	// Get user data
 	user_data = (x_queue_t *)luaL_checkudata(L, 1, "adxl345.queue");
     luaL_argcheck(L, user_data, 1, "adxl345 transaction expected");
 
-    const char *msg = luaL_checkstring( L, 2 );
+    msg.d = luaL_checknumber(L, 2);
+    msg.x = luaL_checknumber(L, 3);
+    msg.y = luaL_checknumber(L, 4);
+    msg.w = luaL_checknumber(L, 5);
+    msg.t = luaL_checkinteger(L, 6);
+
     printf("send 1 \n");
-    xQueueSend( user_data->msgQueue, msg, 100/portTICK_RATE_MS );  
+    xQueueSend( user_data->msgQueue, &msg, 100/portTICK_RATE_MS );  
     printf("send 2 \n");
     return 0;
 }
@@ -101,12 +115,12 @@ static int queue_receive(lua_State* L){
 	user_data = (x_queue_t *)luaL_checkudata(L, 1, "adxl345.queue");
     luaL_argcheck(L, user_data, 1, "adxl345 transaction expected");
 
-    char luaMsg;
+    x_queue_msg_t msg;
     printf("receive 1 \n");
 
-    if (xQueueReceive( user_data->msgQueue, &luaMsg , 100/portTICK_RATE_MS ) == pdPASS){
+    if (xQueueReceive( user_data->msgQueue, &msg , 100/portTICK_RATE_MS ) == pdPASS){
         printf("receive 2 \n");
-        lua_pushstring(L, &luaMsg);
+        lua_pushstring(L, &msg);
     }else{
         lua_pushnil(L);
     }
