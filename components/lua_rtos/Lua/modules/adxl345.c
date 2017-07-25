@@ -80,7 +80,6 @@ static int adxl345_init_xQueue(lua_State* L){
 
 static int queue_send(lua_State* L){
 
-    driver_error_t *error;
 	x_queue_t *user_data;
 
 	// Get user data
@@ -94,7 +93,6 @@ static int queue_send(lua_State* L){
 
 static int queue_receive(lua_State* L){
 
-    driver_error_t *error;
 	x_queue_t *user_data;
 
 	// Get user data
