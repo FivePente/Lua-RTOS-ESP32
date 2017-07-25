@@ -247,7 +247,7 @@ static int adxl345_queue_gc (lua_State *L) {
 //test
 static const LUA_REG_TYPE adxl345_map[] = {
     { LSTRKEY( "init" ), LFUNCVAL( adxl345_init )},
-    { LSTRKEY( "initxQueue" ), LFUNCVAL( adxl345_init_xQueue )},
+    { LSTRKEY( "initQueue" ), LFUNCVAL( adxl345_init_xQueue )},
     { LNILKEY, LNILVAL }
 };
 
