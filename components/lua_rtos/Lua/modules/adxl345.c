@@ -277,7 +277,7 @@ static const LUA_REG_TYPE adxl345_queue_map[] = {
 
 LUALIB_API int luaopen_adxl345( lua_State *L ) {
     luaL_newmetarotable(L,"adxl345.trans", (void *)adxl345_trans_map);
-    luaL_newmetarotable(L,"adxl345.queue", (void *)adxl345_trans_map);
+    luaL_newmetarotable(L,"adxl345.queue", (void *)adxl345_queue_map);
     return 0;
 }
 MODULE_REGISTER_MAPPED(ADXL345, adxl345, adxl345_map, luaopen_adxl345);
