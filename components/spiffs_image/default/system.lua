@@ -9,8 +9,6 @@ sensorInited = 0
 
 msgQueue = adxl345.initQueue()
 
-
-
 local useGSM = 1
 local useWIFI = 0
 
@@ -104,24 +102,4 @@ function startupMqtt()
 end
 
 thread.start(systemLed)
-
-if useWIFI == 1 then
-    net.wf.scan()
-    net.wf.setup(net.wf.mode.STA, "wifi","password")
-    net.wf.start();
-    net.service.sntp.start()
-end
-
-if useGSM == 1 then
-    ppp.setCallback(function (err_code , message)
-        print("ppp state: " , message)
-        if err_code == 0 then
-            pppConnected = 1
-        else
-            pppConnected = 0
-        end
-    end)
-    ppp.setupXTask()
-end
-
 thread.start(startupMqtt)
