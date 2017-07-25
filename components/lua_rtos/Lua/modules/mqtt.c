@@ -307,7 +307,7 @@ static int lmqtt_subscribe( lua_State* L ) {
     luaL_checktype(L, 4, LUA_TFUNCTION);
 
     // Copy argument (function) to the top of stack
-    //lua_pushvalue(mqtt->callbackState, 1); 
+    lua_pushvalue(mqtt->callbackState, 4); 
 
     //Copy argument (function) to the callback statck
     lua_xmove(L , mqtt->callbackState , 1)
