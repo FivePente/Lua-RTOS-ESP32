@@ -88,7 +88,7 @@ static int queue_send(lua_State* L){
 
     const char *msg = luaL_checkstring( L, 2 );
     printf("send 1 \n");
-    xQueueSend( user_data->msgQueue, msg, portMAX_DELAY );  
+    xQueueSend( user_data->msgQueue, msg, 100/portTICK_RATE_MS );  
     printf("send 2 \n");
     return 0;
 }
@@ -104,7 +104,7 @@ static int queue_receive(lua_State* L){
     char luaMsg;
     printf("receive 1 \n");
 
-    if (xQueueReceive( user_data->msgQueue, &luaMsg , portMAX_DELAY ) == pdPASS){
+    if (xQueueReceive( user_data->msgQueue, &luaMsg , 100/portTICK_RATE_MS ) == pdPASS){
         printf("receive 2 \n");
         lua_pushstring(L, &luaMsg);
     }else{
