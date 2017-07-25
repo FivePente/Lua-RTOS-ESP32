@@ -307,7 +307,10 @@ static int lmqtt_subscribe( lua_State* L ) {
     luaL_checktype(L, 4, LUA_TFUNCTION);
 
     // Copy argument (function) to the top of stack
-    lua_pushvalue(mqtt->callbackState, 1); 
+    //lua_pushvalue(mqtt->callbackState, 1); 
+
+    //Copy argument (function) to the callback statck
+    lua_xmove(L , mqtt->callbackState , 1)
 
     // Copy function reference
     callback = luaL_ref(mqtt->callbackState, LUA_REGISTRYINDEX);
@@ -416,7 +419,7 @@ static const LUA_REG_TYPE lmqtt_client_map[] = {
   { LSTRKEY( "disconnect"           ),	 LFUNCVAL( lmqtt_disconnect ) },
   { LSTRKEY( "subscribe"            ),	 LFUNCVAL( lmqtt_subscribe  ) },
   { LSTRKEY( "publish"              ),	 LFUNCVAL( lmqtt_publish    ) },
-  { LSTRKEY( "setLostCallback"      ),	 LFUNCVAL( lmqtt_setConnectLostCallback    ) },
+  { LSTRKEY( "setLostCallback"      ),	 LFUNCVAL( lmqtt_setConnectLostCallback ) },
   { LSTRKEY( "__metatable"          ),	 LROVAL  ( lmqtt_client_map ) },
   { LSTRKEY( "__index"              ),   LROVAL  ( lmqtt_client_map ) },
   { LSTRKEY( "__gc"                 ),   LROVAL  ( lmqtt_client_gc  ) },
