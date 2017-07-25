@@ -117,6 +117,10 @@
         "stl_queue.h": "c",
         "zconf.h": "c",
         "cdefs.h": "c",
-        "zlib.h": "c"
+        "zlib.h": "c",
+        "mprintf.h": "c",
+        "ftp.h": "c",
+        "smb.h": "c",
+        "url.h": "c"
     }
 }

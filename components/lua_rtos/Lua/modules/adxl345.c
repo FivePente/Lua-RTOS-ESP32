@@ -86,7 +86,7 @@ static int queue_send(lua_State* L){
 	user_data = (x_queue_t *)luaL_checkudata(L, 1, "adxl345.queue");
     luaL_argcheck(L, user_data, 1, "adxl345 transaction expected");
 
-    char *msg = luaL_checkstring( L, 2 );
+    const char *msg = luaL_checkstring( L, 2 );
     printf("send 1 \n");
     xQueueSend( user_data->msgQueue, msg, portMAX_DELAY );  
     printf("send 2 \n");
@@ -102,12 +102,15 @@ static int queue_receive(lua_State* L){
     luaL_argcheck(L, user_data, 1, "adxl345 transaction expected");
 
     char luaMsg;
+    printf("receive 1 \n");
 
-    if (xQueueReceive( user_data->msgQueue, &luaMsg , 100/portTICK_RATE_MS ) == pdPASS){
+    if (xQueueReceive( user_data->msgQueue, &luaMsg , portMAX_DELAY ) == pdPASS){
+        printf("receive 2 \n");
         lua_pushstring(L, &luaMsg);
     }else{
         lua_pushnil(L);
     }
+    printf("receive 3 \n");
     return 1;
 }
 
