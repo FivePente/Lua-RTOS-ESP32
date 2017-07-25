@@ -376,15 +376,15 @@ static int lmqtt_client_gc (lua_State *L) {
 
         callback = mqtt->callbacks;
         while (callback) {
-            luaL_unref(L, LUA_REGISTRYINDEX, callback->callback);
+            luaL_unref(mqtt->callbackState, LUA_REGISTRYINDEX, callback->callback);
             nextcallback = callback->next;
         
             free(callback);
             callback = nextcallback;
         }
 
-        luaL_unref(L, LUA_REGISTRYINDEX, mqtt->delivered);
-        luaL_unref(L, LUA_REGISTRYINDEX, mqtt->connectionLost);
+        luaL_unref(mqtt->callbackState, LUA_REGISTRYINDEX, mqtt->delivered);
+        luaL_unref(mqtt->callbackState, LUA_REGISTRYINDEX, mqtt->connectionLost);
 
         mtx_unlock(&mqtt->callback_mtx);
 
