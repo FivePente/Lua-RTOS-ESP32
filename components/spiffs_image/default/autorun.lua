@@ -47,7 +47,7 @@ angleStarted = 0
 local ver = 1.0
 
 function initI2C() 
-    cd = adxl345.init(i2c.I2C0 , i2c.MASTER , 100 , pio.GPIO18 , pio.GPIO19)
+    cd = adxl345.init(i2c.I2C0 , i2c.MASTER , 400 , pio.GPIO18 , pio.GPIO19)
     tmr.delayms(2)
     cd:write(0x2D , 0x00)
     tmr.delayms(2)
