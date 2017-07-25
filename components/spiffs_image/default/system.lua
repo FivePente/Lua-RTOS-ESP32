@@ -92,27 +92,33 @@ function sendData(topic , message , qos)
 end
 
 function startupMqtt()
-    print("start connection mqtt")
-    client = mqtt.client("esp32", "60.205.82.208", 1883, false)
-    client:setLostCallback(function(msg)
-        print(msg)
-        mqttConnected = 0
-        thread.sleepms(3000)
-        startupMqtt()
-    end)
+    while true do
+        if pppConnected == 1 then
+            net.service.sntp.start()
+            print("start connection mqtt")
+            client = mqtt.client("esp32", "60.205.82.208", 1883, false)
+            client:setLostCallback(function(msg)
+                print(msg)
+                mqttConnected = 0
+                startupMqtt()
+            end)
 
-    try(
-        function()
-            client:connect("","" , 30 , 0 , 1)
-            mqttConnected = 1
-            initMainSubscribe(client)
-            runDevice()
-        end,
-        function(where,line,error,message)
-            print("connect fail "..message.." reboot...")
-            thread.sleepms(3000)
-            os.exit(1)
-        end)
+            try(
+                function()
+                    client:connect("","" , 30 , 0 , 1)
+                    mqttConnected = 1
+                    initMainSubscribe(client)
+                    runDevice()
+                end,
+                function(where,line,error,message)
+                    print("connect fail reboot...")
+                    os.exit(1)
+                end
+            )
+
+            break
+        end
+    end
 end
 
 thread.start(systemLed)
@@ -131,11 +137,11 @@ if useGSM == 1 then
         print("ppp state: " , message)
         if err_code == 0 then
             pppConnected = 1
-            net.service.sntp.start()
-            startupMqtt()
         else
             pppConnected = 0
         end
     end)
     ppp.setupXTask()
+    startupMqtt()
 end
+
