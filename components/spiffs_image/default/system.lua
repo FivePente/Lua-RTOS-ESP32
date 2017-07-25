@@ -74,13 +74,15 @@ function initMainSubscribe(mqttClient)
         file2:close()
         os.exit(0)
     end)
-    mqttClient:subscribe("initConfig", mqtt.QOS2, function(len, message)
-        --initConfig()
-        initConfigFlag = 1
-        if message ~= nil and message ~= "" then
-            assert(load(message))()
-        end
-    end)
+    mqttClient:subscribe("initConfig", mqtt.QOS2, initHandler)
+end
+
+function initHandler(len , message)
+    --initConfig()
+    initConfigFlag = 1
+    if message ~= nil and message ~= "" then
+        assert(load(message))()
+    end
 end
 
 function sendData(topic , message , qos)
