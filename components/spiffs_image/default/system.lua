@@ -150,6 +150,7 @@ thread.start(systemLed)
 thread.start(systemDog)
 
 if useNet == 1 then
+    initNet()
     while true do
         if pppConnected == 1 then
             net.service.sntp.start()

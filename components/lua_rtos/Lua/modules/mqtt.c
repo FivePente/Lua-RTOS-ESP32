@@ -149,15 +149,21 @@ static int messageArrived(void *context, char * topicName, int topicLen, MQTTCli
         if (strcmp(callback->topic, topicName) == 0) {
             call = callback->callback;
             if (call != LUA_NOREF) {
+                printf("test 1\n");
                 lua_rawgeti(mqtt->callbackState, LUA_REGISTRYINDEX, call);
+                printf("test 2\n");
                 lua_pushinteger(mqtt->callbackState, m->payloadlen);
+                printf("test 3\n");
                 lua_pushlstring(mqtt->callbackState, m->payload, m->payloadlen);
+                printf("test 4\n");
                 lua_call(mqtt->callbackState, 2, 0);
             }
         }
         
         callback = callback->next;
     }
+
+    printf("test 5\n");
 
     mtx_unlock(&mqtt->callback_mtx);
     

@@ -387,4 +387,5 @@ if useNet == 0 then
     mqttConnected = 1
     startup = 1
 end
+
 runDevice()
