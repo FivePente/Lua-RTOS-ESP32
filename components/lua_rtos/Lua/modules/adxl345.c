@@ -86,8 +86,8 @@ static int queue_send(lua_State* L){
 	user_data = (x_queue_t *)luaL_checkudata(L, 1, "adxl345.queue");
     luaL_argcheck(L, user_data, 1, "adxl345 transaction expected");
 
-    const char *msg = luaL_checkstring( L, 2 );
-    xQueueSend( user_data->msgQueue, msg, 0 );  
+    char *msg = luaL_checkstring( L, 2 );
+    xQueueSend( user_data->msgQueue, msg, portMAX_DELAY );  
     return 0;
 }
 
