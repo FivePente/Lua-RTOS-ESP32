@@ -103,6 +103,9 @@
         "x509v3.h": "c",
         "list.c": "cpp",
         "lua_adds.inc": "c",
-        "ltests.h": "c"
+        "ltests.h": "c",
+        "clients.h": "c",
+        "mqttpacket.h": "c",
+        "mach_port.h": "c"
     }
 }

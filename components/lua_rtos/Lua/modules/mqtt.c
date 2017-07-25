@@ -149,8 +149,11 @@ static int messageArrived(void *context, char * topicName, int topicLen, MQTTCli
         if (strcmp(callback->topic, topicName) == 0) {
             call = callback->callback;
             if (call != LUA_NOREF) {
+                printf("test 0\n");
+                lua_pushstring(mqtt->callbackState, topicName); /* push address */
+                lua_gettable(mqtt->callbackState, LUA_REGISTRYINDEX); /* retrieve value */
                 printf("test 1\n");
-                lua_rawgeti(mqtt->callbackState, LUA_REGISTRYINDEX, call);
+                //lua_rawgeti(mqtt->callbackState, LUA_REGISTRYINDEX, call);
                 printf("test 2\n");
                 lua_pushinteger(mqtt->callbackState, m->payloadlen);
                 printf("test 3\n");
@@ -183,8 +186,8 @@ static int lmqtt_setConnectLostCallback(lua_State* L ){
     luaL_checktype(L, 2, LUA_TFUNCTION);
 
     // Copy argument (function) to the top of stack
-    lua_pushvalue(L , 2); 
-    lua_xmove(L , mqtt->callbackState , 1);
+    lua_pushvalue(L, 1); 
+
 
     // Copy function reference
     mqtt->connectionLost = luaL_ref(mqtt->callbackState, LUA_REGISTRYINDEX);
@@ -210,14 +213,11 @@ static int lmqtt_client( lua_State* L ){
 
     luaL_checktype(L, 4, LUA_TBOOLEAN);
     secure = lua_toboolean( L, 4 );
-
-    lua_State *luaS = lua_newthread(L);
-    lua_pop(L , 1);
     
     // Allocate mqtt structure and initialize
     mqtt = (mqtt_userdata *)lua_newuserdata(L, sizeof(mqtt_userdata));
     mqtt->L = L;
-    mqtt->callbackState = luaS;
+    mqtt->callbackState = luaL_newstate();
     mqtt->callbacks = NULL;
     mqtt->connectionLost = -1;
     mqtt->secure = secure;
@@ -310,16 +310,17 @@ static int lmqtt_subscribe( lua_State* L ) {
     
     luaL_checktype(L, 4, LUA_TFUNCTION);
 
-    // Copy argument (function) to the top of stack
-    lua_pushvalue(L, 4); 
+    // Copy argument (function) to the top of stac
 
-    //Copy argument (function) to the callback statck
-    lua_xmove(L , mqtt->callbackState , 1);
+    lua_pushstring(L, topic);
+    lua_pushvalue(L, 4);
+    lua_settable(L, LUA_REGISTRYINDEX);
 
     // Copy function reference
-    callback = luaL_ref(mqtt->callbackState, LUA_REGISTRYINDEX);
+    //callback = luaL_ref(L, LUA_REGISTRYINDEX);
+    //add_subs_callback(mqtt, topic, callback);
 
-    add_subs_callback(mqtt, topic, callback);        
+    add_subs_callback(mqtt, topic, 0);        
     
     rc = MQTTClient_subscribe(mqtt->client, topic, qos);
     if (rc == 0) {
