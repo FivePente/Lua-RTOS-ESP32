@@ -365,15 +365,15 @@ function runDevice()
                         end
                         --watchTime = os.clock()
                         sendData("data", string.format('{"d":%0.2f, "x":%0.2f , "y":%0.2f , "w":%0.2f , "t":%d}' , disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time()) ,mqtt.QOS0)
-                        pio.pin.sethigh(led_pin)
-                        tmr.delayms(30)
-                        pio.pin.setlow(led_pin)
+                        --pio.pin.sethigh(led_pin)
+                        --tmr.delayms(30)
+                        --pio.pin.setlow(led_pin)
                     end
                 end
             else
                 print("mqtt disconnected...")
                 tmr.delayms(3000)
-                --startTask()
+                startTask()
             end
         else
             print("Network disconnected...")
@@ -390,10 +390,9 @@ end
 
 while true do
     if pppConnected == 1 and mqttConnected == 1 then
-        if startup == 1 then
-            print("run device..........")
-            runDevice()
-            break
-        end
+        print("run device..........")
+        tmr.delayms(3000)
+        runDevice()
+        break
     end
 end

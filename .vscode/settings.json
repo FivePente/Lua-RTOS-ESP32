@@ -101,6 +101,8 @@
         "pkcs12.h": "c",
         "x509.h": "c",
         "x509v3.h": "c",
-        "list.c": "cpp"
+        "list.c": "cpp",
+        "lua_adds.inc": "c",
+        "ltests.h": "c"
     }
 }

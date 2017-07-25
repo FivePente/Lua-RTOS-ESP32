@@ -26,10 +26,9 @@ startup = 0
 initConfigFlag = 0
 useNet = 0
 
-led_pin = pio.GPIO27
-pio.pin.setdir(pio.OUTPUT, led_pin)
-
-function systemDog()
+function systemLed()
+    local led_pin = pio.GPIO27
+    pio.pin.setdir(pio.OUTPUT, led_pin)
 
     while true do
         if pppConnected == 0 then
@@ -48,9 +47,12 @@ function systemDog()
             pio.pin.setlow(led_pin)
             thread.sleepms(2000)
         end
+    end
+end
 
-        if os.clock() > dogTime then
-            thread.sleepms(500)
+function systemDog()
+    while true do
+        if os.clock() - watchTime > dogTime then
             print("system dog reboot...")
             os.exit(1)
         end
@@ -78,9 +80,6 @@ function initMainSubscribe(mqttClient)
         if message ~= nil and message ~= "" then
             assert(load(message))()
         end
-    end)
-    mqttClient:subscribe("startup", mqtt.QOS2, function(len, message)
-        startup = 1
     end)
 end
 
@@ -147,7 +146,10 @@ function initNet()
     end
 end
 
-function mainTask()
+thread.start(systemLed)
+thread.start(systemDog)
+
+if useNet == 1 then
     while true do
         if pppConnected == 1 then
             net.service.sntp.start()
@@ -156,18 +158,4 @@ function mainTask()
             break
         end
     end
-
-    while true do
-        if mqttConnected == 0 then
-            thread.sleepms(3000)
-            startTask()
-        end
-    end
-end
-
-thread.start(systemDog)
-
-if useNet == 1 then
-    initNet()
-    thread.start(mainTask)
 end
