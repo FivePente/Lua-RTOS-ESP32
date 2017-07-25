@@ -59,9 +59,9 @@ function initI2C()
 
     tmr.delayms(10)
 
-    --ad = vl53l0x.init(i2c.I2C0 , i2c.MASTER , 400 , 0x29 , pio.GPIO18 , pio.GPIO19)
-    --tmr.delayms(10)
-    --ad:startRanging(2)
+    ad = vl53l0x.init(i2c.I2C0 , i2c.MASTER , 400 , 0x29 , pio.GPIO18 , pio.GPIO19)
+    tmr.delayms(10)
+    ad:startRanging(2)
 
     s1 = sensor.attach("DS1820", pio.GPIO21, 0x28ff900f, 0xb316041a)
     s1:set("resolution", 10)
@@ -173,6 +173,9 @@ function checkAngle()
         function(where, line, error, message)
             print("read error init I2C:"..message)
             err = 1
+            sensorInited = 0
+            tmr.delayms(10)
+            initI2C()
         end
     )
 
@@ -269,7 +272,7 @@ end
 function checkAll()
     temperature = s1:read("temperature")
     if temperature < maxTemp or temperature > minTemp then
-        --checkDistance()
+        checkDistance()
         checkAngleP()
     else
        print("temperature limitation")
@@ -389,9 +392,9 @@ function runDevice()
                         msgQueue:send(disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time())
                         --msgQueue:send(string.format('{"d":%0.2f, "x":%0.2f , "y":%0.2f , "w":%0.2f , "t":%d}' , disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time()))
                         --sendData("data", string.format('{"d":%0.2f, "x":%0.2f , "y":%0.2f , "w":%0.2f , "t":%d}' , disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time()) ,mqtt.QOS0)
-                        --pio.pin.sethigh(led_pin)
-                        --tmr.delayms(30)
-                        --pio.pin.setlow(led_pin)
+                        pio.pin.sethigh(led_pin)
+                        tmr.delayms(30)
+                        pio.pin.setlow(led_pin)
                     end
                 end
             else
@@ -405,10 +408,4 @@ function runDevice()
     end
 end
 
-while true do
-    if pppConnected == 1 then
-        if mqttConnected == 1 then
-            runDevice()
-        end
-    end
-end
+runDevice()

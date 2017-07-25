@@ -122,7 +122,7 @@ end
 
 thread.start(systemLed)
 
-
+--[[
 if useWIFI == 1 then
     net.wf.scan()
     net.wf.setup(net.wf.mode.STA, "wifi","password")
@@ -143,4 +143,4 @@ if useGSM == 1 then
     ppp.setupXTask()
 end
 
-thread.start(startupMqtt)
+thread.start(startupMqtt)]]
