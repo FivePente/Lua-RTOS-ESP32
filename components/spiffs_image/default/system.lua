@@ -79,10 +79,8 @@ end
 function sendData()
     if client ~= nil and mqttConnected == 1 then
         local d , x , y , w , t = msgQueue:receive()
-        print(t)
         if t ~= 0 then
             print("send....")
-            print(x)
             local str = string.format('{"d":%0.2f, "x":%0.2f , "y":%0.2f , "w":%0.2f , "t":%d}' , d , x , y , w ,t)
             client:publish("data", str , 0)
             watchTime = os.clock()

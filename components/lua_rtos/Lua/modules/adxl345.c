@@ -100,10 +100,7 @@ static int queue_send(lua_State* L){
     msg.y = luaL_checknumber(L, 4);
     msg.w = luaL_checknumber(L, 5);
     msg.t = luaL_checkinteger(L, 6);
-
-    printf("send 1 \n");
     xQueueSend( user_data->msgQueue, &msg, 100/portTICK_RATE_MS );  
-    printf("send 2 \n");
     return 0;
 }
 
@@ -116,10 +113,8 @@ static int queue_receive(lua_State* L){
     luaL_argcheck(L, user_data, 1, "adxl345 transaction expected");
 
     x_queue_msg_t msg;
-    printf("receive 1 \n");
 
     if (xQueueReceive( user_data->msgQueue, &msg , 100/portTICK_RATE_MS ) == pdPASS){
-        printf("receive 2 \n");
         lua_pushnumber(L, msg.d);
         lua_pushnumber(L, msg.x);
         lua_pushnumber(L, msg.y);
@@ -132,7 +127,6 @@ static int queue_receive(lua_State* L){
         lua_pushinteger(L, 0);
         lua_pushinteger(L, 0);
     }
-    printf("receive 3 \n");
     return 5;
 }
 
