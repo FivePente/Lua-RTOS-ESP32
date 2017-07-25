@@ -30,8 +30,6 @@ local useGSM = 1
 local useWIFI = 0
 
 function systemLed()
-
-
     while true do
         if pppConnected == 0 then
             pio.pin.sethigh(led_pin)
@@ -54,9 +52,11 @@ end
 
 function systemDog()
     while true do
-        if os.clock() - watchTime > dogTime then
-            print("system dog reboot...")
-            os.exit(1)
+        if os ~= nil and watchTime ~= nil then 
+            if os.clock() - watchTime > dogTime then
+                print("system dog reboot...")
+                os.exit(1)
+            end
         end
     end
 end
@@ -76,16 +76,16 @@ function initMainSubscribe(mqttClient)
         file2:close()
         os.exit(0)
     end)
-    mqttClient:subscribe("initConfig", mqtt.QOS2, initHandler)
+    mqttClient:subscribe("initConfig", mqtt.QOS2, function(len , message)
+        --initConfig()
+        initConfigFlag = 1
+        if message ~= nil and message ~= "" then
+            assert(load(message))()
+        end
+    end)
 end
 
-function initHandler(len , message)
-    --initConfig()
-    initConfigFlag = 1
-    if message ~= nil and message ~= "" then
-        assert(load(message))()
-    end
-end
+
 
 function sendData(topic , message , qos)
     if mqttConnected == 1 then
@@ -94,13 +94,15 @@ function sendData(topic , message , qos)
     end
 end
 
-function startTask()
+function startupMqtt()
     print("start connection mqtt")
     local err = 0
     client = mqtt.client("esp32", "60.205.82.208", 1883, false)
     client:setLostCallback(function(msg)
         print(msg)
         mqttConnected = 0
+        thread.sleepms(3000)
+        startupMqtt()
     end)
 
     try(
@@ -120,7 +122,7 @@ function startTask()
             if mqttConnectTry < 2 then
                 print("connect fail , trying again...")
                 thread.sleepms(3000)
-                startTask()
+                startupMqtt()
             else
                 print("connect fail , reboot...")
                 thread.sleepms(1000)
@@ -135,6 +137,8 @@ function initNet()
         net.wf.scan()
         net.wf.setup(net.wf.mode.STA, "wifi","password")
         net.wf.start();
+
+        net.service.sntp.start()
     end
 
     if useGSM == 1 then
@@ -142,6 +146,7 @@ function initNet()
             print("ppp state: " , message)
             if err_code == 0 then
                 pppConnected = 1
+                net.service.sntp.start()
             else
                 pppConnected = 0
             end
@@ -152,15 +157,4 @@ end
 
 thread.start(systemLed)
 thread.start(systemDog)
-
-if useNet == 1 then
-    initNet()
-    while true do
-        if pppConnected == 1 then
-            net.service.sntp.start()
-            --net.service.sntp.stop()
-            startTask()
-            break
-        end
-    end
-end
+thread.start(startupMqtt)

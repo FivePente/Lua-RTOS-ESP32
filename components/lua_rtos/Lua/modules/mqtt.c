@@ -78,7 +78,6 @@ typedef struct {
 
 typedef struct {
     lua_State *L;
-    lua_State *callbackState;
     struct mtx callback_mtx;
     
     MQTTClient_connectOptions conn_opts;
@@ -129,9 +128,9 @@ void connectionLost(void* context, char* cause)
     printf("\nConnection lost\n");
 
     if(mqtt->connectionLost != -1){
-        lua_rawgeti(mqtt->callbackState, LUA_REGISTRYINDEX, mqtt->connectionLost);
-        lua_pushstring(mqtt->callbackState, cause);
-        lua_call(mqtt->callbackState, 1, 0);
+        lua_rawgeti(mqtt->L, LUA_REGISTRYINDEX, mqtt->connectionLost);
+        lua_pushstring(mqtt->L, cause);
+        lua_call(mqtt->L, 1, 0);
     }
 
     mtx_unlock(&mqtt->callback_mtx);
@@ -149,25 +148,15 @@ static int messageArrived(void *context, char * topicName, int topicLen, MQTTCli
         if (strcmp(callback->topic, topicName) == 0) {
             call = callback->callback;
             if (call != LUA_NOREF) {
-                printf("test 0\n");
-                lua_pushstring(mqtt->callbackState, topicName); /* push address */
-                lua_gettable(mqtt->callbackState, LUA_REGISTRYINDEX); /* retrieve value */
-                printf("test 1\n");
-                //lua_rawgeti(mqtt->callbackState, LUA_REGISTRYINDEX, call);
-                printf("test 2\n");
-                lua_pushinteger(mqtt->callbackState, m->payloadlen);
-                printf("test 3\n");
-                lua_pushlstring(mqtt->callbackState, m->payload, m->payloadlen);
-                printf("test 4\n");
-                lua_call(mqtt->callbackState, 2, 0);
-                printf("test 5\n");
+                lua_rawgeti(mqtt->L, LUA_REGISTRYINDEX, call);
+                lua_pushinteger(mqtt->L, m->payloadlen);
+                lua_pushlstring(mqtt->L, m->payload, m->payloadlen);
+                lua_call(mqtt->L, 2, 0);
             }
         }
         
         callback = callback->next;
     }
-
-    printf("test 6\n");
 
     mtx_unlock(&mqtt->callback_mtx);
     
@@ -186,11 +175,10 @@ static int lmqtt_setConnectLostCallback(lua_State* L ){
     luaL_checktype(L, 2, LUA_TFUNCTION);
 
     // Copy argument (function) to the top of stack
-    lua_pushvalue(L, 1); 
-
+    lua_pushvalue(L, 2); 
 
     // Copy function reference
-    mqtt->connectionLost = luaL_ref(mqtt->callbackState, LUA_REGISTRYINDEX);
+    mqtt->connectionLost = luaL_ref(L, LUA_REGISTRYINDEX);
 
     return 0;
 }
@@ -217,7 +205,6 @@ static int lmqtt_client( lua_State* L ){
     // Allocate mqtt structure and initialize
     mqtt = (mqtt_userdata *)lua_newuserdata(L, sizeof(mqtt_userdata));
     mqtt->L = L;
-    mqtt->callbackState = luaL_newstate();
     mqtt->callbacks = NULL;
     mqtt->connectionLost = -1;
     mqtt->secure = secure;
@@ -310,17 +297,13 @@ static int lmqtt_subscribe( lua_State* L ) {
     
     luaL_checktype(L, 4, LUA_TFUNCTION);
 
-    // Copy argument (function) to the top of stac
-
-    lua_pushstring(L, topic);
-    lua_pushvalue(L, 4);
-    lua_settable(L, LUA_REGISTRYINDEX);
+    // Copy argument (function) to the top of stack
+    lua_pushvalue(L, 4); 
 
     // Copy function reference
-    //callback = luaL_ref(L, LUA_REGISTRYINDEX);
-    //add_subs_callback(mqtt, topic, callback);
+    callback = luaL_ref(L, LUA_REGISTRYINDEX);
 
-    add_subs_callback(mqtt, topic, 0);        
+    add_subs_callback(mqtt, topic, callback);        
     
     rc = MQTTClient_subscribe(mqtt->client, topic, qos);
     if (rc == 0) {
@@ -385,15 +368,15 @@ static int lmqtt_client_gc (lua_State *L) {
 
         callback = mqtt->callbacks;
         while (callback) {
-            luaL_unref(mqtt->callbackState, LUA_REGISTRYINDEX, callback->callback);
+            luaL_unref(L, LUA_REGISTRYINDEX, callback->callback);
             nextcallback = callback->next;
         
             free(callback);
             callback = nextcallback;
         }
 
-        luaL_unref(mqtt->callbackState, LUA_REGISTRYINDEX, mqtt->delivered);
-        luaL_unref(mqtt->callbackState, LUA_REGISTRYINDEX, mqtt->connectionLost);
+        luaL_unref(L, LUA_REGISTRYINDEX, mqtt->delivered);
+        luaL_unref(L, LUA_REGISTRYINDEX, mqtt->connectionLost);
 
         mtx_unlock(&mqtt->callback_mtx);
 
@@ -424,7 +407,7 @@ static const LUA_REG_TYPE lmqtt_client_map[] = {
   { LSTRKEY( "disconnect"           ),	 LFUNCVAL( lmqtt_disconnect ) },
   { LSTRKEY( "subscribe"            ),	 LFUNCVAL( lmqtt_subscribe  ) },
   { LSTRKEY( "publish"              ),	 LFUNCVAL( lmqtt_publish    ) },
-  { LSTRKEY( "setLostCallback"      ),	 LFUNCVAL( lmqtt_setConnectLostCallback ) },
+  { LSTRKEY( "setLostCallback"      ),	 LFUNCVAL( lmqtt_setConnectLostCallback    ) },
   { LSTRKEY( "__metatable"          ),	 LROVAL  ( lmqtt_client_map ) },
   { LSTRKEY( "__index"              ),   LROVAL  ( lmqtt_client_map ) },
   { LSTRKEY( "__gc"                 ),   LROVAL  ( lmqtt_client_gc  ) },
