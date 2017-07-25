@@ -264,8 +264,8 @@ static const LUA_REG_TYPE adxl345_trans_map[] = {
 
 //inst map
 static const LUA_REG_TYPE adxl345_queue_map[] = {
-    { LSTRKEY( "send" ),            LFUNCVAL( adxl345_read )},
-    { LSTRKEY( "receive" ),            LFUNCVAL( adxl345_writeReg )},
+    { LSTRKEY( "send" ),            LFUNCVAL( queue_send )},
+    { LSTRKEY( "receive" ),            LFUNCVAL( queue_receive )},
     { LSTRKEY( "__metatable" ),  	LROVAL  ( adxl345_queue_map ) },
 	{ LSTRKEY( "__index"     ),   	LROVAL  ( adxl345_queue_map ) },
 	{ LSTRKEY( "__gc"        ),   	LFUNCVAL  ( adxl345_queue_gc ) },
