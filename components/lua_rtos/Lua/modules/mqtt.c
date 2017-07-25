@@ -182,10 +182,10 @@ static int lmqtt_setConnectLostCallback(lua_State* L ){
     luaL_checktype(L, 2, LUA_TFUNCTION);
 
     // Copy argument (function) to the top of stack
-    lua_pushvalue(L, 2); 
+    lua_pushvalue(mqtt->callbackState, 2); 
 
     // Copy function reference
-    mqtt->connectionLost = luaL_ref(L, LUA_REGISTRYINDEX);
+    mqtt->connectionLost = luaL_ref(mqtt->callbackState, LUA_REGISTRYINDEX);
 
     return 0;
 }
@@ -306,10 +306,10 @@ static int lmqtt_subscribe( lua_State* L ) {
     luaL_checktype(L, 4, LUA_TFUNCTION);
 
     // Copy argument (function) to the top of stack
-    lua_pushvalue(L, 4); 
+    lua_pushvalue(mqtt->callbackState, 4); 
 
     // Copy function reference
-    callback = luaL_ref(L, LUA_REGISTRYINDEX);
+    callback = luaL_ref(mqtt->callbackState, LUA_REGISTRYINDEX);
 
     add_subs_callback(mqtt, topic, callback);        
     
