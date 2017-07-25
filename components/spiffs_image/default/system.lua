@@ -75,11 +75,13 @@ function initMainSubscribe(mqttClient)
     end)
 end
 
-function sendData(topic , message , qos)
+--function sendData(topic , message , qos)
+function sendData()
     if client ~= nil and mqttConnected == 1 then
         local msg = msgQueue:receive()
         if msg ~= nil and msg ~= "" then
-            client:publish(topic, message , qos)
+            print(msg)
+            client:publish("data", msg , 0)
             watchTime = os.clock()
         end
     end
@@ -110,6 +112,10 @@ function startupMqtt()
             )
             break
         end
+    end
+
+    while true do
+        sendData()
     end
 end
 
