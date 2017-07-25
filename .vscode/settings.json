@@ -106,6 +106,17 @@
         "ltests.h": "c",
         "clients.h": "c",
         "mqttpacket.h": "c",
-        "mach_port.h": "c"
+        "mach_port.h": "c",
+        "curl_memory.h": "c",
+        "memdebug.h": "c",
+        "queue.h": "c",
+        "pop3.h": "c",
+        "ff.h": "c",
+        "locale_classes.h": "c",
+        "kmod.h": "c",
+        "stl_queue.h": "c",
+        "zconf.h": "c",
+        "cdefs.h": "c",
+        "zlib.h": "c"
     }
 }

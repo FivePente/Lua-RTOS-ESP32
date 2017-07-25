@@ -17,6 +17,9 @@
 #include "platform.h"
 #include <stdlib.h>
 #include <string.h>
+#include <queue.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 
 static const uint8_t adxl345_i2c_addr = 0x53;
@@ -26,6 +29,10 @@ typedef struct {
 	int transaction;
     char *data;
 } adxl345_user_data_t;
+
+typedef struct {
+	xQueueHandle msgQueue;
+} x_queue_t;
 
 static int adxl345_init(lua_State* L) {
 
@@ -58,6 +65,49 @@ static int adxl345_init(lua_State* L) {
     luaL_getmetatable(L, "adxl345.trans");
     lua_setmetatable(L, -2);
 
+    return 1;
+}
+
+static int adxl345_init_xQueue(lua_State* L){
+    x_queue_t *user_data = (x_queue_t *)lua_newuserdata(L, sizeof(x_queue_t));
+    user_data->msgQueue = xQueueCreate(3 , sizeof(char) * 50);  
+
+    luaL_getmetatable(L, "adxl345.queue");
+    lua_setmetatable(L, -2);
+
+    return 1;
+}
+
+static int queue_send(lua_State* L){
+
+    driver_error_t *error;
+	x_queue_t *user_data;
+
+	// Get user data
+	user_data = (x_queue_t *)luaL_checkudata(L, 1, "adxl345.queue");
+    luaL_argcheck(L, user_data, 1, "adxl345 transaction expected");
+
+    const char *msg = luaL_checkstring( L, 2 );
+    xQueueSend( user_data->msgQueue, msg, 0 );  
+    return 0;
+}
+
+static int queue_receive(lua_State* L){
+
+    driver_error_t *error;
+	x_queue_t *user_data;
+
+	// Get user data
+	user_data = (x_queue_t *)luaL_checkudata(L, 1, "adxl345.queue");
+    luaL_argcheck(L, user_data, 1, "adxl345 transaction expected");
+
+    const char *msg;
+
+    if (xQueueReceive( MsgQueue, msg , 100/portTICK_RATE_MS ) == pdPASS){
+        lua_pushstring(L, msg);
+    }else{
+        lua_pushnil(L)
+    }
     return 1;
 }
 
@@ -175,7 +225,6 @@ static int adxl345_close(lua_State* L) {
     return 0;
 }
 
-// Destructor
 static int adxl345_trans_gc (lua_State *L) {
 	adxl345_user_data_t *user_data = NULL;
 
@@ -186,10 +235,21 @@ static int adxl345_trans_gc (lua_State *L) {
     return 0;
 }
 
+static int adxl345_queue_gc (lua_State *L) {
+	x_queue_t *user_data = NULL;
+
+    user_data = (x_queue_t *)luaL_testudata(L, 1, "adxl345.queue");
+    if (user_data) {
+        free(user_data->msgQueue);
+    }
+    return 0;
+}
+
 //class map
 //test
 static const LUA_REG_TYPE adxl345_map[] = {
     { LSTRKEY( "init" ), LFUNCVAL( adxl345_init )},
+    { LSTRKEY( "initxQueue" ), LFUNCVAL( adxl345_init_xQueue )},
     { LNILKEY, LNILVAL }
 };
 
@@ -204,9 +264,20 @@ static const LUA_REG_TYPE adxl345_trans_map[] = {
     { LNILKEY, LNILVAL}
 };
 
+//inst map
+static const LUA_REG_TYPE adxl345_queue_map[] = {
+    { LSTRKEY( "send" ),            LFUNCVAL( adxl345_read )},
+    { LSTRKEY( "receive" ),            LFUNCVAL( adxl345_writeReg )},
+    { LSTRKEY( "__metatable" ),  	LROVAL  ( adxl345_queue_map ) },
+	{ LSTRKEY( "__index"     ),   	LROVAL  ( adxl345_queue_map ) },
+	{ LSTRKEY( "__gc"        ),   	LFUNCVAL  ( adxl345_queue_gc ) },
+    { LNILKEY, LNILVAL}
+};
+
 
 LUALIB_API int luaopen_adxl345( lua_State *L ) {
     luaL_newmetarotable(L,"adxl345.trans", (void *)adxl345_trans_map);
+    luaL_newmetarotable(L,"adxl345.queue", (void *)adxl345_trans_map);
     return 0;
 }
 MODULE_REGISTER_MAPPED(ADXL345, adxl345, adxl345_map, luaopen_adxl345);
