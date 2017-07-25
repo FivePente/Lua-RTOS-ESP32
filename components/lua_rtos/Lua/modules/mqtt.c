@@ -213,7 +213,7 @@ static int lmqtt_client( lua_State* L ){
     // Allocate mqtt structure and initialize
     mqtt = (mqtt_userdata *)lua_newuserdata(L, sizeof(mqtt_userdata));
     mqtt->L = L;
-    mqtt->callbackState = luaL_newstate();
+    mqtt->callbackState = lua_newthread();
     mqtt->callbacks = NULL;
     mqtt->connectionLost = -1;
     mqtt->secure = secure;

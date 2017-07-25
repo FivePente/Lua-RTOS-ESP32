@@ -11,9 +11,6 @@ os.logcons(true)           -- Enable/disable sys log messages to console
 os.shell(true)             -- Enable/disable shell
 os.history(false)          -- Enable/disable history
 
-local useGSM = 1
-local useWIFI = 0
-
 mqttConnectTry = 0
 pppConnected = 0
 watchTime = 0
@@ -25,6 +22,9 @@ dogTime = 120
 startup = 0
 initConfigFlag = 0
 useNet = 1
+
+local useGSM = 1
+local useWIFI = 0
 
 function systemLed()
     local led_pin = pio.GPIO27
