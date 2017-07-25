@@ -174,6 +174,7 @@ function checkAngle()
             print("read error init I2C:"..message)
             err = 1
             sensorInited = 0
+            cd:close()
             tmr.delayms(10)
             initI2C()
         end
@@ -182,32 +183,6 @@ function checkAngle()
     if err == 1 then
         return
     end
-
-    --[[
-    try(
-        function()
-            x, y , z = cd:read()
-
-            if x > maxX then
-                maxX = x
-            elseif x < minX then
-                minX = x
-            end
-
-            if y > maxY then
-                maxY = y
-            elseif y < minY then
-                minY = y
-            end
-        end,
-        function(where, line, error, message)
-            print("read error init I2C:"..message)
-            sensorInited = 0
-            cd:close()
-            tmr.delayms(10)
-            initI2C()
-        end
-    )]]
 
     tX = getXAngle(x , y , z)
     tY = getYAngle(x , y , z)
@@ -327,83 +302,16 @@ function runDevice()
     local timer = os.clock()
     watchTime = timer
     while true do
-        if initConfigFlag == 1 then
-            initConfig()
-            initConfigFlag = 0
-        end
-        if pppConnected == 1 then
-            if mqttConnected == 1 then
-                if sensorInited == 1 then
-                    checkAngle()
-                    if indexCount >= collectionTotal then
-                        checkAll()
-                        local disOffset = disOut - startDis
-                        local tAlarm = '{'
-
-                        if disOffset > hDisAlarm or disOffset < lDisAlarm then
-                            disExceedCount = disExceedCount + 1
-                        else
-                            disExceedCount = 0
-                        end
-
-                        if disExceedCount >= disAlarmExceed then
-                            tAlarm = tAlarm..string.format('"d":%0.2f , ', disOffset)
-                        end
-
-                        local xAngleOffset = xOut - startX
-
-                        if xAngleOffset > hXAlarm or xAngleOffset < lXAlarm then
-                            angleXExceedCount = angleXExceedCount + 1
-                        else
-                            angleXExceedCount = 0
-                        end
-
-                        if angleXExceedCount >= angleAlarmExceed then
-                            tAlarm = tAlarm..string.format('"x":%0.2f , ', cutNumber(xAngleOffset))
-                        end                        
-
-                        local yAngleOffset = yOut - startY
-
-                        if yAngleOffset > hYAlarm or yAngleOffset < lYAlarm then
-                            angleYExceedCount = angleYExceedCount + 1
-                        else
-                            angleYExceedCount = 0
-                        end
-
-                        if angleYExceedCount >= angleAlarmExceed then
-                            tAlarm = tAlarm..string.format('"y":%0.2f , ', cutNumber(yAngleOffset))
-                        end  
-
-                        if temperature > hTmpAlarm or temperature < lTmpAlarm then
-                            tmpExceedCount = tmpExceedCount + 1
-                        else
-                            tmpExceedCount = 0
-                        end
-
-                        if tmpExceedCount >= tmpAlarmExceed then
-                            tAlarm = tAlarm..string.format('"w":%0.2f , ', temperature)
-                        end
-
-                        if #tAlarm > 2 then
-                            --msgQueue:send(tAlarm..string.format('"t":%d}', os.time()))
-                            --sendData("alarm" , tAlarm..string.format('"t":%d}', os.time()) , mqtt.QOS1)
-                        end
-                        --watchTime = os.clock()
-                        msgQueue:send(disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time())
-                        --msgQueue:send(string.format('{"d":%0.2f, "x":%0.2f , "y":%0.2f , "w":%0.2f , "t":%d}' , disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time()))
-                        --sendData("data", string.format('{"d":%0.2f, "x":%0.2f , "y":%0.2f , "w":%0.2f , "t":%d}' , disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time()) ,mqtt.QOS0)
-                        pio.pin.sethigh(led_pin)
-                        tmr.delayms(30)
-                        pio.pin.setlow(led_pin)
-                    end
-                end
-            else
-                --print("mqtt disconnected...")
-                --tmr.delayms(3000)
+        if sensorInited == 1 then
+            checkAngle()
+            if indexCount >= collectionTotal then
+                checkAll()
+                local disOffset = disOut - startDis
+                msgQueue:send(disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time())
+                pio.pin.sethigh(led_pin)
+                tmr.delayms(30)
+                pio.pin.setlow(led_pin)
             end
-        else
-            --print("Network disconnected...")
-            --tmr.delayms(3000)
         end
     end
 end
