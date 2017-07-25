@@ -358,11 +358,11 @@ function runDevice()
                         end
 
                         if #tAlarm > 2 then
-                            msgQueue.receive(tAlarm..string.format('"t":%d}', os.time()))
+                            msgQueue:send(tAlarm..string.format('"t":%d}', os.time()))
                             --sendData("alarm" , tAlarm..string.format('"t":%d}', os.time()) , mqtt.QOS1)
                         end
                         --watchTime = os.clock()
-                        msgQueue.receive(string.format('{"d":%0.2f, "x":%0.2f , "y":%0.2f , "w":%0.2f , "t":%d}' , disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time()))
+                        msgQueue:send(string.format('{"d":%0.2f, "x":%0.2f , "y":%0.2f , "w":%0.2f , "t":%d}' , disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time()))
                         --sendData("data", string.format('{"d":%0.2f, "x":%0.2f , "y":%0.2f , "w":%0.2f , "t":%d}' , disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time()) ,mqtt.QOS0)
                         pio.pin.sethigh(led_pin)
                         tmr.delayms(30)

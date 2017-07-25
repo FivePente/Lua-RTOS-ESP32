@@ -77,7 +77,7 @@ end
 
 function sendData(topic , message , qos)
     if client ~= nil and mqttConnected == 1 then
-        local msg = msgQueue.receive()
+        local msg = msgQueue:receive()
         if msg ~= nil and msg ~= "" then
             client:publish(topic, message , qos)
             watchTime = os.clock()
