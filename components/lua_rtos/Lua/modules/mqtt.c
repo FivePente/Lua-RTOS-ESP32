@@ -155,15 +155,16 @@ static int messageArrived(void *context, char * topicName, int topicLen, MQTTCli
                 lua_pushinteger(mqtt->callbackState, m->payloadlen);
                 printf("test 3\n");
                 lua_pushlstring(mqtt->callbackState, m->payload, m->payloadlen);
-                printf("test 4\n");
+                printf("test 4 %p\n" , mqtt->callbackState);
                 lua_call(mqtt->callbackState, 2, 0);
+                printf("test 5\n");
             }
         }
         
         callback = callback->next;
     }
 
-    printf("test 5\n");
+    printf("test 6\n");
 
     mtx_unlock(&mqtt->callback_mtx);
     
