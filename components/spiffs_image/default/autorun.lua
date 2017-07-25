@@ -312,7 +312,6 @@ function runDevice()
                     checkAngle()
                     if indexCount >= collectionTotal then
                         checkAll()
-
                         local disOffset = disOut - startDis
                         local tAlarm = '{'
 
@@ -372,11 +371,11 @@ function runDevice()
                 end
             else
                 print("mqtt disconnected...")
-                tmr.delayms(3000)
+                --tmr.delayms(3000)
             end
         else
             print("Network disconnected...")
-            tmr.delayms(3000)
+            --tmr.delayms(3000)
         end
     end
 end

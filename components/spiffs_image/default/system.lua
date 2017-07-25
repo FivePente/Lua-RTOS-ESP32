@@ -104,7 +104,7 @@ function startupMqtt()
                 end
             )
 
-            break
+            while true do end
         end
     end
 end
@@ -129,6 +129,6 @@ if useGSM == 1 then
         end
     end)
     ppp.setupXTask()
-    startupMqtt()
+    thread.start(startupMqtt)
 end
 
