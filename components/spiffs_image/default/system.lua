@@ -133,6 +133,10 @@ function startupMqtt()
 end
 
 function initNet()
+    
+    thread.start(systemLed)
+    thread.start(systemDog)
+
     if useWIFI == 1 then
         net.wf.scan()
         net.wf.setup(net.wf.mode.STA, "wifi","password")
@@ -147,6 +151,7 @@ function initNet()
             if err_code == 0 then
                 pppConnected = 1
                 net.service.sntp.start()
+                startupMqtt()
             else
                 pppConnected = 0
             end
@@ -155,6 +160,4 @@ function initNet()
     end
 end
 
-thread.start(systemLed)
-thread.start(systemDog)
-thread.start(startupMqtt)
+initNet()
