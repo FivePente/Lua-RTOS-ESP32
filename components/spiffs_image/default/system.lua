@@ -24,7 +24,7 @@ sensorInited = 0
 dogTime = 120
 startup = 0
 initConfigFlag = 0
-useNet = 0
+useNet = 1
 
 function systemLed()
     local led_pin = pio.GPIO27

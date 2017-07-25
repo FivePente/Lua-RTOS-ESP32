@@ -387,12 +387,4 @@ if useNet == 0 then
     mqttConnected = 1
     startup = 1
 end
-
-while true do
-    if pppConnected == 1 and mqttConnected == 1 then
-        print("run device..........")
-        tmr.delayms(3000)
-        runDevice()
-        break
-    end
-end
+runDevice()
