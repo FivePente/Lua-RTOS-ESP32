@@ -310,7 +310,7 @@ static int lmqtt_subscribe( lua_State* L ) {
     lua_pushvalue(mqtt->callbackState, 4); 
 
     //Copy argument (function) to the callback statck
-    lua_xmove(L , mqtt->callbackState , 1)
+    lua_xmove(L , mqtt->callbackState , 1);
 
     // Copy function reference
     callback = luaL_ref(mqtt->callbackState, LUA_REGISTRYINDEX);
