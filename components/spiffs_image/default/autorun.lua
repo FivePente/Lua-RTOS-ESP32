@@ -152,7 +152,35 @@ function checkAngle()
     local z = 0
     local tX = 0
     local tY = 0
+    local err = 0
 
+    try(
+        function()
+            x, y , z = cd:read()
+
+            if x > maxX then
+                maxX = x
+            elseif x < minX then
+                minX = x
+            end
+
+            if y > maxY then
+                maxY = y
+            elseif y < minY then
+                minY = y
+            end
+        end,
+        function(where, line, error, message)
+            print("read error init I2C:"..message)
+            err = 1
+        end
+    )
+
+    if err == 1 then
+        return
+    end
+
+    --[[
     try(
         function()
             x, y , z = cd:read()
@@ -176,7 +204,7 @@ function checkAngle()
             tmr.delayms(10)
             initI2C()
         end
-    )
+    )]]
 
     tX = getXAngle(x , y , z)
     tY = getYAngle(x , y , z)
