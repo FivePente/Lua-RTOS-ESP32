@@ -377,4 +377,10 @@ function runDevice()
     end
 end
 
-runDevice()
+while true do
+    if pppConnected == 1 then
+        if mqttConnected == 1 then
+            runDevice()
+        end
+    end
+end
