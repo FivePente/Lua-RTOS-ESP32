@@ -23,12 +23,14 @@ startup = 0
 initConfigFlag = 0
 useNet = 1
 
+led_pin = pio.GPIO27
+pio.pin.setdir(pio.OUTPUT, led_pin)
+
 local useGSM = 1
 local useWIFI = 0
 
 function systemLed()
-    local led_pin = pio.GPIO27
-    pio.pin.setdir(pio.OUTPUT, led_pin)
+
 
     while true do
         if pppConnected == 0 then
