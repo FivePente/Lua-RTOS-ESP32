@@ -12,9 +12,11 @@ msgQueue = adxl345.initQueue()
 local useGSM = 1
 local useWIFI = 0
 
+led_pin = pio.GPIO27
+pio.pin.setdir(pio.OUTPUT, led_pin)
+
 function systemLed()
-    local led_pin = pio.GPIO27
-    pio.pin.setdir(pio.OUTPUT, led_pin)
+
     while true do
         if pppConnected == 0 then
             pio.pin.sethigh(led_pin)
