@@ -9,8 +9,8 @@ sensorInited = 0
 
 msgQueue = adxl345.initQueue()
 
-local useGSM = 1
-local useWIFI = 0
+local useGSM = 0
+local useWIFI = 1
 
 led_pin = pio.GPIO27
 pio.pin.setdir(pio.OUTPUT, led_pin)
@@ -104,7 +104,7 @@ end
 thread.start(systemLed)
 if useWIFI == 1 then
     net.wf.scan()
-    net.wf.setup(net.wf.mode.STA, "wifi","password")
+    net.wf.setup(net.wf.mode.STA, "HIWIFI_3B0F16","Freedom0806")
     net.wf.start();
     net.service.sntp.start()
 end
