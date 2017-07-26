@@ -31,8 +31,6 @@ function systemLed()
             thread.sleepms(30)
             pio.pin.setlow(led_pin)
             thread.sleepms(2000)
-        else
-            pio.pin.sethigh(led_pin)
         end
     end
 end
@@ -58,7 +56,7 @@ end
 
 --function sendData(topic , message , qos)
 function sendData()
-    if client ~= nil and mqttConnected == 1 then
+    if mqttConnected == 1 then
         local d , x , y , w , t = msgQueue:receive()
         if t ~= 0 then
             print("send....")
@@ -102,4 +100,23 @@ function startupMqtt()
 end
 
 thread.start(systemLed)
+if useWIFI == 1 then
+    net.wf.scan()
+    net.wf.setup(net.wf.mode.STA, "wifi","password")
+    net.wf.start();
+    net.service.sntp.start()
+end
+
+if useGSM == 1 then
+    ppp.setCallback(function (err_code , message)
+        print("ppp state: " , message)
+        if err_code == 0 then
+            pppConnected = 1
+        else
+            pppConnected = 0
+        end
+    end)
+    ppp.setupXTask()
+end
+
 thread.start(startupMqtt)

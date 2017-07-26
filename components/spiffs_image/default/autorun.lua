@@ -69,13 +69,6 @@ function initI2C()
     sensorInited = 1
 end
 
-function restart()
-    if ad ~= nil then
-        ad:stopRanging()
-    end
-    os.exit(1)
-end
-
 function saveConfig()
     local file2 = io.open("config.lua","w+")
     file2:write( "startDis="..startDis.." startX="..startX.." startY="..startY)
@@ -307,7 +300,7 @@ function runDevice()
             if indexCount >= collectionTotal then
                 checkAll()
                 local disOffset = disOut - startDis
-                msgQueue:send(disOffset , cutNumber(xAngleOffset) , cutNumber(yAngleOffset) , temperature, os.time())
+                msgQueue:send(disOffset , cutNumber(xOut) , cutNumber(yOut) , temperature, os.time())
                 pio.pin.sethigh(led_pin)
                 tmr.delayms(30)
                 pio.pin.setlow(led_pin)
@@ -317,22 +310,3 @@ function runDevice()
 end
 
 runDevice()
-
-if useWIFI == 1 then
-    net.wf.scan()
-    net.wf.setup(net.wf.mode.STA, "wifi","password")
-    net.wf.start();
-    net.service.sntp.start()
-end
-
-if useGSM == 1 then
-    ppp.setCallback(function (err_code , message)
-        print("ppp state: " , message)
-        if err_code == 0 then
-            pppConnected = 1
-        else
-            pppConnected = 0
-        end
-    end)
-    ppp.setupXTask()
-end
