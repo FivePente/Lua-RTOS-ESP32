@@ -133,6 +133,7 @@
         "evp.h": "c",
         "bio.h": "c",
         "inftrees.h": "c",
-        "xmlerror.h": "c"
+        "xmlerror.h": "c",
+        "libgsm.h": "c"
     }
 }
