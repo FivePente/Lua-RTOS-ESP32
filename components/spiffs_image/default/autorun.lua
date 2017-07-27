@@ -295,6 +295,11 @@ function runDevice()
     local timer = os.clock()
     watchTime = timer
     while true do
+        if initFlag == 1 then
+            initConfig()
+            initFlag = 0
+        end
+
         if sensorInited == 1 then
             checkAngle()
             if indexCount >= collectionTotal then
@@ -309,9 +314,4 @@ function runDevice()
     end
 end
 
-while true do
-    if mqttConnected == 1 then
-        runDevice()
-        break
-    end
-end
+runDevice()

@@ -6,6 +6,7 @@ os.history(false)          -- Enable/disable history
 pppConnected = 0
 mqttConnected = 0
 sensorInited = 0
+initFlag = 0
 
 msgQueue = adxl345.initQueue()
 
@@ -49,7 +50,8 @@ function initMainSubscribe(mqttClient)
         os.exit(0)
     end)
     mqttClient:subscribe("initConfig", mqtt.QOS2, function(len , message)
-        initConfig()
+        initFlag = 1
+        --initConfig()
         if message ~= nil and message ~= "" then
             assert(load(message))()
         end
