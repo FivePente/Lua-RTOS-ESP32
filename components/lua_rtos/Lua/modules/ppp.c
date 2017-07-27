@@ -879,7 +879,7 @@ int gsm_RFOn()
 static int ppp_setup(lua_State* L){
     tcpip_adapter_init();
     int code = 0;
-	code = ppposInit;
+	code = ppposInit();
 	lua_pushinteger(L, code);
     return 1;
 }
