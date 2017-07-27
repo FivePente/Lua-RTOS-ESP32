@@ -313,3 +313,5 @@ function runDevice()
         end
     end
 end
+
+runDevice()
