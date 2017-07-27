@@ -116,7 +116,7 @@ if useGSM == 1 then
 
     pppConnected = ppp.setup()
 
-    if ppp.setup() == 0 then
+    if pppConnected == 0 then
         print("PPPoS EXAMPLE", "ERROR: GSM not initialized, HALTED");
     else
         thread.start(startupMqtt)
