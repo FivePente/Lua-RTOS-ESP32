@@ -313,10 +313,3 @@ function runDevice()
         end
     end
 end
-
-while true do
-    if pppConnected == 1 and mqttConnected == 1 then
-        runDevice()
-        break
-    end
-end
