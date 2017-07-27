@@ -121,6 +121,18 @@
         "mprintf.h": "c",
         "ftp.h": "c",
         "smb.h": "c",
-        "url.h": "c"
+        "url.h": "c",
+        "meow_fft.h": "c",
+        "list.h": "c",
+        "socketbuffer.h": "c",
+        "apr_allocator.h": "c",
+        "http.h": "c",
+        "net_service_curl.inc": "c",
+        "deflate.h": "c",
+        "port.h": "c",
+        "evp.h": "c",
+        "bio.h": "c",
+        "inftrees.h": "c",
+        "xmlerror.h": "c"
     }
 }

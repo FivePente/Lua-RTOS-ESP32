@@ -1,19 +1,12 @@
-#include "luartos.h"
+/* PPPoS Client Example with GSM (tested with Telit GL865-DUAL-V3)
 
-#if CONFIG_LUA_RTOS_LUA_USE_PPP
+   This example code is in the Public Domain (or CC0 licensed, at your option.)
 
-#include "lua.h"
-#include "error.h"
-#include "lauxlib.h"
-#include "modules.h"
-#include "platform.h"
-#include <stdlib.h>
+   Unless required by applicable law or agreed to in writing, this
+   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+   CONDITIONS OF ANY KIND, either express or implied.
+ */
 #include <string.h>
-#include "uart.h"
-
-#include <stdio.h>
-#include <assert.h>
-#include <signal.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_system.h"
@@ -28,10 +21,6 @@
 
 #include "libGSM.h"
 
-#include "driver/uart.h"
-#include <drivers/uart.h>
-
-#include <sys/status.h>
 
 // === GSM configuration that you can set via 'make menuconfig'. ===
 #define UART_GPIO_TX 17
@@ -229,6 +218,7 @@ static void ppp_status_cb(ppp_pcb *pcb, int err_code, void *ctx)
 			#endif
 			xSemaphoreTake(pppos_mutex, PPPOSMUTEX_TIMEOUT);
 			gsm_status = GSM_STATE_CONNECTED;
+			sendStatus(err_code , "connected");
 			xSemaphoreGive(pppos_mutex);
 			break;
 		}
@@ -1131,31 +1121,3 @@ int smsDelete(int idx)
 	return atCmd_waitResponse(buf, GSM_OK_Str, NULL, -1, 5000, NULL, 0);
 }
 
-static int ppp_setup(lua_State* L){
-    tcpip_adapter_init();
-    int code = 0;
-	code = ppposInit;
-	lua_pushinteger(L, code);
-    return 1;
-}
-
-//class map
-static const LUA_REG_TYPE ppp_map[] = {
-    { LSTRKEY( "setup" ),  LFUNCVAL( ppp_setup )},
-    { LNILKEY, LNILVAL }
-};
-
-
-LUALIB_API int luaopen_ppp( lua_State *L ) {
-	luaState = L;
-#if !LUA_USE_ROTABLE
-    luaL_newlib(L, ppp_map);
-    return 1;
-#else
-	return 0;
-#endif
-}
-
-MODULE_REGISTER_MAPPED(PPP, ppp, ppp_map, luaopen_ppp)
-
-#endif
