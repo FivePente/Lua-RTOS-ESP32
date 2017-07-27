@@ -309,4 +309,9 @@ function runDevice()
     end
 end
 
-runDevice()
+while true do
+    if mqttConnected == 1 then
+        runDevice()
+        break
+    end
+end
