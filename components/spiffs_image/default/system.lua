@@ -3,15 +3,15 @@ os.logcons(true)           -- Enable/disable sys log messages to console
 os.shell(true)             -- Enable/disable shell
 os.history(false)          -- Enable/disable history
 
-pppConnected = 0
+netConnected = 0
 mqttConnected = 0
 sensorInited = 0
 initFlag = 0
 
 msgQueue = adxl345.initQueue()
 
-local useGSM = 0
-local useWIFI = 1
+--0 wifi  1 uart DTU 2 lora
+local netMode = 0
 
 led_pin = pio.GPIO27
 pio.pin.setdir(pio.OUTPUT, led_pin)
@@ -19,7 +19,7 @@ pio.pin.setdir(pio.OUTPUT, led_pin)
 function systemLed()
 
     while true do
-        if pppConnected == 0 then
+        if netConnected == 0 then
             pio.pin.sethigh(led_pin)
             thread.sleepms(30)
             pio.pin.setlow(led_pin)
@@ -51,14 +51,12 @@ function initMainSubscribe(mqttClient)
     end)
     mqttClient:subscribe("initConfig", mqtt.QOS2, function(len , message)
         initFlag = 1
-        --initConfig()
         if message ~= nil and message ~= "" then
             assert(load(message))()
         end
     end)
 end
 
---function sendData(topic , message , qos)
 function sendData()
     if mqttConnected == 1 then
         local d , x , y , w , t = msgQueue:receive()
@@ -66,7 +64,6 @@ function sendData()
             print("send....")
             local str = string.format('{"d":%0.2f, "x":%0.2f , "y":%0.2f , "w":%0.2f , "t":%d}' , d , x , y , w ,t)
             client:publish("data", str , 0)
-            watchTime = os.clock()
         end
     end
 end
@@ -104,24 +101,16 @@ function startupMqtt()
 end
 
 thread.start(systemLed)
-if useWIFI == 1 then
+
+if netMode == 0 then
     net.wf.scan()
     net.wf.setup(net.wf.mode.STA, "HiWiFi_3B0F16","Freedom0806")
-    net.wf.start();
-    pppConnected = 1
+    net.wf.start()
+    netConnected = 1
     net.service.sntp.start()
-end
 
-if useGSM == 1 then
-    ppp.setCallback(function (err_code , message)
-        print("ppp state: " , message)
-        if err_code == 0 then
-            pppConnected = 1
-        else
-            pppConnected = 0
-        end
-    end)
-    ppp.setupXTask()
+elseif netMode == 1 then
+    uart.attach(uart.UART2, 115200, 8, uart.PARNONE, uart.STOP1)
 end
 
 thread.start(startupMqtt)
