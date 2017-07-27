@@ -892,7 +892,6 @@ static const LUA_REG_TYPE ppp_map[] = {
 
 
 LUALIB_API int luaopen_ppp( lua_State *L ) {
-	luaState = L;
 #if !LUA_USE_ROTABLE
     luaL_newlib(L, ppp_map);
     return 1;
