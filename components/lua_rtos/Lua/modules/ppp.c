@@ -44,6 +44,7 @@ static uint8_t conn_ok = 0;
 #define BUF_SIZE (1024)
 // *** If not using hw flow control, set it to 38400
 #define UART_BDRATE 38400
+
 #define GSM_OK_Str "OK"
 
 
