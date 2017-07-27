@@ -113,16 +113,12 @@ if useWIFI == 1 then
 end
 
 if useGSM == 1 then
-    ppp.setCallback(function (err_code , message)
-        print("ppp state: " , message)
-        if err_code == 0 then
-            pppConnected = 1
-        else
-            pppConnected = 0
-        end
-    end)
-    --ppp.setupXTask()
-    thread.start(ppp.setupTask)
-end
 
-thread.start(startupMqtt)
+    pppConnected = ppp.setup()
+
+    if ppp.setup() == 0 then
+        print("PPPoS EXAMPLE", "ERROR: GSM not initialized, HALTED");
+    else
+        thread.start(startupMqtt)
+    end 
+end

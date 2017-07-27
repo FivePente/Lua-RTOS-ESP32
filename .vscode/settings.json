@@ -134,6 +134,8 @@
         "bio.h": "c",
         "inftrees.h": "c",
         "xmlerror.h": "c",
-        "libgsm.h": "c"
+        "libgsm.h": "c",
+        "adc.h": "c",
+        "stepper.h": "c"
     }
 }
