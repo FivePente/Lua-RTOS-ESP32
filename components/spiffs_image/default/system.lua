@@ -110,7 +110,15 @@ if netMode == 0 then
     net.service.sntp.start()
 
 elseif netMode == 1 then
-    uart.attach(uart.UART2, 115200, 8, uart.PARNONE, uart.STOP1)
+    ppp.setCallback(function (err_code , message)
+        print("ppp state: " , message)
+        if err_code == 0 then
+            netConnected = 1
+        else
+            netConnected = 0
+        end
+    end)
+    ppp.setupXTask()
 end
 
 thread.start(startupMqtt)
