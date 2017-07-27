@@ -11,7 +11,7 @@ initFlag = 0
 msgQueue = adxl345.initQueue()
 
 --0 wifi  1 uart DTU 2 lora
-local netMode = 0
+local netMode = 1
 
 led_pin = pio.GPIO27
 pio.pin.setdir(pio.OUTPUT, led_pin)
@@ -70,7 +70,7 @@ end
 
 function startupMqtt()
     while true do
-        if pppConnected == 1 then
+        if netConnected == 1 then
             net.service.sntp.start()
             print("start connection mqtt")
             client = mqtt.client("esp32", "60.205.82.208", 1883, false)
