@@ -39,11 +39,7 @@
 #define UART_BDRATE 115200
 #define CONFIG_GSM_APN ""
 
-#ifdef CONFIG_GSM_DEBUG
 #define GSM_DEBUG 1
-#else
-#define GSM_DEBUG 0
-#endif
 #define BUF_SIZE (1024)
 #define GSM_OK_Str "OK"
 #define PPPOSMUTEX_TIMEOUT 1000 / portTICK_RATE_MS
