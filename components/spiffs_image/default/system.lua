@@ -114,7 +114,7 @@ end
 
 if useGSM == 1 then
 
-    pppConnected = ppp.setup()
+    --pppConnected = ppp.setup()
 
     if pppConnected == 0 then
         print("PPPoS EXAMPLE", "ERROR: GSM not initialized, HALTED");
