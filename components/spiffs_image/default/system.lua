@@ -10,8 +10,8 @@ initFlag = 0
 
 msgQueue = adxl345.initQueue()
 
-local useGSM = 0
-local useWIFI = 1
+local useGSM = 1
+local useWIFI = 0
 
 led_pin = pio.GPIO27
 pio.pin.setdir(pio.OUTPUT, led_pin)
