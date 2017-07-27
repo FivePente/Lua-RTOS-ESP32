@@ -119,8 +119,8 @@ if useGSM == 1 then
             pppConnected = 0
         end
     end)
-    ppp.setupXTask()
-    --thread.start(ppp.setupTask)
+    --ppp.setupXTask()
+    thread.start(ppp.setupTask)
 end
 
 thread.start(startupMqtt)
