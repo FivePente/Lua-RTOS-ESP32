@@ -113,8 +113,8 @@ static GSM_Cmd cmd_Reset =
 
 static GSM_Cmd cmd_RFOn =
 {
-	.cmd = "AT+CFUN=1\r\n",
-	.cmdSize = sizeof("ATCFUN=1,0\r\n")-1,
+	.cmd = "AT+CFUN=4\r\n",
+	.cmdSize = sizeof("ATCFUN=4,0\r\n")-1,
 	.cmdResponseOnOk = GSM_OK_Str,
 	.timeoutMs = 10000,
 	.delayMs = 1000,
@@ -179,7 +179,6 @@ static GSM_Cmd *GSM_Init[] =
 		&cmd_Reset,
 		&cmd_EchoOff,
 		&cmd_RFOn,
-		&cmd_NoSMSInd,
 		&cmd_Pin,
 		&cmd_Reg,
 		&cmd_APN,
@@ -506,9 +505,9 @@ static void pppos_client_task()
     	goto exit;
     }
 
-    if (gpio_set_direction(UART_GPIO_TX, GPIO_MODE_OUTPUT)) goto exit;
-	if (gpio_set_direction(UART_GPIO_RX, GPIO_MODE_INPUT)) goto exit;
-	if (gpio_set_pull_mode(UART_GPIO_RX, GPIO_PULLUP_ONLY)) goto exit;
+    //if (gpio_set_direction(UART_GPIO_TX, GPIO_MODE_OUTPUT)) goto exit;
+	//if (gpio_set_direction(UART_GPIO_RX, GPIO_MODE_INPUT)) goto exit;
+	//if (gpio_set_pull_mode(UART_GPIO_RX, GPIO_PULLUP_ONLY)) goto exit;
 
 	char PPP_ApnATReq[sizeof(CONFIG_GSM_APN)+24];
 	
