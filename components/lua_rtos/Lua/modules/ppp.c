@@ -36,7 +36,7 @@
 // === GSM configuration that you can set via 'make menuconfig'. ===
 #define UART_GPIO_TX 17
 #define UART_GPIO_RX 16
-#define UART_BDRATE 115200
+#define UART_BDRATE 38400
 #define CONFIG_GSM_APN "playmetric"
 
 #define GSM_DEBUG 1
