@@ -147,8 +147,8 @@ GSM_Cmd GSM_MGR_InitCmds[] =
 				.timeoutMs = 10000,
 		},
 		{
-				.cmd = "AT+CGDCONT=1,\"IP\",\"playmetric\"\r", //playmetric , CMMTM
-				.cmdSize = sizeof("AT+CGDCONT=1,\"IP\",\"playmetric\"\r")-1,
+				.cmd = "AT+CGDCONT=1,\"IP\",\"CMMTM\"\r", //playmetric , CMMTM
+				.cmdSize = sizeof("AT+CGDCONT=1,\"IP\",\"CMMTM\"\r")-1,
 				.cmdResponseOnOk = GSM_OK_Str,
 				.timeoutMs = 8000,
 		},
