@@ -143,7 +143,7 @@ GSM_Cmd GSM_MGR_InitCmds[] =
 		{
 				.cmd = "AT+CREG?\r\n",
 				.cmdSize = sizeof("AT+CREG?\r\n")-1,
-				.cmdResponseOnOk = "CREG: 0,1",
+				.cmdResponseOnOk = GSM_OK_Str, //"CREG: 0,1",
 				.timeoutMs = 10000,
 		},
 		{
