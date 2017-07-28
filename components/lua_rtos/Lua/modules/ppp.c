@@ -103,7 +103,6 @@ GSM_Cmd GSM_MGR_InitCmds[] =
 				.cmdResponseOnOk = GSM_OK_Str,
 				.timeoutMs = 300,
 		},
-		/*
 		{
 				.cmd = "AT+CCID\r\n",
 				.cmdSize = sizeof("AT+CCID\r\n")-1,
@@ -112,29 +111,16 @@ GSM_Cmd GSM_MGR_InitCmds[] =
 		},
 		{
 				.cmd = "AT+CFUN=1\r\n",
-				.cmdSize = sizeof("ATCFUN=1\r\n")-1,
+				.cmdSize = sizeof("AT+CFUN=1\r\n")-1,
 				.cmdResponseOnOk = GSM_OK_Str,
 				.timeoutMs = 3000,
-		},*/
-		
+		},
 		{
 				.cmd = "AT+CGCLASS=\"B\"\r\n",
 				.cmdSize = sizeof("AT+CGCLASS=\"B\"\r\n")-1,
 				.cmdResponseOnOk = GSM_OK_Str,
 				.timeoutMs = 10000,
-		},/*
-		{
-				.cmd = "AT+CGATT=1\r\n",
-				.cmdSize = sizeof("AT+CGATT=1\r\n")-1,
-				.cmdResponseOnOk = GSM_OK_Str,
-				.timeoutMs = 10000,
 		},
-		{
-				.cmd = "AT+CGACT=1,1\r\n",
-				.cmdSize = sizeof("AT+CGACT=1,1\r\n")-1,
-				.cmdResponseOnOk = GSM_OK_Str,
-				.timeoutMs = 10000,
-		},*/
 		{
 				.cmd = "AT+CPIN?\r\n",
 				.cmdSize = sizeof("AT+CPIN?\r\n")-1,
