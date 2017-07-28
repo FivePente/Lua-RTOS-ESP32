@@ -427,8 +427,8 @@ static void pppos_client_task()
 		}
 		conn_ok = 99;
 		pppapi_set_default(ppp);
-		pppapi_set_auth(ppp, PPPAUTHTYPE_PAP, PPP_User, PPP_Pass);
-		//pppapi_set_auth(ppp, PPPAUTHTYPE_NONE, PPP_User, PPP_Pass);
+		//pppapi_set_auth(ppp, PPPAUTHTYPE_PAP, PPP_User, PPP_Pass);
+		pppapi_set_auth(ppp, PPPAUTHTYPE_NONE, PPP_User, PPP_Pass);
 		pppapi_connect(ppp, 0);
 
 		// *** Handle GSM modem responses ***
