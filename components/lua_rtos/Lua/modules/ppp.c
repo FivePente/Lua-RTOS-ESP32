@@ -141,12 +141,6 @@ GSM_Cmd GSM_MGR_InitCmds[] =
 				.timeoutMs = 10000,
 		},
 		{
-				.cmd = "AT+CIPTCFG=1\r\n",
-				.cmdSize = sizeof("AT+CIPTCFG=1\r\n")-1,
-				.cmdResponseOnOk = GSM_OK_Str, //"CREG: 0,1",
-				.timeoutMs = 10000,
-		},
-		{
 				.cmd = "AT+CGDCONT=1,\"IP\",\"cmnet\"\r\n", //playmetric , CMMTM
 				.cmdSize = sizeof("AT+CGDCONT=1,\"IP\",\"cmnet\"\r\n")-1,
 				.cmdResponseOnOk = GSM_OK_Str,
