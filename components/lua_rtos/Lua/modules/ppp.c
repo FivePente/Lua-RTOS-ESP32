@@ -119,7 +119,7 @@ GSM_Cmd GSM_MGR_InitCmds[] =
 		{
 				.cmd = "AT+CFUN=1\r\n",
 				.cmdSize = sizeof("ATCFUN=1,0\r\n")-1,
-				.cmdResponseOnOk = GSM_OK_Str,
+				.cmdResponseOnOk = "CINIT: 1, 0, 0",
 				.timeoutMs = 10000,
 		},
 		{
