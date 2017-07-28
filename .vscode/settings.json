@@ -136,6 +136,8 @@
         "xmlerror.h": "c",
         "libgsm.h": "c",
         "adc.h": "c",
-        "stepper.h": "c"
+        "stepper.h": "c",
+        "dsa.h": "c",
+        "ecdsa.h": "c"
     }
 }

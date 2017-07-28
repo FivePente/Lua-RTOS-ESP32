@@ -122,6 +122,31 @@ GSM_Cmd GSM_MGR_InitCmds[] =
 				.cmdResponseOnOk = GSM_OK_Str,
 				.timeoutMs = 10000,
 		},*/
+		
+		{
+				.cmd = "AT+CIPSHUT\r\n", //playmetric , CMMTM
+				.cmdSize = sizeof("AT+CIPSHUT\r\n")-1,
+				.cmdResponseOnOk = GSM_OK_Str,
+				.timeoutMs = 10000,
+		},
+		{
+				.cmd = "AT+CGDCONT=1,\"IP\",\"CMMTM\"\r", //playmetric , CMMTM
+				.cmdSize = sizeof("AT+CGDCONT=1,\"IP\",\"CMMTM\"\r")-1,
+				.cmdResponseOnOk = GSM_OK_Str,
+				.timeoutMs = 10000,
+		},
+		{
+				.cmd = "AT+CSTT=\"CMMTM\",\"\",\"\"\r\n", //playmetric , CMMTM
+				.cmdSize = sizeof("AT+CGDCONT=1,\"IP\",\"playmetric\"\r\n")-1,
+				.cmdResponseOnOk = GSM_OK_Str,
+				.timeoutMs = 10000,
+		},
+		{
+				.cmd = "AT+CGACT=1,1\r\n",
+				.cmdSize = sizeof("AT+CGACT=1,1\r\n")-1,
+				.cmdResponseOnOk = GSM_OK_Str,
+				.timeoutMs = 10000,
+		},
 		{
 				.cmd = "AT+CGATT=1\r\n",
 				.cmdSize = sizeof("AT+CGATT=1\r\n")-1,
@@ -129,8 +154,8 @@ GSM_Cmd GSM_MGR_InitCmds[] =
 				.timeoutMs = 10000,
 		},
 		{
-				.cmd = "AT+CGACT=1,1\r\n",
-				.cmdSize = sizeof("AT+CGACT=1,1\r\n")-1,
+				.cmd = "AT+CIPMUX=1\r\n",
+				.cmdSize = sizeof("AT+CIPMUX=1\r\n")-1,
 				.cmdResponseOnOk = GSM_OK_Str,
 				.timeoutMs = 10000,
 		},
@@ -146,12 +171,7 @@ GSM_Cmd GSM_MGR_InitCmds[] =
 				.cmdResponseOnOk = GSM_OK_Str, //"CREG: 0,1",
 				.timeoutMs = 10000,
 		}/*,
-		{
-				.cmd = "AT+CGDCONT=1,\"IP\",\"CMMTM\"\r", //playmetric , CMMTM
-				.cmdSize = sizeof("AT+CGDCONT=1,\"IP\",\"CMMTM\"\r")-1,
-				.cmdResponseOnOk = GSM_OK_Str,
-				.timeoutMs = 8000,
-		},
+
 		{
 				//.cmd = "AT+CGDATA=\"PPP\",1\r\n",
 				//.cmdSize = sizeof("AT+CGDATA=\"PPP\",1\r\n")-1,
