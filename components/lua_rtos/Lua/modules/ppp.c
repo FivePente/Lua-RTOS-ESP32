@@ -131,13 +131,13 @@ GSM_Cmd GSM_MGR_InitCmds[] =
 		{
 				.cmd = "AT+CPIN?\r\n",
 				.cmdSize = sizeof("AT+CPIN?\r\n")-1,
-				.cmdResponseOnOk = "CPIN: READY",
+				.cmdResponseOnOk = GSM_OK_Str, //"CPIN: READY",
 				.timeoutMs = 10000,
 		},
 		{
 				.cmd = "AT+CREG?\r\n",
 				.cmdSize = sizeof("AT+CREG?\r\n")-1,
-				.cmdResponseOnOk = "CREG: 0,1",
+				.cmdResponseOnOk = GSM_OK_Str, //"CREG: 0,1",
 				.timeoutMs = 10000,
 		},
 		{
@@ -147,8 +147,10 @@ GSM_Cmd GSM_MGR_InitCmds[] =
 				.timeoutMs = 10000,
 		},
 		{
-				.cmd = "AT+CGDATA=\"PPP\",1\r\n",
-				.cmdSize = sizeof("AT+CGDATA=\"PPP\",1\r\n")-1,
+				//.cmd = "AT+CGDATA=\"PPP\",1\r\n",
+				//.cmdSize = sizeof("AT+CGDATA=\"PPP\",1\r\n")-1,
+				.cmd = "ATD*99***1#\r\n",
+				.cmdSize = sizeof("ATD*99***1#\r\n")-1,
 				.cmdResponseOnOk = "CONNECT",
 				.timeoutMs = 30000,
 		}
