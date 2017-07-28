@@ -122,13 +122,13 @@ GSM_Cmd GSM_MGR_InitCmds[] =
 				.cmdSize = sizeof("AT+CGCLASS=\"B\"\r\n")-1,
 				.cmdResponseOnOk = GSM_OK_Str,
 				.timeoutMs = 10000,
-		},
+		},/*
 		{
 				.cmd = "AT+CGATT=1\r\n",
 				.cmdSize = sizeof("AT+CGATT=1\r\n")-1,
 				.cmdResponseOnOk = GSM_OK_Str,
 				.timeoutMs = 10000,
-		},/*
+		},
 		{
 				.cmd = "AT+CGACT=1,1\r\n",
 				.cmdSize = sizeof("AT+CGACT=1,1\r\n")-1,
