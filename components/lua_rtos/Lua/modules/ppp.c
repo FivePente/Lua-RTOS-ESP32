@@ -109,13 +109,13 @@ GSM_Cmd GSM_MGR_InitCmds[] =
 				.cmdSize = sizeof("AT+CCID\r\n")-1,
 				.cmdResponseOnOk = GSM_OK_Str,
 				.timeoutMs = 3000,
-		},
+		},*/
 		{
-				.cmd = "AT+CFUN=4\r\n",
-				.cmdSize = sizeof("ATCFUN=4\r\n")-1,
+				.cmd = "AT+CFUN=1\r\n",
+				.cmdSize = sizeof("ATCFUN=1\r\n")-1,
 				.cmdResponseOnOk = GSM_OK_Str,
 				.timeoutMs = 3000,
-		},*/
+		},
 		
 		{
 				.cmd = "AT+CGCLASS=\"B\"\r\n",
