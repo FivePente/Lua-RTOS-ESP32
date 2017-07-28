@@ -145,7 +145,7 @@ GSM_Cmd GSM_MGR_InitCmds[] =
 				.cmdSize = sizeof("AT+CREG?\r\n")-1,
 				.cmdResponseOnOk = GSM_OK_Str, //"CREG: 0,1",
 				.timeoutMs = 10000,
-		},
+		}/*,
 		{
 				.cmd = "AT+CGDCONT=1,\"IP\",\"CMMTM\"\r", //playmetric , CMMTM
 				.cmdSize = sizeof("AT+CGDCONT=1,\"IP\",\"CMMTM\"\r")-1,
@@ -159,7 +159,7 @@ GSM_Cmd GSM_MGR_InitCmds[] =
 	            .cmdSize = sizeof("ATDT*99***1#\r\n")-1,
 				.cmdResponseOnOk = "CONNECT",
 				.timeoutMs = 30000,
-		}
+		}*/
 };
 
 #define GSM_MGR_InitCmdsSize  (sizeof(GSM_MGR_InitCmds)/sizeof(GSM_Cmd))
