@@ -137,7 +137,7 @@ GSM_Cmd GSM_MGR_InitCmds[] =
 		},
 		{
 				.cmd = "AT+CSTT=\"CMMTM\",\"\",\"\"\r\n", //playmetric , CMMTM
-				.cmdSize = sizeof("AT+CGDCONT=1,\"IP\",\"playmetric\"\r\n")-1,
+				.cmdSize = sizeof("AT+CGDCONT=1,\"IP\",\"CMMTM\"\r\n")-1,
 				.cmdResponseOnOk = GSM_OK_Str,
 				.timeoutMs = 10000,
 		},
