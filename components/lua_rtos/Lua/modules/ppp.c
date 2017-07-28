@@ -113,7 +113,7 @@ GSM_Cmd GSM_MGR_InitCmds[] =
 				.cmd = "AT+CFUN=1\r\n",
 				.cmdSize = sizeof("ATCFUN=1,0\r\n")-1,
 				.cmdResponseOnOk = GSM_OK_Str,
-				.timeoutMs = 3000,
+				.timeoutMs = 10000,
 		},
 		{
 				.cmd = "ATE0\r\n",
@@ -125,13 +125,13 @@ GSM_Cmd GSM_MGR_InitCmds[] =
 				.cmd = "AT+CPIN?\r\n",
 				.cmdSize = sizeof("AT+CPIN?\r\n")-1,
 				.cmdResponseOnOk = "CPIN: READY",
-				.timeoutMs = 3000,
+				.timeoutMs = 5000,
 		},
 		{
 				.cmd = "AT+CREG?\r\n",
 				.cmdSize = sizeof("AT+CREG?\r\n")-1,
 				.cmdResponseOnOk = "CREG: 0,1",
-				.timeoutMs = 3000,
+				.timeoutMs = 10000,
 		},
 		{
 				.cmd = "AT+CGDCONT=1,\"IP\",\"playmetric\"\r", //playmetric , CMMTM
