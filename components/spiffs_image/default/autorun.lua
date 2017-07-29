@@ -56,13 +56,10 @@ function initI2C()
     --cd:write(0x38 , 0xA0)
     cd:write(0x2E , 0x00)
     cd:write(0x2D , 0x28)
-
     tmr.delayms(10)
-
-    ad = vl53l0x.init(i2c.I2C0 , i2c.MASTER , 400 , 0x29 , pio.GPIO19 , pio.GPIO23)
-    tmr.delayms(10)
-    ad:startRanging(2)
-
+    --ad = vl53l0x.init(i2c.I2C0 , i2c.MASTER , 400 , 0x29 , pio.GPIO19 , pio.GPIO23)
+    --tmr.delayms(10)
+    --ad:startRanging(2)
     s1 = sensor.attach("DS1820", pio.GPIO25, 0x28ff900f, 0xb316041a)
     s1:set("resolution", 10)
 
@@ -240,7 +237,7 @@ end
 function checkAll()
     temperature = s1:read("temperature")
     if temperature < maxTemp or temperature > minTemp then
-        checkDistance()
+        --checkDistance()
         checkAngleP()
     else
        print("temperature limitation")
