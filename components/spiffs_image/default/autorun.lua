@@ -47,7 +47,7 @@ angleStarted = 0
 local ver = 1.0
 
 function initI2C() 
-    cd = adxl345.init(i2c.I2C0 , i2c.MASTER , 400 , pio.GPIO18 , pio.GPIO19)
+    cd = adxl345.init(i2c.I2C0 , i2c.MASTER , 400 , pio.GPIO19 , pio.GPIO23)
     tmr.delayms(2)
     cd:write(0x2D , 0x00)
     tmr.delayms(2)
@@ -59,11 +59,11 @@ function initI2C()
 
     tmr.delayms(10)
 
-    ad = vl53l0x.init(i2c.I2C0 , i2c.MASTER , 400 , 0x29 , pio.GPIO18 , pio.GPIO19)
+    ad = vl53l0x.init(i2c.I2C0 , i2c.MASTER , 400 , 0x29 , pio.GPIO19 , pio.GPIO23)
     tmr.delayms(10)
     ad:startRanging(2)
 
-    s1 = sensor.attach("DS1820", pio.GPIO21, 0x28ff900f, 0xb316041a)
+    s1 = sensor.attach("DS1820", pio.GPIO35, 0x28ff900f, 0xb316041a)
     s1:set("resolution", 10)
 
     sensorInited = 1
