@@ -11,7 +11,7 @@ initFlag = 0
 msgQueue = adxl345.initQueue()
 
 --0 wifi  1 uart DTU 2 lora
-local netMode = 1
+local netMode = 0
 
 led_pin = pio.GPIO27
 pio.pin.setdir(pio.OUTPUT, led_pin)

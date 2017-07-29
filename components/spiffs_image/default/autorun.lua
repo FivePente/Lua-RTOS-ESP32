@@ -63,7 +63,7 @@ function initI2C()
     tmr.delayms(10)
     ad:startRanging(2)
 
-    s1 = sensor.attach("DS1820", pio.GPIO35, 0x28ff900f, 0xb316041a)
+    s1 = sensor.attach("DS1820", pio.GPIO25, 0x28ff900f, 0xb316041a)
     s1:set("resolution", 10)
 
     sensorInited = 1
