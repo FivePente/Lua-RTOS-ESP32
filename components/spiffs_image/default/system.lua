@@ -13,8 +13,8 @@ msgQueue = adxl345.initQueue()
 --0 wifi  1 uart DTU 2 lora
 local netMode = 0
 
-led_pin = pio.GPIO27
-pio.pin.setdir(pio.OUTPUT, led_pin)
+--led_pin = pio.GPIO27
+--pio.pin.setdir(pio.OUTPUT, led_pin)
 
 function systemLed()
 
@@ -100,7 +100,7 @@ function startupMqtt()
     end
 end
 
-thread.start(systemLed)
+--thread.start(systemLed)
 
 if netMode == 0 then
     net.wf.scan()

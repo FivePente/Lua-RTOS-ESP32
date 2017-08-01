@@ -248,14 +248,14 @@ function getXAngle(x , y , z)
     --local tmp = x / math.sqrt(y*y + z*z)
     --local res = math.atan(tmp)
     res = math.atan(x , math.sqrt(y*y + z*z))
-    return math.deg(res)
+    return math.deg(res) + 180
 end
 
 function getYAngle(x , y , z)
     --local tmp = y / math.sqrt(x*x + z*z)
     --local res = math.atan(tmp)
     local res = math.atan(y , math.sqrt(x*x + z*z))
-    return math.deg(res)
+    return math.deg(res) + 180
 end
 
 function cutNumber(v)
@@ -289,8 +289,6 @@ function runDevice()
     initI2C()
     tmr.delayms(100)
 
-    local timer = os.clock()
-    watchTime = timer
     while true do
         if initFlag == 1 then
             initConfig()
