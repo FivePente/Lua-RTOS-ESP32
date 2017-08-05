@@ -135,7 +135,7 @@ maxX = 0
 minX = 0
 maxY = 0
 minY = 0
---[[
+
 function checkAngle()
     local x = 0
     local y = 0
@@ -181,86 +181,6 @@ function checkAngle()
     
     xList[indexA] = tX - startX                                     
     yList[indexA] = tY - startY
-
-    indexA = indexA + 1
-
-    if indexA > collectionMax then
-    
-        table.sort(xList)
-        table.sort(yList)
-
-        for i= 4, collectionMax - 3 do
-            tX = tX + xList[i]
-            tY = tY + yList[i]
-        end
-
-        tX = tX / (collectionMax - 6)
-        tY = tY / (collectionMax - 6)
-
-        xOutCount = xOutCount + tX
-        yOutCount = yOutCount + tY
-
-        indexCount = indexCount + 1
-        indexA = 1
-    end
-end
-]]
-
-
-function checkAngle()
-    local x = 0
-    local y = 0
-    local z = 0
-    local tX = 0
-    local tY = 0
-    local err = 0
-
-    try(
-        function()
-            x, y , z = cd:read()
-
-            if x > maxX then
-                maxX = x
-            elseif x < minX then
-                minX = x
-            end
-
-            if y > maxY then
-                maxY = y
-            elseif y < minY then
-                minY = y
-            end
-        end,
-        function(where, line, error, message)
-            print("read error init I2C:"..message)
-            err = 1
-            sensorInited = 0
-            cd:close()
-            tmr.delayms(10)
-            initI2C()
-        end
-    )
-
-    if err == 1 then
-        return
-    end
-
-    tX = getXAngle(x , y , z)
-    tY = getYAngle(x , y , z)
-
-    --print(tX.."  "..tY)
-    
-    xList[indexA] = tX - startX                                  
-    yList[indexA] = tY - startY
-
-    if xList[indexA - 1] ~= nil then
-        if (xList[indexA] - xList[indexA - 1] > 0.3) or (xList[indexA - 1] - xList[indexA] > 0.3) then
-            xList[indexA] = xList[indexA - 1] 
-        end
-        if (yList[indexA] - yList[indexA - 1] > 0.3) or (yList[indexA - 1] - yList[indexA] > 0.3) then
-            yList[indexA] = yList[indexA - 1] 
-        end
-    end
 
     indexA = indexA + 1
 

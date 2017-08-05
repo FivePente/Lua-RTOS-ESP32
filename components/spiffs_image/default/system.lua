@@ -13,8 +13,8 @@ msgQueue = adxl345.initQueue()
 --0 wifi  1 uart DTU 2 lora
 local netMode = 0
 
---led_pin = pio.GPIO27
---pio.pin.setdir(pio.OUTPUT, led_pin)
+led_pin = pio.GPIO27
+pio.pin.setdir(pio.OUTPUT, led_pin)
 
 function systemLed()
 
@@ -63,7 +63,7 @@ function sendData()
         if t ~= 0 then
             print("send....")
             local str = string.format('{"d":%0.2f, "x":%0.2f , "y":%0.2f , "w":%0.2f , "t":%d}' , d , x , y , w ,t)
-            client:publish("data", str , 0)
+            client:publish("/free/test", str , 0)
         end
     end
 end
@@ -100,7 +100,7 @@ function startupMqtt()
     end
 end
 
---thread.start(systemLed)
+thread.start(systemLed)
 
 if netMode == 0 then
     net.wf.scan()
